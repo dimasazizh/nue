@@ -410,43 +410,33 @@
       <State name="normal" offset="0 0 64 64"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_AlignedNameBar" size="323 65" texture="Kenshi_UI.png">
-    <BasisSkin type="SubSkin" offset="0 0 323 65" align="Stretch">
-      <State name="normal" offset="0 580 323 65"/>
+  <Resource type="ResourceSkin" name="NUE_PanelBackground" size="128 96" texture="nue_panel_background.png">
+    <BasisSkin type="SubSkin" offset="0 0 6 6" align="Left Top">
+      <State name="normal" offset="0 0 6 6"/>
     </BasisSkin>
-  </Resource>
-  <Resource type="ResourceSkin" name="NUE_AlignedStatusBar" size="238 45" texture="Kenshi_UI.png">
-    <BasisSkin type="SubSkin" offset="0 0 238 45" align="Stretch">
-      <State name="normal" offset="344 752 238 45"/>
+    <BasisSkin type="SubSkin" offset="6 0 116 6" align="HStretch Top">
+      <State name="normal" offset="6 0 116 6"/>
     </BasisSkin>
-  </Resource>
-  <Resource type="ResourceSkin" name="NUE_RightHudBackground" size="490 268" texture="Kenshi_UI.png">
-    <BasisSkin type="SubSkin" offset="0 0 8 8" align="Left Top">
-      <State name="normal" offset="1420 805 8 8"/>
+    <BasisSkin type="SubSkin" offset="122 0 6 6" align="Right Top">
+      <State name="normal" offset="122 0 6 6"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="8 0 474 8" align="HStretch Top">
-      <State name="normal" offset="1428 805 474 8"/>
+    <BasisSkin type="SubSkin" offset="0 6 6 84" align="Left VStretch">
+      <State name="normal" offset="0 6 6 84"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="482 0 8 8" align="Right Top">
-      <State name="normal" offset="1902 805 8 8"/>
+    <BasisSkin type="SubSkin" offset="6 6 116 84" align="Stretch">
+      <State name="normal" offset="6 6 116 84"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 8 8 252" align="Left VStretch">
-      <State name="normal" offset="1420 813 8 252"/>
+    <BasisSkin type="SubSkin" offset="122 6 6 84" align="Right VStretch">
+      <State name="normal" offset="122 6 6 84"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="8 8 474 252" align="Stretch">
-      <State name="normal" offset="1428 813 474 252"/>
+    <BasisSkin type="SubSkin" offset="0 90 6 6" align="Left Bottom">
+      <State name="normal" offset="0 90 6 6"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="482 8 8 252" align="Right VStretch">
-      <State name="normal" offset="1902 813 8 252"/>
+    <BasisSkin type="SubSkin" offset="6 90 116 6" align="HStretch Bottom">
+      <State name="normal" offset="6 90 116 6"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 260 8 8" align="Left Bottom">
-      <State name="normal" offset="1420 1065 8 8"/>
-    </BasisSkin>
-    <BasisSkin type="SubSkin" offset="8 260 474 8" align="HStretch Bottom">
-      <State name="normal" offset="1428 1065 474 8"/>
-    </BasisSkin>
-    <BasisSkin type="SubSkin" offset="482 260 8 8" align="Right Bottom">
-      <State name="normal" offset="1902 1065 8 8"/>
+    <BasisSkin type="SubSkin" offset="122 90 6 6" align="Right Bottom">
+      <State name="normal" offset="122 90 6 6"/>
     </BasisSkin>
   </Resource>
   <Resource type="ResourceSkin" name="NUE_Equipment_back" size="25 25" texture="nue_equipment_sockets.png">

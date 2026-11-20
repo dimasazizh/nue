@@ -4,10 +4,10 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.78342065 0.6574 0.22257935 0.3486" name="NUE_RightHudBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.78342065 0.6574 0.22257935 0.3486" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="-0.006 0.782 0.136 0.224" name="NUE_HealthBackdrop" align="Left Bottom">
+    <Widget type="Widget" skin="NUE_PanelBackground" position_real="-0.006 0.782 0.136 0.224" name="NUE_HealthBackdrop" align="Left Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
     <Widget type="Widget" skin="PanelEmpty" position_real="0.9696508 0.6763046 0.029 0.275" name="ShortcutsPanelHideEdge" align="Right Bottom">
@@ -89,7 +89,7 @@
           <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
-      <Widget type="Widget" skin="NUE_Panel" position_real="0.290 0.10 0.420 0.80" align="Default">
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.290 0.10 0.420 0.80" align="Default">
         <Widget type="ImageBox" skin="ImageBox" position_real="0.1176471 0.0666667 0.7647059 0.8666667" align="Default" name="SpeedPanel">
           <Property key="ImageResource" value="Kenshi_CharacterSpeedSet"/>
           <Property key="ImageGroup" value="Icons"/>
@@ -321,7 +321,7 @@
     </Widget>
     <Widget type="Window" skin="Kenshi_WindowClientBorderDragAndMove" position_real="0.134 0.5222 0.025 0.4764" name="OrdersPanelDragAndMove" align="Left Bottom">
       <Property key="Snap" value="false"/>
-      <Widget type="Widget" skin="NUE_Panel" position_real="0 0 1 1" name="OrdersPanel">
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="OrdersPanel">
         <Property key="Alpha" value="0.94"/>
         <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.104 0.90 0.092" name="OrdersBlockButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
@@ -422,29 +422,29 @@
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 0.701681" name="ExtendingPanel">
         <Property key="InheritsPick" value="true"/>
         <Property key="NeedMouse" value="false"/>
-        <Widget type="Widget" skin="Kenshi_FloatingPanelThinSkin" position_real="0 0 0.7479453 0.10989" name="BountyPanel">
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 0.7479453 0.10989" name="BountyPanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="Widget" skin="Kenshi_GenericTextBoxFlat" position_real="0.00478469 0 1.00478 1.025">
             <Widget type="Widget" skin="PanelEmpty" position_real="0.0333333 0.195122 0.919048 0.609756" name="BountyText"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="NUE_AlignedNameBar" position_real="0 0.0688623 0.7479453 0.167582" name="NamePanel">
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.0688623 0.7479453 0.167582" name="NamePanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.024 0.42623 0.952 0.377049" name="NameText"/>
         </Widget>
-        <Widget type="Widget" skin="NUE_AlignedStatusBar" position_real="0 0.227545 0.7479453 0.10211" name="StatusPanel">
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.227545 0.7479453 0.10211" name="StatusPanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0 1 1" name="HealthText">
             <Property key="TextAlign" value="Center"/>
             <Property key="TextColour" value="0.956863 0.913725 0.835294"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_ExtendedStatsPanelSkin" position_real="0 0.329341 0.7479453 0.722527" name="ExtendedStatsPanel">
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.329341 0.7479453 0.722527" name="ExtendedStatsPanel">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.423237 0.917695 0.481328" name="ExtendedStatsText"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.0246914 0.0494297 0.934156 0.307985" name="StateText"/>
         </Widget>
       </Widget>
-      <Widget type="Widget" skin="Kenshi_StatsPanelSkin" position_real="0 0.701681 0.7479453 0.308824" style="Overlapped" name="StatsPanel">
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.701681 0.7479453 0.308824" style="Overlapped" name="StatsPanel">
         <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.061225 0.917695 0.870748" name="StatsText"/>
       </Widget>
       <Widget type="Button" skin="Kenshi_ExtendedStatsButton" position_real="0.31991865 0.680672 0.108108 0.0630975" style="Overlapped" name="ExtendedStatsButton">
