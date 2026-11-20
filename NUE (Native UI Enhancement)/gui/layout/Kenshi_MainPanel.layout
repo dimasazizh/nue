@@ -7,10 +7,10 @@
     <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.7918413 0.6763046 0.1738095 0.0383639" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.7918413 0.955 0.1738095 0.0438012" name="NUE_GameSpeedBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.79367965 0.955 0.20497115 0.0438012" name="NUE_GameSpeedBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.9696508 0.664 0.029 0.234" name="ShortcutsPanelHideEdge" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.9696508 0.6763046 0.029 0.275" name="ShortcutsPanelHideEdge" align="Right Bottom">
       <Property key="NeedKey" value="true"/>
       <Property key="Alpha" value="0.75"/>
       <Property key="InheritsAlpha" value="false"/>
@@ -52,15 +52,15 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.9425229 0.9568 0.0231279 0.0407617" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.96395895 0.9568 0.03469185 0.0407617" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
-        <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.11 0.123 0.78 0.754" align="Default">
+        <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.123 0.52 0.754" align="Default">
           <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.8347417 0.9568 0.1072293 0.0407617" name="SpeedButtonsPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.85272965 0.9568 0.1072293 0.0407617" name="SpeedButtonsPanel" align="Right Bottom">
       <Property key="Alpha" value="0.85"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0130719 0.0588235 0.2287582 0.8823529" name="TimeSpeedButton1" align="Default">
         <Widget type="Widget" skin="NUE_Icon_pause" name="NUE_Art_TimeSpeedButton1" position_real="0.1657143 0.11 0.6685714 0.78" align="Default">
@@ -358,21 +358,21 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.7938913 0.9568 0.0392472 0.0407617" name="FloorPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.79572965 0.9568 0.053 0.0407617" name="FloorPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.6785714 0.0882353 0.2857143 0.3823529" name="FloorArrowUp" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.0882353 0.2116 0.3823529" name="FloorArrowUp" align="Default">
           <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.6785714 0.5294118 0.2857143 0.3823529" name="FloorArrowDown" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.5294118 0.2116 0.3823529" name="FloorArrowDown" align="Default">
           <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0357143 0.1176471 0.625 0.7647059" name="FloorText" align="Default">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0357143 0.1176471 0.68 0.7647059" name="FloorText" align="Default">
           <Property key="Caption" value="Floor 1"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
