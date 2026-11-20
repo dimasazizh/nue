@@ -4,7 +4,7 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.78342065 0.638 0.22257935 0.368" name="NUE_RightHudBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.78342065 0.6574 0.22257935 0.3486" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
     <Widget type="Widget" skin="NUE_RightHudBackground" position_real="-0.006 0.782 0.136 0.224" name="NUE_HealthBackdrop" align="Left Bottom">
@@ -83,44 +83,44 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.7938913 0.6775 0.0500403 0.0359661" align="Right Bottom" name="NUE_TravelSpeedPanel">
-      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.145 0.252 0.71" name="SpeedArrowLeft" align="Default">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.7938913 0.665 0.0500403 0.0485" align="Right Bottom" name="NUE_TravelSpeedPanel">
+      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.10 0.252 0.80" name="SpeedArrowLeft" align="Default">
         <Widget type="Widget" skin="NUE_Icon_left" name="NUE_Art_SpeedArrowLeft" position_real="0.11 0.266 0.78 0.468" align="Default">
           <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
-      <Widget type="Widget" skin="NUE_Panel" position_real="0.290 0.145 0.420 0.71" align="Default">
+      <Widget type="Widget" skin="NUE_Panel" position_real="0.290 0.10 0.420 0.80" align="Default">
         <Widget type="ImageBox" skin="ImageBox" position_real="0.1176471 0.0666667 0.7647059 0.8666667" align="Default" name="SpeedPanel">
           <Property key="ImageResource" value="Kenshi_CharacterSpeedSet"/>
           <Property key="ImageGroup" value="Icons"/>
           <Property key="ImageName" value="Run"/>
         </Widget>
       </Widget>
-      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.730 0.145 0.252 0.71" name="SpeedArrowRight" align="Default">
+      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.730 0.10 0.252 0.80" name="SpeedArrowRight" align="Default">
         <Widget type="Widget" skin="NUE_Icon_right" name="NUE_Art_SpeedArrowRight" position_real="0.11 0.266 0.78 0.468" align="Default">
           <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8444046 0.6775 0.1212462 0.0359661" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8444046 0.665 0.1212462 0.0485" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="TimeMoneyPanel">
         <Property key="Alpha" value="0.85"/>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0289017 0.0333333 0.283237 0.4666667" align="Default" name="MoneyLabelText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.51 0.09 0.4610983 0.40" align="Default" name="MoneyLabelText">
           <Property key="Caption" value="Money:"/>
-          <Property key="TextAlign" value="Left VCenter"/>
+          <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.3352601 0.0333333 0.6358382 0.4666667" align="Default" name="MoneyAmountText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.51 0.51 0.4610983 0.40" align="Default" name="MoneyAmountText">
           <Property key="Caption" value="c. 100.000"/>
           <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0289017 0.5 0.5028902 0.4666667" align="Default" name="DayText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0289017 0.09 0.44 0.40" align="Default" name="DayText">
           <Property key="Caption" value="Day: 12345"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.6127168 0.5 0.3583815 0.4666667" align="Default" name="TimeText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0289017 0.51 0.44 0.40" align="Default" name="TimeText">
           <Property key="Caption" value="23:38"/>
-          <Property key="TextAlign" value="Right VCenter"/>
+          <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
       </Widget>
     </Widget>
