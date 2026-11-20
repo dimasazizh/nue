@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <MyGUI type="Layout" version="3.2.0">
   <Widget type="Window" skin="Kenshi_WindowCX" position_real="0 0 0.451172 0.735352" layer="Window" name="Root">
-    <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0 0.00423729 0.973684 0.985876" align="Stretch" name="TabsMain">
+    <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0.013158 0.00423729 0.973684 0.985876" align="Stretch" name="TabsMain">
       <Property key="ButtonWidth" value="140"/>
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="MapTab">
         <Property key="Caption" value="MAP"/>
@@ -9,7 +9,7 @@
           <Property key="ButtonWidth" value="140"/>
           <Widget type="TabItem" skin="" name="NUE_ElevationView" position_real="0 0 1 1">
             <Property key="Caption" value="ELEVATION"/>
-            <Widget type="ScrollView" skin="Kenshi_ScrollViewMap" position_real="0 0.062 0.995495 0.885" name="MapScrollView">
+            <Widget type="ScrollView" skin="Kenshi_ScrollViewMap" position_real="0.0022525 0.062 0.995495 0.885" name="MapScrollView">
               <Property key="CanvasSize" value="4096 4096"/>
               <Property key="VisibleHScroll" value="true"/>
               <Property key="VisibleVScroll" value="true"/>
@@ -32,13 +32,13 @@
                 </Widget>
               </Widget>
             </Widget>
-            <Widget type="Button" skin="Kenshi_CenterMapButtonSkin" position_real="0 0.954683 0.027027 0.0422961" align="Left Bottom" name="MapCenterButton">
+            <Widget type="Button" skin="Kenshi_CenterMapButtonSkin" position_real="0.0022525 0.954683 0.027027 0.0422961" align="Left Bottom" name="MapCenterButton">
               <Property key="Caption" value="O"/>
             </Widget>
-            <Widget type="Button" skin="Kenshi_Button1" position_real="0.907658 0.954683 0.027027 0.0422961" align="Right Bottom" name="MapZoomOutButton">
+            <Widget type="Button" skin="Kenshi_Button1" position_real="0.9256755 0.954683 0.027027 0.0422961" align="Right Bottom" name="MapZoomOutButton">
               <Property key="Caption" value="-"/>
             </Widget>
-            <Widget type="Button" skin="Kenshi_Button1" position_real="0.952703 0.954683 0.027027 0.0422961" align="Right Bottom" name="MapZoomInButton">
+            <Widget type="Button" skin="Kenshi_Button1" position_real="0.9707205 0.954683 0.027027 0.0422961" align="Right Bottom" name="MapZoomInButton">
               <Property key="Caption" value="+"/>
             </Widget>
           </Widget>
@@ -75,20 +75,20 @@
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="FactionTab">
         <Property key="Caption" value="FACTION"/>
         <Property key="Visible" value="false"/>
-        <Widget type="ScrollView" skin="Kenshi_ScrollView" position_real="0 0.0120846 0.5 0.983384" align="Stretch" name="RelationsPanel">
+        <Widget type="ScrollView" skin="Kenshi_ScrollView" position_real="0.006757 0.0120846 0.5 0.983384" align="Stretch" name="RelationsPanel">
           <Property key="CanvasAlign" value="Left Top"/>
         </Widget>
-        <Widget type="EditBox" skin="Kenshi_EditBox" position_real="0.601351 0.0770393 0.308559 0.0543807" align="Right Top" name="FactionNameText">
+        <Widget type="EditBox" skin="Kenshi_EditBox" position_real="0.608108 0.0770393 0.308559 0.0543807" align="Right Top" name="FactionNameText">
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.594595 0.0468278 0.308559 0.0256798" align="Right Top" name="lbFactionName">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.601352 0.0468278 0.308559 0.0256798" align="Right Top" name="lbFactionName">
           <Property key="Caption" value="FACTION NAME"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.518018 0.170695 0.468468 0.823263" align="Right VStretch">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.524775 0.170695 0.468468 0.823263" align="Right VStretch">
           <Widget type="Widget" skin="PanelEmpty" position_real="0 0.0146789 0.9375 0.965138" name="FactionInfoPanel"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.603604 0.146526 0.308559 0.0256798" align="Right Top" name="lbFactionInfo">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.610361 0.146526 0.308559 0.0256798" align="Right Top" name="lbFactionInfo">
           <Property key="Caption" value="INFORMATION"/>
           <Property key="TextAlign" value="Center"/>
           <Property key="TextColour" value="#E8BD72"/>
@@ -97,11 +97,11 @@
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="ResearchTab">
         <Property key="Caption" value="RESEARCH"/>
         <Property key="Visible" value="false"/>
-        <Widget type="ListBox" skin="Kenshi_ListBoxEmpty" position_real="0 0.0407855 0.18018 0.351964" name="ResearchTypeList"/>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.186937 0.0407855 0.394144 0.57855">
+        <Widget type="ListBox" skin="Kenshi_ListBoxEmpty" position_real="0.0022525 0.0407855 0.18018 0.351964" name="ResearchTypeList"/>
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.1891895 0.0407855 0.394144 0.57855">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00571429 0.0261097 0.925714 0.932115" align="Stretch" name="BlueprintsAvailablePanel"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.596847 0.0407855 0.38964 0.57855">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.5990995 0.0407855 0.38964 0.57855">
           <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0447761 0.0365854 0.910448 0.926829" name="ResearchQueueList"/>
           <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.0895522 0.170732 0.80597 0.231707" name="ResearchBenchMessage">
             <Property key="Caption" value="Research Bench Message"/>
@@ -111,23 +111,23 @@
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0 0.0196375 0.168919 0.0256798" name="lbResearchTypes">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.0022525 0.0196375 0.168919 0.0256798" name="lbResearchTypes">
           <Property key="Caption" value="TYPES"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.191441 0.0196375 0.382883 0.0256798" name="lbResearchBlueprints">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.1936935 0.0196375 0.382883 0.0256798" name="lbResearchBlueprints">
           <Property key="Caption" value="BLUEPRINTS"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.603604 0.0196375 0.376126 0.0256798" name="lbResearchQueue">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.6058565 0.0196375 0.376126 0.0256798" name="lbResearchQueue">
           <Property key="Caption" value="QUEUE"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0 0.643505 0.490991 0.0256798" name="lbResearchDescription">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.0022525 0.643505 0.490991 0.0256798" name="lbResearchDescription">
           <Property key="Caption" value="DESCRIPTION"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0 0.664653 0.995495 0.330816">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00678733 0.0365297 0.479638 0.913242" name="ResearchDescriptionPanel1"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.50905 0.0365297 0.468326 0.913242" name="ResearchDescriptionPanel2"/>
         </Widget>
@@ -135,52 +135,52 @@
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="CraftTab">
         <Property key="Caption" value="CRAFTING"/>
         <Property key="Visible" value="false"/>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0 0.0120846 0.306306 0.0256798" name="lbCraftingStations">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.0022525 0.0120846 0.306306 0.0256798" name="lbCraftingStations">
           <Property key="Caption" value="STATIONS"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.328829 0.0317221 0.317568 0.593656">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.3310815 0.0317221 0.317568 0.593656">
           <Widget type="Widget" skin="PanelEmpty" position_real="0 0.0254453 0.93617 0.931298" align="Stretch" name="QueueItemsPanel"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.668919 0.0317221 0.317568 0.564955">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.6711715 0.0317221 0.317568 0.564955">
           <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0545455 0.0375 0.909091 0.9375" name="CraftQueue"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0 0.664653 0.995495 0.330816">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00226244 0.0365297 0.443439 0.926941" align="Stretch" name="QueueDescriptionPanel1"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.468326 0.0365297 0.50905 0.913242" align="Stretch" name="QueueDescriptionPanel2"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.675676 0.0120846 0.306306 0.0256798" name="lbCraftingQueue">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.6779285 0.0120846 0.306306 0.0256798" name="lbCraftingQueue">
           <Property key="Caption" value="QUEUE"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0 0.643505 0.644144 0.0256798" name="lbCraftingDescription">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.0022525 0.643505 0.644144 0.0256798" name="lbCraftingDescription">
           <Property key="Caption" value="DESCRIPTION"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.335586 0.0120846 0.306306 0.0256798" name="lbCraftingItems">
+        <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.3378385 0.0120846 0.306306 0.0256798" name="lbCraftingItems">
           <Property key="Caption" value="ITEMS"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="ListBox" skin="Kenshi_ListBoxEmpty" position_real="0 0.0317221 0.317568 0.593656" name="CraftingStationsList"/>
-        <Widget type="Button" skin="Kenshi_TickButton1" position_real="0.675676 0.593656 0.306306 0.0317221" name="QueueRepeat">
+        <Widget type="ListBox" skin="Kenshi_ListBoxEmpty" position_real="0.0022525 0.0317221 0.317568 0.593656" name="CraftingStationsList"/>
+        <Widget type="Button" skin="Kenshi_TickButton1" position_real="0.6779285 0.593656 0.306306 0.0317221" name="QueueRepeat">
           <Property key="Caption" value="Repeat Queue"/>
         </Widget>
       </Widget>
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="SquadsTab">
         <Property key="Caption" value="SQUADS"/>
         <Property key="Visible" value="false"/>
-        <Widget type="TextBox" skin="Kenshi_GenericTextBoxFlat" position_real="0.824324 0.00302115 0.162162 0.0543807" name="FactionSizeText">
+        <Widget type="TextBox" skin="Kenshi_GenericTextBoxFlat" position_real="0.8265765 0.00302115 0.162162 0.0543807" name="FactionSizeText">
           <Property key="Caption" value="20/256"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="Button" skin="Kenshi_Button2" position_real="0.646396 0.0135952 0.166667 0.0377644" name="NewSquadButton">
+        <Widget type="Button" skin="Kenshi_Button2" position_real="0.6486485 0.0135952 0.166667 0.0377644" name="NewSquadButton">
           <Property key="Caption" value="NEW SQUAD"/>
         </Widget>
-        <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0 0.0770393 0.995495 0.862538" name="SquadsPanel">
+        <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0022525 0.0770393 0.995495 0.862538" name="SquadsPanel">
           <Property key="NeedDragDrop" value="true"/>
           <Property key="VerticalAlignment" value="true"/>
         </Widget>
-        <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.621622 0.944109 0.364865 0.0543807" name="DismissCharPanel">
+        <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.6238745 0.944109 0.364865 0.0543807" name="DismissCharPanel">
           <Property key="NeedDragDrop" value="true"/>
           <Widget type="TextBox" skin="Kenshi_GenericTextBoxFlat" position_real="0 0 0.981366 1" align="Stretch" name="lbSquadsDismiss">
             <Property key="Caption" value="DRAG HERE TO DISMISS"/>
@@ -191,7 +191,7 @@
       </Widget>
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424" name="MessagesTab">
         <Property key="Caption" value="DIALOGUE"/>
-        <Widget type="EditBox" skin="Kenshi_WordWrap" position_real="0 0.00302115 0.988739 0.983384" align="Stretch" name="MessagesTextBox">
+        <Widget type="EditBox" skin="Kenshi_WordWrap" position_real="0.0056305 0.00302115 0.988739 0.983384" align="Stretch" name="MessagesTextBox">
           <Property key="MultiLine" value="true"/>
           <Property key="Static" value="true"/>
           <Property key="ReadOnly" value="true"/>
@@ -202,8 +202,8 @@
       </Widget>
       <Widget type="TabItem" skin="" position_real="0 0.0501433 1 0.948424">
         <Property key="Caption" value="AI"/>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.00900901 0.844411 1 0.149547" align="Stretch" name="AIToolTip"/>
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.0225225 0.00755287 0.97973 0.823263" align="Stretch" name="AIOptions"/>
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.00900901 0.844411 0.98198198 0.149547" align="Stretch" name="AIToolTip"/>
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.00900901 0.00755287 0.98198198 0.823263" align="Stretch" name="AIOptions"/>
       </Widget>
     </Widget>
   </Widget>
