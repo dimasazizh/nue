@@ -4,48 +4,43 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.8248413 0.6763046 0.1738095 0.123" name="NUE_RightHudBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.8248413 0.6763046 0.1738095 0.0383639" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="Kenshi_Input1OutputLineSkin" position_real="0.8274455 0.7141520 0.1686011 0.0046296" name="NUE_RightHudFloorDivider" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.8248413 0.955 0.1738095 0.0438012" name="NUE_GameSpeedBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
-      <Property key="Alpha" value="0.90"/>
     </Widget>
-    <Widget type="Widget" skin="Kenshi_Input1OutputLineSkin" position_real="0.8274455 0.7585103 0.1686011 0.0046296" name="NUE_RightHudMoneyDivider" align="Right Bottom">
-      <Property key="NeedMouse" value="false"/>
-      <Property key="Alpha" value="0.90"/>
-    </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.8248413 0.6763046 0.1738095 0.0383639" name="ShortcutsPanelHideEdge" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.177 0.664 0.029 0.234" name="ShortcutsPanelHideEdge" align="Left Bottom">
       <Property key="NeedKey" value="true"/>
       <Property key="Alpha" value="0.75"/>
       <Property key="InheritsAlpha" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="ShortcutsPanel" align="Default">
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0080645 0.0625 0.1572581 0.875" align="Default" name="ShortcutInventoryButton">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.025 0.0104167 0.95 0.1458333" align="Default" name="ShortcutInventoryButton">
           <Widget type="Widget" skin="NUE_Icon_inventory" name="NUE_Art_ShortcutInventoryButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.1733871 0.0625 0.1572581 0.875" align="Default" name="ShortcutStatsButton">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.025 0.1770833 0.95 0.1458333" align="Default" name="ShortcutStatsButton">
           <Widget type="Widget" skin="NUE_Icon_stats" name="NUE_Art_ShortcutStatsButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.3387097 0.0625 0.1572581 0.875" align="Default" name="ShortcutMapButton">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.025 0.3437500 0.95 0.1458333" align="Default" name="ShortcutMapButton">
           <Widget type="Widget" skin="NUE_Icon_map" name="NUE_Art_ShortcutMapButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_IconOnlyButtonSurface" position_real="0.5040323 0.0625 0.1572581 0.875" align="Default" name="ShortcutTechButton">
+        <Widget type="Button" skin="NUE_IconOnlyButtonSurface" position_real="0.025 0.5104167 0.95 0.1458333" align="Default" name="ShortcutTechButton">
           <Widget type="Widget" skin="NUE_Icon_research" name="NUE_Art_ShortcutTechButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.6693548 0.0625 0.1572581 0.875" align="Default" name="ShortcutSquadButton">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.025 0.6770833 0.95 0.1458333" align="Default" name="ShortcutSquadButton">
           <Widget type="Widget" skin="NUE_Icon_squad" name="NUE_Art_ShortcutSquadButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.8346774 0.0625 0.1572581 0.875" align="Default" name="ShortcutHelpButton">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.025 0.8437500 0.95 0.1458333" align="Default" name="ShortcutHelpButton">
           <Widget type="Widget" skin="NUE_Icon_help" name="NUE_Art_ShortcutHelpButton" position_real="0.22 0.11 0.56 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
@@ -57,7 +52,7 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.9755229 0.7182651 0.0231279 0.0407617" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.9755229 0.9568 0.0231279 0.0407617" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
         <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.11 0.123 0.78 0.754" align="Default">
@@ -65,7 +60,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.8677417 0.7182651 0.1072293 0.0407617" name="SpeedButtonsPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.8677417 0.9568 0.1072293 0.0407617" name="SpeedButtonsPanel" align="Right Bottom">
       <Property key="Alpha" value="0.85"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0130719 0.0588235 0.2287582 0.8823529" name="TimeSpeedButton1" align="Default">
         <Widget type="Widget" skin="NUE_Icon_pause" name="NUE_Art_TimeSpeedButton1" position_real="0.1657143 0.11 0.6685714 0.78" align="Default">
@@ -88,7 +83,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.8268913 0.7626234 0.0500403 0.0359661" align="Right Bottom" name="NUE_TravelSpeedPanel">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.8268913 0.6775 0.0500403 0.0359661" align="Right Bottom" name="NUE_TravelSpeedPanel">
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.145 0.252 0.71" name="SpeedArrowLeft" align="Default">
         <Widget type="Widget" skin="NUE_Icon_left" name="NUE_Art_SpeedArrowLeft" position_real="0.11 0.266 0.78 0.468" align="Default">
           <Property key="NeedMouse" value="false"/>
@@ -107,7 +102,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8774046 0.7626234 0.1212462 0.0359661" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8774046 0.6775 0.1212462 0.0359661" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="TimeMoneyPanel">
         <Property key="Alpha" value="0.85"/>
@@ -363,7 +358,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8268913 0.7182651 0.0392472 0.0407617" name="FloorPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.8268913 0.9568 0.0392472 0.0407617" name="FloorPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
@@ -383,7 +378,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.8248413 0.8021862 0.1738095 0.1966149" name="SquadPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.8248413 0.716 0.1738095 0.237" name="SquadPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="true"/>
       <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
         <Property key="ButtonAutoWidth" value="false"/>
