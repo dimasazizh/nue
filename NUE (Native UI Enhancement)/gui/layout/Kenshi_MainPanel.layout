@@ -4,10 +4,10 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.7918413 0.6763046 0.1738095 0.0383639" name="NUE_RightHudBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.775 0.638 0.225 0.362" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0.79367965 0.955 0.20497115 0.0438012" name="NUE_GameSpeedBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0 0.782 0.132 0.218" name="NUE_HealthBackdrop" align="Left Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
     <Widget type="Widget" skin="PanelEmpty" position_real="0.9696508 0.6763046 0.029 0.275" name="ShortcutsPanelHideEdge" align="Right Bottom">
@@ -128,7 +128,7 @@
       <Property key="Snap" value="true"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="MedicalPanel">
         <Property key="Depth" value="0"/>
-        <Widget type="Widget" skin="NUE_RightHudBackground" position_real="0 0 1 1" name="MedicalPanel_Back">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="MedicalPanel_Back">
           <Property key="Depth" value="1"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.403 0.055 0.385 0.032" name="LifeBar1" align="Default">
             <Property key="NeedMouse" value="true"/>
