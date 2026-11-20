@@ -491,36 +491,40 @@
     <Widget type="Widget" skin="PanelEmpty" position_real="0 0.287 0.1738095 0.506347" style="Overlapped" name="InformationPanel" align="Left Bottom">
       <Property key="InheritsPick" value="true"/>
       <Property key="NeedMouse" value="false"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 0.701681" name="ExtendingPanel">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="ExtendingPanel">
         <Property key="InheritsPick" value="true"/>
         <Property key="NeedMouse" value="false"/>
-        <Widget type="Widget" skin="Kenshi_FloatingPanelThinSkin" position_real="0 0 0.7479453 0.10989" name="BountyPanel">
+        <Widget type="Widget" skin="Kenshi_FloatingPanelThinSkin" position_real="0 0 0.7479453 0.0771077" name="BountyPanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="Widget" skin="Kenshi_GenericTextBoxFlat" position_real="0.00478469 0 1.00478 1.025">
             <Widget type="Widget" skin="PanelEmpty" position_real="0.0333333 0.195122 0.919048 0.609756" name="BountyText"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="NUE_AlignedNameBar" position_real="0 0.0688623 0.7479453 0.167582" name="NamePanel">
+        <Widget type="Widget" skin="NUE_AlignedNameBar" position_real="0 0.0483194 0.7479453 0.1175891" name="NamePanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.024 0.42623 0.952 0.377049" name="NameText"/>
         </Widget>
-        <Widget type="Widget" skin="NUE_AlignedStatusBar" position_real="0 0.227545 0.7479453 0.10211" name="StatusPanel">
+        <Widget type="Widget" skin="NUE_AlignedStatusBar" position_real="0 0.1596640 0.7479453 0.0716486" name="StatusPanel">
           <Property key="Alpha" value="0.85"/>
           <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0 1 1" name="HealthText">
             <Property key="TextAlign" value="Center"/>
             <Property key="TextColour" value="0.956863 0.913725 0.835294"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_ExtendedStatsPanelSkin" position_real="0 0.329341 0.7479453 0.722527" name="ExtendedStatsPanel">
-          <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.423237 0.917695 0.481328" name="ExtendedStatsText"/>
-          <Widget type="Widget" skin="PanelEmpty" position_real="0.0246914 0.0494297 0.934156 0.307985" name="StateText"/>
+        <Widget type="Widget" skin="PanelEmpty" position_real="0 0.2310923 0.7479453 0.7689077" name="ExtendedStatsPanel">
+          <Property key="Visible" value="false"/>
+          <Widget type="Widget" skin="Kenshi_ExtendedStatsPanelSkin" position_real="0 0 1 0.6593554">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+          <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.2790636 0.917695 0.3173662" name="ExtendedStatsText"/>
+          <Widget type="Widget" skin="PanelEmpty" position_real="0.0246914 0.0325917 0.934156 0.2030716" name="StateText"/>
+          <Widget type="Widget" skin="Kenshi_StatsPanelSkin" position_real="0 0.6120223 1 0.3879777" name="StatsPanel">
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.061225 0.917695 0.870748" name="StatsText"/>
+          </Widget>
         </Widget>
       </Widget>
-      <Widget type="Widget" skin="Kenshi_StatsPanelSkin" position_real="0 0.701681 0.7479453 0.308824" style="Overlapped" name="StatsPanel">
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.061225 0.917695 0.870748" name="StatsText"/>
-      </Widget>
       <Widget type="Button" skin="Kenshi_ExtendedStatsButton" position_real="0.31991865 0.680672 0.108108 0.0630975" style="Overlapped" name="ExtendedStatsButton">
-        <Property key="StateSelected" value="true"/>
+        <Property key="StateSelected" value="false"/>
       </Widget>
     </Widget>
     <Widget type="Widget" skin="Kenshi_FloatingPanelSkin" position_real="0.1825397 0.9040903 0.2063492 0.0916784" layer="MiddleFront" name="TooltipPanel" align="Left Bottom">
