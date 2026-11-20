@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MyGUI type="Layout" version="3.2.0">
+  <Widget type="Window" skin="NUE_CompactStatsWindow" position_real="0 0 0.568 0.695" layer="Window" name="Root">
+    <Property key="Caption" value=""/>
+    <Property key="MinSize" value="0 704"/>
+    <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.012000 0.403099 0.180000 0.031920" name="lbAttributes">
+      <Property key="Caption" value="ATTRIBUTES"/>
+      <Property key="TextAlign" value="Center"/>
+      <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+      <Property key="Alpha" value="0"/>
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+    </Widget>
+    <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.203000 0.010944 0.785000 0.030096" name="lbSkills">
+      <Property key="Caption" value="SKILLS"/>
+      <Property key="TextAlign" value="Center"/>
+      <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+    <Property key="NeedMouse" value="false"/><Property key="NeedKey" value="false"/><Property key="Alpha" value="0"/></Widget>
+    <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.016000 0.636568 0.697000 0.031920" name="lbDescription">
+      <Property key="Caption" value="DESCRIPTION"/>
+      <Property key="TextAlign" value="Center"/>
+      <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+      <Property key="Alpha" value="0"/>
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+    </Widget>
+    <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.720000 0.636568 0.268000 0.031920" name="lbDerivedStats">
+      <Property key="TextAlign" value="Center"/>
+      <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+      <Property key="Caption" value="DERIVED STATISTICS"/>
+    </Widget>
+    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.720000 0.668487 0.268000 0.229821">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.0547445 0.026087 0.890511 0.947826" align="Stretch" name="StatisticsPanel"/>
+    </Widget>
+    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.272000000 0.037392000 0.723000000 0.649791042">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000000 0.369364261 0.296000000 0.609856925" name="Skills2Panel"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.014206318 0.296000000 0.381541104" name="Skills3Panel"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.388644263 0.296000000 0.611355737" name="Skills4Panel"/>
+      <Widget type="Widget" skin="NUE_Stats_weapons" position_real="0.013000000 0.133945281 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_combat" position_real="0.013000000 0.449528482 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_ranged" position_real="0.013000000 0.659579037 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_thievery" position_real="0.508000000 0.102488435 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_athletics" position_real="0.508000000 0.279052669 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_sciences" position_real="0.508000000 0.479970591 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Stats_trades" position_real="0.508000000 0.764096946 0.045000000 0.074075800">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+    </Widget>
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.272000 0.037377 0.723000 0.463469">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000 0.020000 0.296000 0.495000" name="Skills1Panel"/>
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+    </Widget>
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000 0.455994 1.000000 0.547193">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008 0.06833 0.250 0.35417">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.00791 0.06833 0.250 0.49167">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.125 0.90 0.86" align="HStretch Top" name="AttributesPanel">
+          <Property key="InheritsAlpha" value="false"/>
+        </Widget>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.008 0.005 0.250 0.05833">
+        <Property key="Caption" value="ATTRIBUTES"/>
+        <Property key="TextAlign" value="Center"/>
+        <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+    </Widget>
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000 0.188781 1.000000 0.811219">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008000 0.624946 0.987000 0.360790">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.004000 0.555738 0.991000 0.427869">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.015000 0.193398 0.352000 0.790000" align="HStretch Top" name="Description1Panel"/>
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.383000 0.193398 0.601000 0.790000" name="Description2Panel" align="HStretch Top"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+    </Widget>
+  <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.272000000 0.000000000 0.723000000 0.037392000" name="NUE_SkillsHeading">
+      <Property key="Caption" value="SKILLS"/>
+      <Property key="TextAlign" value="Center"/>
+      <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
+    <Property key="NeedMouse" value="false"/><Property key="NeedKey" value="false"/></Widget>
+    </Widget>
+  <CodeGeneratorSettings/>
+</MyGUI>

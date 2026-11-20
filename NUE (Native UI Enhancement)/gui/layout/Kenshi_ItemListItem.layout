@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MyGUI type="Layout" version="3.2.0">
+  <Widget type="Widget" skin="Kenshi_ConnectBarSkin" position_real="0 0 1 0.9375" align="Stretch" name="Root">
+    <Property key="InheritsPick" value="true"/>
+    <Property key="NeedKey" value="false"/>
+    <Property key="NeedMouse" value="true"/>
+    <Widget type="Widget" skin="Kenshi_Button1" position_real="0 0 0.9 1" align="Stretch">
+      <Property key="NeedKey" value="false"/>
+      <Property key="NeedMouse" value="false"/>
+    </Widget>
+    <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.015 0 0.86 1" align="Stretch" name="ItemName">
+      <Property key="Caption" value="Item Name"/>
+      <Property key="NeedKey" value="false"/>
+      <Property key="NeedMouse" value="false"/>
+      <Property key="TextAlign" value="Left VCenter"/>
+      <Property key="TextColour" value="0.803922 0.741176 0.654902"/>
+    </Widget>
+    <Widget type="Button" skin="Kenshi_Button1" position_real="0.9 0 0.1 1" align="Right VStretch" name="RemoveButton">
+      <Property key="Caption" value="X"/>
+      <Property key="TextColour" value="0.949020 0.607843 0.501961"/>
+    </Widget>
+    <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.015 0 0.86 1" align="Stretch" name="ItemValue">
+      <Property key="Caption" value="0"/>
+      <Property key="TextColour" value="0.803922 0.741176 0.654902"/>
+      <Property key="TextAlign" value="Right VCenter"/>
+      <Property key="NeedMouse" value="false"/>
+    </Widget>
+    <Widget type="Widget" skin="Kenshi_LifeBarSkin" position_real="0.015 0.216667 0.86 0.5" align="Stretch" name="Progress">
+      <Property key="NeedMouse" value="false"/>
+    </Widget>
+  </Widget>
+  <CodeGeneratorSettings/>
+</MyGUI>

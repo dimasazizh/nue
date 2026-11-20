@@ -1,0 +1,830 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MyGUI type="Resource" version="1.1">
+  <Resource type="ResourceSkin" name="NUE_ButtonSurface" size="118 45" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 6 6" align="Left Top">
+      <State name="disabled" offset="612 766 6 6"/>
+      <State name="normal" offset="612 766 6 6"/>
+      <State name="highlighted" offset="612 766 6 6"/>
+      <State name="pushed" offset="741 766 6 6"/>
+      <State name="disabled_checked" offset="612 766 6 6"/>
+      <State name="normal_checked" offset="612 766 6 6"/>
+      <State name="highlighted_checked" offset="612 766 6 6"/>
+      <State name="pushed_checked" offset="741 766 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 0 106 6" align="HStretch Top">
+      <State name="disabled" offset="618 766 106 6"/>
+      <State name="normal" offset="618 766 106 6"/>
+      <State name="highlighted" offset="618 766 106 6"/>
+      <State name="pushed" offset="747 766 106 6"/>
+      <State name="disabled_checked" offset="618 766 106 6"/>
+      <State name="normal_checked" offset="618 766 106 6"/>
+      <State name="highlighted_checked" offset="618 766 106 6"/>
+      <State name="pushed_checked" offset="747 766 106 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 0 6 6" align="Right Top">
+      <State name="disabled" offset="724 766 6 6"/>
+      <State name="normal" offset="724 766 6 6"/>
+      <State name="highlighted" offset="724 766 6 6"/>
+      <State name="pushed" offset="853 766 6 6"/>
+      <State name="disabled_checked" offset="724 766 6 6"/>
+      <State name="normal_checked" offset="724 766 6 6"/>
+      <State name="highlighted_checked" offset="724 766 6 6"/>
+      <State name="pushed_checked" offset="853 766 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 6 6 33" align="Right VStretch">
+      <State name="disabled" offset="724 772 6 33"/>
+      <State name="normal" offset="724 772 6 33"/>
+      <State name="highlighted" offset="724 772 6 33"/>
+      <State name="pushed" offset="853 772 6 33"/>
+      <State name="disabled_checked" offset="724 772 6 33"/>
+      <State name="normal_checked" offset="724 772 6 33"/>
+      <State name="highlighted_checked" offset="724 772 6 33"/>
+      <State name="pushed_checked" offset="853 772 6 33"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 39 6 6" align="Right Bottom">
+      <State name="disabled" offset="724 805 6 6"/>
+      <State name="normal" offset="724 805 6 6"/>
+      <State name="highlighted" offset="724 805 6 6"/>
+      <State name="pushed" offset="853 805 6 6"/>
+      <State name="disabled_checked" offset="724 805 6 6"/>
+      <State name="normal_checked" offset="724 805 6 6"/>
+      <State name="highlighted_checked" offset="724 805 6 6"/>
+      <State name="pushed_checked" offset="853 805 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 39 106 6" align="HStretch Bottom">
+      <State name="disabled" offset="618 805 106 6"/>
+      <State name="normal" offset="618 805 106 6"/>
+      <State name="highlighted" offset="618 805 106 6"/>
+      <State name="pushed" offset="747 805 106 6"/>
+      <State name="disabled_checked" offset="618 805 106 6"/>
+      <State name="normal_checked" offset="618 805 106 6"/>
+      <State name="highlighted_checked" offset="618 805 106 6"/>
+      <State name="pushed_checked" offset="747 805 106 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 39 6 6" align="Left Bottom">
+      <State name="disabled" offset="612 805 6 6"/>
+      <State name="normal" offset="612 805 6 6"/>
+      <State name="highlighted" offset="612 805 6 6"/>
+      <State name="pushed" offset="741 805 6 6"/>
+      <State name="disabled_checked" offset="612 805 6 6"/>
+      <State name="normal_checked" offset="612 805 6 6"/>
+      <State name="highlighted_checked" offset="612 805 6 6"/>
+      <State name="pushed_checked" offset="741 805 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 6 6 33" align="Left VStretch">
+      <State name="disabled" offset="612 772 6 33"/>
+      <State name="normal" offset="612 772 6 33"/>
+      <State name="highlighted" offset="612 772 6 33"/>
+      <State name="pushed" offset="741 772 6 33"/>
+      <State name="disabled_checked" offset="612 772 6 33"/>
+      <State name="normal_checked" offset="612 772 6 33"/>
+      <State name="highlighted_checked" offset="612 772 6 33"/>
+      <State name="pushed_checked" offset="741 772 6 33"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 6 106 33" align="Stretch">
+      <State name="disabled" offset="618 772 106 33"/>
+      <State name="normal" offset="618 772 106 33"/>
+      <State name="highlighted" offset="618 772 106 33"/>
+      <State name="pushed" offset="747 772 106 33"/>
+      <State name="disabled_checked" offset="618 772 106 33"/>
+      <State name="normal_checked" offset="618 772 106 33"/>
+      <State name="highlighted_checked" offset="618 772 106 33"/>
+      <State name="pushed_checked" offset="747 772 106 33"/>
+    </BasisSkin>
+    <BasisSkin type="SimpleText" offset="3 3 112 39" align="Stretch">
+      <State name="disabled" colour="0.662745 0.607843 0.537255" shift="0"/>
+      <State name="normal" colour="0.956863 0.913725 0.835294" shift="0"/>
+      <State name="highlighted" colour="1.000000 0.839216 0.600000" shift="0"/>
+      <State name="pushed" colour="0.909804 0.741176 0.447059" shift="0"/>
+      <State name="disabled_checked" colour="0.662745 0.607843 0.537255" shift="0"/>
+      <State name="normal_checked" colour="0.909804 0.741176 0.447059" shift="0"/>
+      <State name="highlighted_checked" colour="1.000000 0.839216 0.600000" shift="0"/>
+      <State name="pushed_checked" colour="0.909804 0.741176 0.447059" shift="0"/>
+    </BasisSkin>
+  </Resource>
+  <!-- Image-only version of the native Kenshi button: no clipped runtime TECH caption. -->
+  <Resource type="ResourceSkin" name="NUE_IconOnlyButtonSurface" size="118 45" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 6 6" align="Left Top">
+      <State name="disabled" offset="612 766 6 6"/>
+      <State name="normal" offset="612 766 6 6"/>
+      <State name="highlighted" offset="612 766 6 6"/>
+      <State name="pushed" offset="741 766 6 6"/>
+      <State name="disabled_checked" offset="612 766 6 6"/>
+      <State name="normal_checked" offset="612 766 6 6"/>
+      <State name="highlighted_checked" offset="612 766 6 6"/>
+      <State name="pushed_checked" offset="741 766 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 0 106 6" align="HStretch Top">
+      <State name="disabled" offset="618 766 106 6"/>
+      <State name="normal" offset="618 766 106 6"/>
+      <State name="highlighted" offset="618 766 106 6"/>
+      <State name="pushed" offset="747 766 106 6"/>
+      <State name="disabled_checked" offset="618 766 106 6"/>
+      <State name="normal_checked" offset="618 766 106 6"/>
+      <State name="highlighted_checked" offset="618 766 106 6"/>
+      <State name="pushed_checked" offset="747 766 106 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 0 6 6" align="Right Top">
+      <State name="disabled" offset="724 766 6 6"/>
+      <State name="normal" offset="724 766 6 6"/>
+      <State name="highlighted" offset="724 766 6 6"/>
+      <State name="pushed" offset="853 766 6 6"/>
+      <State name="disabled_checked" offset="724 766 6 6"/>
+      <State name="normal_checked" offset="724 766 6 6"/>
+      <State name="highlighted_checked" offset="724 766 6 6"/>
+      <State name="pushed_checked" offset="853 766 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 6 6 33" align="Right VStretch">
+      <State name="disabled" offset="724 772 6 33"/>
+      <State name="normal" offset="724 772 6 33"/>
+      <State name="highlighted" offset="724 772 6 33"/>
+      <State name="pushed" offset="853 772 6 33"/>
+      <State name="disabled_checked" offset="724 772 6 33"/>
+      <State name="normal_checked" offset="724 772 6 33"/>
+      <State name="highlighted_checked" offset="724 772 6 33"/>
+      <State name="pushed_checked" offset="853 772 6 33"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="112 39 6 6" align="Right Bottom">
+      <State name="disabled" offset="724 805 6 6"/>
+      <State name="normal" offset="724 805 6 6"/>
+      <State name="highlighted" offset="724 805 6 6"/>
+      <State name="pushed" offset="853 805 6 6"/>
+      <State name="disabled_checked" offset="724 805 6 6"/>
+      <State name="normal_checked" offset="724 805 6 6"/>
+      <State name="highlighted_checked" offset="724 805 6 6"/>
+      <State name="pushed_checked" offset="853 805 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 39 106 6" align="HStretch Bottom">
+      <State name="disabled" offset="618 805 106 6"/>
+      <State name="normal" offset="618 805 106 6"/>
+      <State name="highlighted" offset="618 805 106 6"/>
+      <State name="pushed" offset="747 805 106 6"/>
+      <State name="disabled_checked" offset="618 805 106 6"/>
+      <State name="normal_checked" offset="618 805 106 6"/>
+      <State name="highlighted_checked" offset="618 805 106 6"/>
+      <State name="pushed_checked" offset="747 805 106 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 39 6 6" align="Left Bottom">
+      <State name="disabled" offset="612 805 6 6"/>
+      <State name="normal" offset="612 805 6 6"/>
+      <State name="highlighted" offset="612 805 6 6"/>
+      <State name="pushed" offset="741 805 6 6"/>
+      <State name="disabled_checked" offset="612 805 6 6"/>
+      <State name="normal_checked" offset="612 805 6 6"/>
+      <State name="highlighted_checked" offset="612 805 6 6"/>
+      <State name="pushed_checked" offset="741 805 6 6"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 6 6 33" align="Left VStretch">
+      <State name="disabled" offset="612 772 6 33"/>
+      <State name="normal" offset="612 772 6 33"/>
+      <State name="highlighted" offset="612 772 6 33"/>
+      <State name="pushed" offset="741 772 6 33"/>
+      <State name="disabled_checked" offset="612 772 6 33"/>
+      <State name="normal_checked" offset="612 772 6 33"/>
+      <State name="highlighted_checked" offset="612 772 6 33"/>
+      <State name="pushed_checked" offset="741 772 6 33"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="6 6 106 33" align="Stretch">
+      <State name="disabled" offset="618 772 106 33"/>
+      <State name="normal" offset="618 772 106 33"/>
+      <State name="highlighted" offset="618 772 106 33"/>
+      <State name="pushed" offset="747 772 106 33"/>
+      <State name="disabled_checked" offset="618 772 106 33"/>
+      <State name="normal_checked" offset="618 772 106 33"/>
+      <State name="highlighted_checked" offset="618 772 106 33"/>
+      <State name="pushed_checked" offset="747 772 106 33"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Panel" size="174 68" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 174 68" align="Stretch">
+      <State name="normal" offset="1634 733 174 68"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Body" size="96 128" texture="nue_body.png">
+    <BasisSkin type="SubSkin" offset="0 0 96 128" align="Stretch">
+      <State name="normal" offset="0 0 96 128"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_medic" size="64 64" texture="nue_icon_medic.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_rescue" size="64 64" texture="nue_icon_rescue.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_block" size="64 64" texture="nue_icon_block.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_hold" size="64 64" texture="nue_icon_hold.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_passive" size="64 64" texture="nue_icon_passive.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_jobs" size="64 64" texture="nue_icon_jobs.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_ranged" size="64 64" texture="nue_icon_ranged.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_taunt" size="64 64" texture="nue_icon_taunt.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_sneak" size="64 64" texture="nue_icon_sneak.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_prospect" size="64 64" texture="nue_icon_prospect.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_inventory" size="64 64" texture="nue_icon_inventory.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_stats" size="64 64" texture="nue_icon_stats.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_map" size="64 64" texture="nue_icon_map.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_research" size="64 64" texture="nue_icon_research.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_squad" size="64 64" texture="nue_icon_squad.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_help" size="64 64" texture="nue_icon_help.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_pause" size="64 64" texture="nue_icon_pause.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_play" size="64 64" texture="nue_icon_play.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_fast" size="64 64" texture="nue_icon_fast.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_fastest" size="64 64" texture="nue_icon_fastest.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_build" size="64 64" texture="nue_icon_build.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_up" size="64 64" texture="nue_icon_up.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_down" size="64 64" texture="nue_icon_down.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_left" size="64 64" texture="nue_icon_left.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_right" size="64 64" texture="nue_icon_right.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_blood" size="64 64" texture="nue_icon_blood.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_head" size="64 64" texture="nue_icon_head.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_chest" size="64 64" texture="nue_icon_chest.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_stomach" size="64 64" texture="nue_icon_stomach.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_left_arm" size="64 64" texture="nue_icon_left_arm.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_right_arm" size="64 64" texture="nue_icon_right_arm.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_left_leg" size="64 64" texture="nue_icon_left_leg.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_right_leg" size="64 64" texture="nue_icon_right_leg.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Icon_hunger" size="64 64" texture="nue_icon_hunger.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_weapons" size="64 64" texture="nue_stats_weapons.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_combat" size="64 64" texture="nue_stats_combat.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_ranged" size="64 64" texture="nue_stats_ranged.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_thievery" size="64 64" texture="nue_stats_thievery.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_athletics" size="64 64" texture="nue_stats_athletics.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_sciences" size="64 64" texture="nue_stats_sciences.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_trades" size="64 64" texture="nue_stats_trades.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_AlignedNameBar" size="323 65" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 323 65" align="Stretch">
+      <State name="normal" offset="0 580 323 65"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_AlignedStatusBar" size="238 45" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 238 45" align="Stretch">
+      <State name="normal" offset="344 752 238 45"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_RightHudBackground" size="490 268" texture="Kenshi_UI.png">
+    <BasisSkin type="SubSkin" offset="0 0 8 8" align="Left Top">
+      <State name="normal" offset="1420 805 8 8"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="8 0 474 8" align="HStretch Top">
+      <State name="normal" offset="1428 805 474 8"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="482 0 8 8" align="Right Top">
+      <State name="normal" offset="1902 805 8 8"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 8 8 252" align="Left VStretch">
+      <State name="normal" offset="1420 813 8 252"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="8 8 474 252" align="Stretch">
+      <State name="normal" offset="1428 813 474 252"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="482 8 8 252" align="Right VStretch">
+      <State name="normal" offset="1902 813 8 252"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 260 8 8" align="Left Bottom">
+      <State name="normal" offset="1420 1065 8 8"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="8 260 474 8" align="HStretch Bottom">
+      <State name="normal" offset="1428 1065 474 8"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="482 260 8 8" align="Right Bottom">
+      <State name="normal" offset="1902 1065 8 8"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_back" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="0 32 25 25"/>
+      <State name="disabled" offset="0 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_hip" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="25 32 25 25"/>
+      <State name="disabled" offset="25 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_head" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="50 32 25 25"/>
+      <State name="disabled" offset="50 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_armour" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="75 32 25 25"/>
+      <State name="disabled" offset="75 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_legs" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="100 32 25 25"/>
+      <State name="disabled" offset="100 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_boots" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="125 32 25 25"/>
+      <State name="disabled" offset="125 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_shirt" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="150 32 25 25"/>
+      <State name="disabled" offset="150 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_belt" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="175 32 25 25"/>
+      <State name="disabled" offset="175 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+  <Resource type="ResourceSkin" name="NUE_Equipment_backpack_attach" size="25 25" texture="nue_equipment_sockets.png">
+    <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
+      <State name="normal" offset="0 0 3 3"/>
+      <State name="disabled" offset="32 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+      <State name="normal" offset="3 0 26 3"/>
+      <State name="disabled" offset="35 0 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+      <State name="normal" offset="29 0 3 3"/>
+      <State name="disabled" offset="61 0 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+      <State name="normal" offset="0 3 3 26"/>
+      <State name="disabled" offset="32 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+      <State name="normal" offset="3 3 26 26"/>
+      <State name="disabled" offset="35 3 26 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+      <State name="normal" offset="29 3 3 26"/>
+      <State name="disabled" offset="61 3 3 26"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+      <State name="normal" offset="0 29 3 3"/>
+      <State name="disabled" offset="32 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+      <State name="normal" offset="3 29 26 3"/>
+      <State name="disabled" offset="35 29 26 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+      <State name="normal" offset="29 29 3 3"/>
+      <State name="disabled" offset="61 29 3 3"/>
+    </BasisSkin>
+    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+      <State name="normal" offset="200 32 25 25"/>
+      <State name="disabled" offset="200 32 25 25"/>
+    </BasisSkin>
+  </Resource>
+</MyGUI>
