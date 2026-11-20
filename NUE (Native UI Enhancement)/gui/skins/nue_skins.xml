@@ -533,296 +533,296 @@
       <State name="disabled" offset="25 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_head" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_head" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="50 32 25 25"/>
       <State name="disabled" offset="50 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_armour" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_armour" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="75 32 25 25"/>
       <State name="disabled" offset="75 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_legs" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_legs" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="100 32 25 25"/>
       <State name="disabled" offset="100 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_boots" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_boots" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="125 32 25 25"/>
       <State name="disabled" offset="125 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_shirt" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_shirt" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="150 32 25 25"/>
       <State name="disabled" offset="150 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_belt" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_belt" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="175 32 25 25"/>
       <State name="disabled" offset="175 32 25 25"/>
     </BasisSkin>
   </Resource>
-  <Resource type="ResourceSkin" name="NUE_Equipment_backpack_attach" size="25 25" texture="nue_equipment_sockets.png">
+  <Resource type="ResourceSkin" name="NUE_Equipment_backpack_attach" size="35 35" texture="nue_equipment_sockets.png">
     <BasisSkin type="SubSkin" offset="0 0 3 3" align="Left Top">
       <State name="normal" offset="0 0 3 3"/>
       <State name="disabled" offset="32 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 0 19 3" align="HStretch Top">
+    <BasisSkin type="SubSkin" offset="3 0 29 3" align="HStretch Top">
       <State name="normal" offset="3 0 26 3"/>
       <State name="disabled" offset="35 0 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 0 3 3" align="Right Top">
+    <BasisSkin type="SubSkin" offset="32 0 3 3" align="Right Top">
       <State name="normal" offset="29 0 3 3"/>
       <State name="disabled" offset="61 0 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 3 3 19" align="Left VStretch">
+    <BasisSkin type="SubSkin" offset="0 3 3 29" align="Left VStretch">
       <State name="normal" offset="0 3 3 26"/>
       <State name="disabled" offset="32 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 3 19 19" align="Stretch">
+    <BasisSkin type="SubSkin" offset="3 3 29 29" align="Stretch">
       <State name="normal" offset="3 3 26 26"/>
       <State name="disabled" offset="35 3 26 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 3 3 19" align="Right VStretch">
+    <BasisSkin type="SubSkin" offset="32 3 3 29" align="Right VStretch">
       <State name="normal" offset="29 3 3 26"/>
       <State name="disabled" offset="61 3 3 26"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 22 3 3" align="Left Bottom">
+    <BasisSkin type="SubSkin" offset="0 32 3 3" align="Left Bottom">
       <State name="normal" offset="0 29 3 3"/>
       <State name="disabled" offset="32 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="3 22 19 3" align="HStretch Bottom">
+    <BasisSkin type="SubSkin" offset="3 32 29 3" align="HStretch Bottom">
       <State name="normal" offset="3 29 26 3"/>
       <State name="disabled" offset="35 29 26 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="22 22 3 3" align="Right Bottom">
+    <BasisSkin type="SubSkin" offset="32 32 3 3" align="Right Bottom">
       <State name="normal" offset="29 29 3 3"/>
       <State name="disabled" offset="61 29 3 3"/>
     </BasisSkin>
-    <BasisSkin type="SubSkin" offset="0 0 25 25" align="Center">
+    <BasisSkin type="SubSkin" offset="0 3 35 35" align="Center">
       <State name="normal" offset="200 32 25 25"/>
       <State name="disabled" offset="200 32 25 25"/>
     </BasisSkin>
