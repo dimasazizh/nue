@@ -395,38 +395,38 @@
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="NUE_Panel" position_real="0 0 1 1" name="OrdersPanel">
         <Property key="Alpha" value="0.94"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.594 0.90 0.092" name="OrdersBlockButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.104 0.90 0.092" name="OrdersBlockButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.104 0.90 0.092" name="OrdersHoldButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.202 0.90 0.092" name="OrdersHoldButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_hold" name="NUE_Art_OrdersHoldButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.202 0.90 0.092" name="OrdersChaseButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.300 0.90 0.092" name="OrdersChaseButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_jobs" name="NUE_Art_OrdersChaseButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.398 0.90 0.092" name="OrdersRangedButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.496 0.90 0.092" name="OrdersRangedButton" align="Default">
           <Property key="Enabled" value="true"/>
           <Widget type="Widget" skin="NUE_Icon_ranged" name="NUE_Art_OrdersRangedButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.300 0.90 0.092" name="OrdersTauntButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.398 0.90 0.092" name="OrdersTauntButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_taunt" name="NUE_Art_OrdersTauntButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.888 0.90 0.092" name="OrdersSneakButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.790 0.90 0.092" name="OrdersSneakButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_sneak" name="NUE_Art_OrdersSneakButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="PanelEmpty" position_real="1.12 0.202 0.325 0.085" style="Popup" layer="Middle" align="Default">
+        <Widget type="Widget" skin="PanelEmpty" position_real="1.12 0.300 0.325 0.085" style="Popup" layer="Middle" align="Default">
           <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
             <Property key="InheritsAlpha" value="false"/>
             <Property key="Alpha" value="0.75"/>
@@ -443,17 +443,17 @@
             <Property key="NeedToolTip" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.790 0.90 0.092" name="OrdersMedicButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.692 0.90 0.092" name="OrdersMedicButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_medic" name="NUE_Art_OrdersMedicButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.006 0.90 0.092" name="OrdersRescueButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.594 0.90 0.092" name="OrdersRescueButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_rescue" name="NUE_Art_OrdersRescueButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.496 0.90 0.092" name="OrdersProspectButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.888 0.90 0.092" name="OrdersProspectButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_prospect" name="NUE_Art_OrdersProspectButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
@@ -481,7 +481,7 @@
             <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.692 0.90 0.092" name="OrdersPassiveButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.006 0.90 0.092" name="OrdersPassiveButton" align="Default">
           <Widget type="Widget" skin="NUE_Icon_passive" name="NUE_Art_OrdersPassiveButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
