@@ -385,6 +385,17 @@
       </Widget>
     </Widget>
   </Resource>
+  <Resource type="ResourceLayout" name="NUE_HudReadoutWindow" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" position="0 0 360 282" name="Root">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <UserString key="LE_TargetWidgetType" value="Window"/>
+      <Widget type="Widget" skin="PanelEmpty" position="0 0 360 282" align="Stretch" name="Client">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+      </Widget>
+    </Widget>
+  </Resource>
   <Resource type="ResourceLayout" name="NUE_RightHudDragWindow" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position="0 0 360 282" name="Root">
       <Property key="Alpha" value="0"/>
