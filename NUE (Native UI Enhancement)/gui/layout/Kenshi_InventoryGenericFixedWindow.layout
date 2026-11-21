@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Window" skin="Kenshi_WindowC" position_real="0.015 0.10 0.0989583 0.181481" layer="Window" name="Root">
+        <Property key="Caption" value="INVENTORY"/>
+        <Widget type="Widget" skin="PanelEmpty" position_real="0 0 0.978261 1" align="Stretch" name="Content">
+            <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.0833333 0.0662252 0.833333 0.662252" align="Default" name="backpack_content"/>
+            <Widget type="Button" skin="Kenshi_Button2" position_real="0.233333 0.781457 0.527778 0.172185" align="HCenter Bottom" name="ArrangeButton">
+                <Property key="Caption" value="ARRANGE"/>
+            </Widget>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

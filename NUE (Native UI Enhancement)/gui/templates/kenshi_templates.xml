@@ -87,6 +87,11 @@
       <Widget type="Widget" skin="Kenshi_SquadPanelHeaderSkin" position="0 0 716 35" align="HStretch Top"/>
       <Widget type="Widget" skin="PanelEmpty" position="20 0 670 37" align="HStretch Top" name="HeaderPlace">
         <Widget type="Widget" skin="PanelEmpty" position="0 0 645 37" align="Stretch" name="Empty"/>
+        <Widget type="Widget" skin="PanelEmpty" position="638 0 32 37" align="Right Top" name="Controls">
+          <Property key="Visible" value="false"/>
+          <Widget type="Button" skin="Kenshi_SmallArrowLeftSkin" position="0 9 15 19" name="Left"/>
+          <Widget type="Button" skin="Kenshi_SmallArrowRightSkin" position="17 9 15 19" name="Right"/>
+        </Widget>
       </Widget>
       <Widget type="Widget" skin="Kenshi_SquadPanelSkin" position="0 51 716 169" align="Stretch">
         <Widget type="Widget" skin="PanelEmpty" position="14 13 690 159" align="Stretch" name="TabItem"/>
