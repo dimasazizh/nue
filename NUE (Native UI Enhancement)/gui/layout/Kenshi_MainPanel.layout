@@ -147,18 +147,43 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="TabControl" skin="NUE_HudTabControl" position_real="0.807101264464 0.674 0.160984524403 0.279" name="NUE_HudViews" align="Right Bottom" style="Popup" layer="MiddleFront">
+    <Widget type="TabControl" skin="NUE_HudTabControl" position_real="0.807101264464 0.7625 0.160984524403 0.1905" name="NUE_HudViews" align="Right Bottom" style="Popup" layer="MiddleFront">
       <Property key="NeedMouse" value="false"/>
       <Property key="InheritsPick" value="true"/>
       <Property key="ButtonAutoWidth" value="false"/>
       <Property key="ButtonWidth" value="100"/>
       <Property key="SmoothShow" value="false"/>
       <!-- Keep the page content below the floor controls and readouts. -->
-      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
-        <Property key="Caption" value="JOBS"/>
+      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
+        <Property key="Caption" value="SQUAD"/>
         <Property key="NeedMouse" value="false"/>
         <Property key="InheritsPick" value="true"/>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.454191776416 1 0.545808223584" align="Stretch">
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.200627326089 1 0.799372673911" align="Stretch">
+          <Property key="NeedMouse" value="false"/>
+        </Widget>
+        <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0.200627326089 1 0.799372673911" name="SquadPanelDragAndMove" align="Stretch">
+          <Property key="Snap" value="true"/>
+          <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
+            <Property key="ButtonAutoWidth" value="false"/>
+            <Property key="ButtonWidth" value="112"/>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 1"/>
+            </Widget>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 2"/>
+            </Widget>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 3"/>
+            </Widget>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
+        <Property key="Caption" value="JOBS"/>
+        <Property key="Visible" value="false"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.200627326089 1 0.799372673911" align="Stretch">
           <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
             <Property key="InheritsAlpha" value="false"/>
             <Property key="Alpha" value="0.75"/>
@@ -173,28 +198,6 @@
             <Property key="NeedKey" value="false"/>
             <Property key="NeedMouse" value="false"/>
             <Property key="NeedToolTip" value="false"/>
-          </Widget>
-        </Widget>
-      </Widget>
-      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
-        <Property key="Caption" value="SQUAD"/>
-        <Property key="Visible" value="false"/>
-        <Property key="NeedMouse" value="false"/>
-        <Property key="InheritsPick" value="true"/>
-        <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0.454191776416 1 0.545808223584" name="SquadPanelDragAndMove" align="Stretch">
-          <Property key="Snap" value="true"/>
-          <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
-            <Property key="ButtonAutoWidth" value="false"/>
-            <Property key="ButtonWidth" value="112"/>
-            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-              <Property key="Caption" value="Squad 1"/>
-            </Widget>
-            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-              <Property key="Caption" value="Squad 2"/>
-            </Widget>
-            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-              <Property key="Caption" value="Squad 3"/>
-            </Widget>
           </Widget>
         </Widget>
       </Widget>
