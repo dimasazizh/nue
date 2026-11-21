@@ -144,7 +144,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.807101264464 0.796000000000 0.160984524403 0.157000000000" name="SquadPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.807101264464 0.800719505620000000000000 0.160984524403 0.152280494380000000000000" name="SquadPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="true"/>
       <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
         <Property key="ButtonAutoWidth" value="false"/>
