@@ -54,6 +54,8 @@
         <Widget type="Widget" skin="Kenshi_FloatingPanelSkin" position_real="0.852083 0.760185 0.147917 0.240741" align="Right Bottom" name="CommandsPanel">
             <Widget type="EditBox" skin="Kenshi_GenericTextBox" position_real="0.0176056 0.115385 0.96831 0.865385" align="Stretch" name="CommandsTextBox">
                 <Property key="TextColour" value="0.956863 0.913725 0.835294"/>
+                <Property key="TextShadowColour" value="0.78 0.67 0.49"/>
+                <Property key="TextShadow" value="true"/>
                 <Property key="WordWrap" value="true"/>
                 <Property key="Static" value="true"/>
                 <Property key="MultiLine" value="true"/>

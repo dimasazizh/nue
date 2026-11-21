@@ -591,6 +591,17 @@
       <Widget type="ScrollBar" skin="Kenshi_ScrollBarH" position="1 78 87 15" align="HStretch Bottom" name="HScroll"/>
     </Widget>
   </Resource>
+  <Resource type="ResourceLayout" name="NUE_SquadsItemBox" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" position="7 7 103 93" name="Root">
+      <UserString key="LE_TargetWidgetType" value="ItemBox"/>
+      <UserString key="DragLayer" value="DragAndDrop"/>
+      <Widget type="Widget" skin="PanelEmpty" position="1 1 101 77" align="Stretch" name="Client"/>
+      <Widget type="ScrollBar" skin="Kenshi_ScrollBarV" position="88 1 15 77" align="Right VStretch" name="VScroll">
+        <Property key="Visible" value="false"/>
+      </Widget>
+      <Widget type="ScrollBar" skin="Kenshi_ScrollBarH" position="1 78 101 15" align="HStretch Bottom" name="HScroll"/>
+    </Widget>
+  </Resource>
   <Resource type="ResourceLayout" name="Kenshi_EditBox" version="3.2.0">
     <Widget type="Widget" skin="Kenshi_GenericInputBoxSkin" position="0 0 140 32" name="Root">
       <UserString key="LE_TargetWidgetType" value="EditBox"/>

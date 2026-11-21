@@ -38,47 +38,47 @@
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000000 0.369364261 0.296000000 0.609856925" name="Skills2Panel"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.014206318 0.296000000 0.381541104" name="Skills3Panel"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.388644263 0.296000000 0.595" name="Skills4Panel"/>
-      <Widget type="Widget" skin="NUE_Stats_weapons" position_real="0.013000000 0.133945281 0.045000000 0.074075800">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000000 0.389364261 0.296000000 0.609856925" name="Skills2Panel"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.034206318 0.296000000 0.381541104" name="Skills3Panel"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.560000000 0.408644263 0.296000000 0.589" name="Skills4Panel"/>
+      <Widget type="Widget" skin="NUE_Stats_weapons" position_real="0.013000000 0.153945281 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_combat" position_real="0.013000000 0.449528482 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_combat" position_real="0.013000000 0.469528482 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_ranged" position_real="0.013000000 0.659579037 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_ranged" position_real="0.013000000 0.679579037 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_thievery" position_real="0.508000000 0.102488435 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_thievery" position_real="0.508000000 0.122488435 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_athletics" position_real="0.508000000 0.279052669 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_athletics" position_real="0.508000000 0.299052669 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_sciences" position_real="0.508000000 0.479970591 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_sciences" position_real="0.508000000 0.499970591 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="NUE_Stats_trades" position_real="0.508000000 0.764096946 0.045000000 0.074075800">
+      <Widget type="Widget" skin="NUE_Stats_trades" position_real="0.508000000 0.784096946 0.045000000 0.074075800">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
     </Widget>
     <Widget type="Widget" skin="PanelEmpty" position_real="0.272000 0.037377 0.723000 0.463469">
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000 0.020000 0.296000 0.495000" name="Skills1Panel"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.066000 0.048 0.296000 0.495000" name="Skills1Panel"/>
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>
@@ -93,7 +93,7 @@
         <Property key="InheritsPick" value="true"/>
       </Widget>
       <Widget type="Widget" skin="PanelEmpty" position_real="0.00791 0.06833 0.250 0.49167">
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.125 0.90 0.86" align="HStretch Top" name="AttributesPanel">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.175 0.90 0.81" align="HStretch Top" name="AttributesPanel">
           <Property key="InheritsAlpha" value="false"/>
         </Widget>
         <Property key="NeedMouse" value="false"/>
