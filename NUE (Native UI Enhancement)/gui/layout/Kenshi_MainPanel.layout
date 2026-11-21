@@ -52,12 +52,12 @@
           <Property key="Caption" value="23:38"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TabControl" skin="NUE_HudViewTabs" position_real="0 0.23057724 0.864195 0.58718338" name="NUE_HudViews">
+        <Widget type="TabControl" skin="NUE_HudViewTabs" position_real="0.00000000000000 0.23057724177606 0.86419500000000 0.58795557675676" name="NUE_HudViews">
           <Property key="ButtonAutoWidth" value="false"/>
           <Property key="ButtonWidth" value="36"/>
           <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
             <Property key="Caption" value=" "/>
-            <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0 1 1" name="SquadPanelDragAndMove" align="Stretch">
+            <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.20730774520575 0.00000000000000 0.79269207687440 1.00000000000000" name="SquadPanelDragAndMove" align="Stretch">
               <Property key="Snap" value="true"/>
               <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
                 <Property key="ButtonAutoWidth" value="false"/>
@@ -77,7 +77,7 @@
           <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_OrdersView">
             <Property key="Caption" value=" "/>
             <Property key="Visible" value="false"/>
-            <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0 0 1 1" name="OrdersPanelDragAndMove" align="Stretch">
+            <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.20730774520575 0.00000000000000 0.79269207687440 1.00000000000000" name="OrdersPanelDragAndMove" align="Stretch">
               <Property key="Snap" value="false"/>
               <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="OrdersPanel">
                 <Property key="Alpha" value="0.94"/>

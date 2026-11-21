@@ -136,7 +136,7 @@
       <Widget type="Widget" skin="NUE_Icon_jobs" position="44 72 20 20" align="Left VCenter">
         <Property key="NeedMouse" value="false"/>
       </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position="78 0 312 164" align="Stretch" name="TabItem"/>
+      <Widget type="Widget" skin="PanelEmpty" position="0 0 390 164" align="Stretch" name="TabItem"/>
     </Widget>
   </Resource>
   <Resource type="ResourceLayout" name="Kenshi_ScrollBar" version="3.2.0">
