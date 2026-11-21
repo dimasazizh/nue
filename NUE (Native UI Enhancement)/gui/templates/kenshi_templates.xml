@@ -121,6 +121,20 @@
         </Widget>
     </Widget>
   </Resource>
+  <Resource type="ResourceLayout" name="NUE_HudTabControl" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" position="0 0 310 301" name="Root">
+      <UserString key="LE_TargetWidgetType" value="TabControl"/>
+      <UserString key="ButtonSkin" value="Kenshi_Button1"/>
+      <Widget type="Widget" skin="PanelEmpty" position="0 0 310 30" align="HStretch Top" name="HeaderPlace">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+        <Widget type="Widget" skin="PanelEmpty" position="0 0 310 30" align="Stretch" name="Empty">
+          <Property key="NeedMouse" value="false"/>
+        </Widget>
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position="0 0 310 301" align="Stretch" name="TabItem"/>
+    </Widget>
+  </Resource>
   <Resource type="ResourceLayout" name="Kenshi_ScrollBar" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position="0 0 260 50" name="Root">
       <Property key="VerticalAlignment" value="false"/>

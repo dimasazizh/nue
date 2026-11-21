@@ -52,55 +52,6 @@
           <Property key="Caption" value="23:38"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0.035506322320 0.163732394366 0.804922622015 0.670774647887" name="NUE_HudViews">
-          <Property key="ButtonAutoWidth" value="false"/>
-          <Property key="ButtonWidth" value="100"/>
-          <!-- Let the header receive clicks through the empty area of each page. -->
-          <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
-            <Property key="Caption" value="JOBS"/>
-            <Property key="NeedMouse" value="false"/>
-            <Property key="InheritsPick" value="true"/>
-            <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" align="Stretch">
-              <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
-                <Property key="InheritsAlpha" value="false"/>
-                <Property key="Alpha" value="0.75"/>
-                <Property key="NeedDragDrop" value="true"/>
-                <Property key="VerticalAlignment" value="true"/>
-              </Widget>
-              <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.0520231 0.0909091 0.904624 0.812834" align="Stretch" name="JobsPanelInfo">
-                <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
-                <Property key="WordWrap" value="true"/>
-                <Property key="InheritsAlpha" value="false"/>
-                <Property key="Alpha" value="0.5"/>
-                <Property key="NeedKey" value="false"/>
-                <Property key="NeedMouse" value="false"/>
-                <Property key="NeedToolTip" value="false"/>
-              </Widget>
-            </Widget>
-          </Widget>
-          <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
-            <Property key="Caption" value="SQUAD"/>
-            <Property key="Visible" value="false"/>
-            <Property key="NeedMouse" value="false"/>
-            <Property key="InheritsPick" value="true"/>
-            <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" name="SquadPanelDragAndMove" align="Stretch">
-              <Property key="Snap" value="true"/>
-              <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
-                <Property key="ButtonAutoWidth" value="false"/>
-                <Property key="ButtonWidth" value="112"/>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 1"/>
-                </Widget>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 2"/>
-                </Widget>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 3"/>
-                </Widget>
-              </Widget>
-            </Widget>
-          </Widget>
-        </Widget>
       </Widget>
     </Widget>
     <Widget type="Widget" skin="PanelEmpty" position_real="0.971790638663 0.800719505620 0.026860161337 0.194444444444" name="ShortcutsPanelHideEdge" align="Right Bottom">
@@ -193,6 +144,57 @@
         <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0357143 0.1176471 0.68 0.7647059" name="FloorText" align="Default">
           <Property key="Caption" value="Floor 1"/>
           <Property key="TextAlign" value="Center"/>
+        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="TabControl" skin="NUE_HudTabControl" position_real="0.807101264464 0.674 0.160984524403 0.279" name="NUE_HudViews" align="Right Bottom">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <Property key="ButtonAutoWidth" value="false"/>
+      <Property key="ButtonWidth" value="100"/>
+      <!-- Keep the page content below the floor controls and readouts. -->
+      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
+        <Property key="Caption" value="JOBS"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.454191776416 1 0.545808223584" align="Stretch">
+          <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
+            <Property key="InheritsAlpha" value="false"/>
+            <Property key="Alpha" value="0.75"/>
+            <Property key="NeedDragDrop" value="true"/>
+            <Property key="VerticalAlignment" value="true"/>
+          </Widget>
+          <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.0520231 0.0909091 0.904624 0.812834" align="Stretch" name="JobsPanelInfo">
+            <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
+            <Property key="WordWrap" value="true"/>
+            <Property key="InheritsAlpha" value="false"/>
+            <Property key="Alpha" value="0.5"/>
+            <Property key="NeedKey" value="false"/>
+            <Property key="NeedMouse" value="false"/>
+            <Property key="NeedToolTip" value="false"/>
+          </Widget>
+        </Widget>
+      </Widget>
+      <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
+        <Property key="Caption" value="SQUAD"/>
+        <Property key="Visible" value="false"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+        <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0.454191776416 1 0.545808223584" name="SquadPanelDragAndMove" align="Stretch">
+          <Property key="Snap" value="true"/>
+          <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
+            <Property key="ButtonAutoWidth" value="false"/>
+            <Property key="ButtonWidth" value="112"/>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 1"/>
+            </Widget>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 2"/>
+            </Widget>
+            <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+              <Property key="Caption" value="Squad 3"/>
+            </Widget>
+          </Widget>
         </Widget>
       </Widget>
     </Widget>
