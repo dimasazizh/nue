@@ -93,8 +93,8 @@
           <Widget type="Button" skin="Kenshi_SmallArrowRightSkin" position="17 9 15 19" name="Right"/>
         </Widget>
       </Widget>
-      <Widget type="Widget" skin="Kenshi_SquadPanelSkin" position="0 51 716 169" align="Stretch">
-        <Widget type="Widget" skin="PanelEmpty" position="14 13 690 159" align="Stretch" name="TabItem"/>
+      <Widget type="Widget" skin="Kenshi_SquadPanelSkin" position="0 41 716 179" align="Stretch">
+        <Widget type="Widget" skin="PanelEmpty" position="14 4 690 168" align="Stretch" name="TabItem"/>
       </Widget>
     </Widget>
   </Resource>

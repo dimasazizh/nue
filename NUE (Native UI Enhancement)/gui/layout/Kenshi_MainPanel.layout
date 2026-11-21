@@ -4,13 +4,10 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.7910000000 0.6580000000 0.2090000000 0.3420000000" name="NUE_RightHudBackdrop" align="Right Bottom">
+    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.800000000000 0.741000000000 0.200000000000 0.259000000000" name="NUE_RightHudBackdrop" align="Right Bottom">
       <Property key="NeedMouse" value="false"/>
     </Widget>
-    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.793058535307 0.129999998620 0.206941464693" name="NUE_HealthBackdrop" align="Left Bottom">
-      <Property key="NeedMouse" value="false"/>
-    </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.970657602100 0.756275061175 0.027993197900 0.238888888889" name="ShortcutsPanelHideEdge" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.971790638663 0.800719505620 0.026860161337 0.194444444444" name="ShortcutsPanelHideEdge" align="Right Bottom">
       <Property key="NeedKey" value="true"/>
       <Property key="Alpha" value="0.75"/>
       <Property key="InheritsAlpha" value="false"/>
@@ -52,7 +49,7 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.965163357900 0.667000000000 0.033487442100 0.048500000000" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.966518776329 0.750000000000 0.032132023671 0.039000000000" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
         <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.123 0.52 0.754" align="Default">
@@ -60,7 +57,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.8577956405 0.9568000000 0.1035065866 0.0407617000" name="SpeedButtonsPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.863496812850 0.956800000000 0.099317113586 0.040761700000" name="SpeedButtonsPanel" align="Right Bottom">
       <Property key="Alpha" value="0.85"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0130719 0.0588235 0.2287582 0.8823529" name="TimeSpeedButton1" align="Default">
         <Widget type="Widget" skin="NUE_Icon_pause" name="NUE_Art_TimeSpeedButton1" position_real="0.1657143 0.11 0.6685714 0.78" align="Default">
@@ -83,13 +80,13 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.801000000000 0.667000000000 0.165796471400 0.330561700000" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.809000000000 0.750000000000 0.159085788867 0.247561700000" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="TimeMoneyPanel">
         <Property key="InheritsPick" value="true"/>
         <Property key="NeedMouse" value="false"/>
         <Property key="Alpha" value="0.85"/>
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.010703046844 0.876689586241 0.308570995920 0.123310413759" name="NUE_TravelSpeedPanel">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.010703046844 0.835347309378 0.308570995920 0.164652690622" name="NUE_TravelSpeedPanel">
           <Property key="InheritsAlpha" value="false"/>
           <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.0588235 0.252 0.8823529" name="SpeedArrowLeft" align="Default">
             <Widget type="Widget" skin="NUE_Icon_left" name="NUE_Art_SpeedArrowLeft" position_real="0.11 0.266 0.78 0.468" align="Default">
@@ -109,25 +106,199 @@
             </Widget>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.654105665200 0.013204796563 0.325492428100 0.058687984724" align="Default" name="MoneyLabelText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.654105665200 0.014178283636 0.325492428100 0.063014593937" align="Default" name="MoneyLabelText">
           <Property key="Caption" value="Money:"/>
           <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.654105665200 0.074827180523 0.325492428100 0.058687984724" align="Default" name="MoneyAmountText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.654105665200 0.080343607270 0.325492428100 0.063014593937" align="Default" name="MoneyAmountText">
           <Property key="Caption" value="c. 100.000"/>
           <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.314495101000 0.013204796563 0.310598994500 0.058687984724" align="Default" name="DayText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.314495101000 0.014178283636 0.310598994500 0.063014593937" align="Default" name="DayText">
           <Property key="Caption" value="Day: 12345"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.314495101000 0.074827180523 0.310598994500 0.058687984724" align="Default" name="TimeText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.314495101000 0.080343607270 0.310598994500 0.063014593937" align="Default" name="TimeText">
           <Property key="Caption" value="23:38"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0 0.7961862 0.13 0.1966149" name="MedicalPanelDragAndMove" align="Left Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.809000000000 0.750000000000 0.046347949320 0.039000000000" name="FloorPanelDragAndMove" align="Right Bottom">
+      <Property key="Snap" value="false"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
+        <Property key="Alpha" value="0.75"/>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.0882353 0.2116 0.3823529" name="FloorArrowUp" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.11 0.73125 0.78" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.5294118 0.2116 0.3823529" name="FloorArrowDown" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.11 0.73125 0.78" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0357143 0.1176471 0.68 0.7647059" name="FloorText" align="Default">
+          <Property key="Caption" value="Floor 1"/>
+          <Property key="TextAlign" value="Center"/>
+        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.807101264464 0.796000000000 0.160984524403 0.157000000000" name="SquadPanelDragAndMove" align="Right Bottom">
+      <Property key="Snap" value="true"/>
+      <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
+        <Property key="ButtonAutoWidth" value="false"/>
+        <Property key="ButtonWidth" value="112"/>
+        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+          <Property key="Caption" value="Squad 1"/>
+        </Widget>
+        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+          <Property key="Caption" value="Squad 2"/>
+        </Widget>
+        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+          <Property key="Caption" value="Squad 3"/>
+        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.134 0.5222 0.025 0.4764" name="OrdersPanelDragAndMove" align="Left Bottom">
+      <Property key="Snap" value="false"/>
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="OrdersPanel">
+        <Property key="Alpha" value="0.94"/>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.100000000000 0.900000000000 0.100000000000" name="OrdersBlockButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.200000000000 0.900000000000 0.100000000000" name="OrdersHoldButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_hold" name="NUE_Art_OrdersHoldButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.300000000000 0.900000000000 0.100000000000" name="OrdersChaseButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_jobs" name="NUE_Art_OrdersChaseButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.500000000000 0.900000000000 0.100000000000" name="OrdersRangedButton" align="Default">
+          <Property key="Enabled" value="true"/>
+          <Widget type="Widget" skin="NUE_Icon_ranged" name="NUE_Art_OrdersRangedButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.400000000000 0.900000000000 0.100000000000" name="OrdersTauntButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_taunt" name="NUE_Art_OrdersTauntButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.800000000000 0.900000000000 0.100000000000" name="OrdersSneakButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_sneak" name="NUE_Art_OrdersSneakButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Widget" skin="PanelEmpty" position_real="1.12 0.300 0.325 0.085" style="Popup" layer="Middle" align="Default">
+          <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
+            <Property key="InheritsAlpha" value="false"/>
+            <Property key="Alpha" value="0.75"/>
+            <Property key="NeedDragDrop" value="true"/>
+            <Property key="VerticalAlignment" value="true"/>
+          </Widget>
+          <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.0520231 0.0909091 0.904624 0.812834" align="Stretch" name="JobsPanelInfo">
+            <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
+            <Property key="WordWrap" value="true"/>
+            <Property key="InheritsAlpha" value="false"/>
+            <Property key="Alpha" value="0.5"/>
+            <Property key="NeedKey" value="false"/>
+            <Property key="NeedMouse" value="false"/>
+            <Property key="NeedToolTip" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.700000000000 0.900000000000 0.100000000000" name="OrdersMedicButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_medic" name="NUE_Art_OrdersMedicButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.600000000000 0.900000000000 0.100000000000" name="OrdersRescueButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_rescue" name="NUE_Art_OrdersRescueButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.900000000000 0.900000000000 0.100000000000" name="OrdersProspectButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_prospect" name="NUE_Art_OrdersProspectButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+        <Widget type="Widget" skin="Kenshi_FrameSkin" position_real="0.663223 0.315385 0.307851 0.384615">
+          <Property key="Visible" value="false"/>
+          <Property key="Enabled" value="false"/>
+          <Widget type="ScrollBar" skin="Kenshi_BehaviorSlider" position_real="0.0671141 0.1 0.375839 0.8" name="BehaviorSlider">
+            <Property key="Range" value="3"/>
+            <Property key="RangePosition" value="0"/>
+          </Widget>
+          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.15 0.57047 0.21">
+            <Property key="TextColour" value="0.803922 0.741176 0.654902"/>
+            <Property key="Caption" value="AGRESSIVE"/>
+            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
+          </Widget>
+          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.44 0.536913 0.15">
+            <Property key="TextColour" value="0.662745 0.607843 0.537255"/>
+            <Property key="Caption" value="CONFIDENT"/>
+            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
+          </Widget>
+          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.7 0.536913 0.15">
+            <Property key="TextColour" value="0.662745 0.607843 0.537255"/>
+            <Property key="Caption" value="SUBMISSIVE"/>
+            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
+          </Widget>
+        </Widget>
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.050000000000 0.000000000000 0.900000000000 0.100000000000" name="OrdersPassiveButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_passive" name="NUE_Art_OrdersPassiveButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
+            <Property key="NeedMouse" value="false"/>
+          </Widget>
+        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000000000 0.297000000000 0.173809500000 0.506347000000" style="Overlapped" name="InformationPanel" align="Left Bottom">
+      <Property key="InheritsPick" value="true"/>
+      <Property key="NeedMouse" value="false"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 0.701681" name="ExtendingPanel">
+        <Property key="InheritsPick" value="true"/>
+        <Property key="NeedMouse" value="false"/>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 0.7479453 0.10989" name="BountyPanel">
+          <Property key="Alpha" value="0.85"/>
+          <Widget type="Widget" skin="Kenshi_GenericTextBoxFlat" position_real="0.00478469 0 1.00478 1.025">
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.0333333 0.195122 0.919048 0.609756" name="BountyText"/>
+          </Widget>
+        </Widget>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.0688623 0.7479453 0.167582" name="NamePanel">
+          <Property key="Alpha" value="0.85"/>
+          <Widget type="Widget" skin="PanelEmpty" position_real="0.024 0.42623 0.952 0.377049" name="NameText"/>
+        </Widget>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.227545 0.7479453 0.10211" name="StatusPanel">
+          <Property key="Alpha" value="0.85"/>
+          <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0 1 1" name="HealthText">
+            <Property key="TextAlign" value="Center"/>
+            <Property key="TextColour" value="0.956863 0.913725 0.835294"/>
+          </Widget>
+        </Widget>
+        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.329341 0.7479453 0.722527" name="ExtendedStatsPanel">
+          <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.423237 0.917695 0.481328" name="ExtendedStatsText"/>
+          <Widget type="Widget" skin="PanelEmpty" position_real="0.0246914 0.0494297 0.934156 0.307985" name="StateText"/>
+        </Widget>
+      </Widget>
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.701681 0.7479453 0.278" style="Overlapped" name="StatsPanel">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.1888492086330935251798561151 0.917695 0.7911507913669064748201438849" name="StatsText"/>
+      </Widget>
+      <Widget type="Button" skin="NUE_IconOnlyButtonSurface" position_real="0.31991865 0.680672 0.108108 0.053" style="Overlapped" name="ExtendedStatsButton">
+        <Property key="StateSelected" value="true"/>
+        <Widget type="Widget" skin="NUE_Icon_up" position_real="0.25 0.22 0.50 0.56" name="NUE_Art_ExtendedStatsButton">
+          <Property key="NeedMouse" value="false"/>
+        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.788000000000 0.129999998620 0.212000000000" name="NUE_HealthBackdrop" align="Left Bottom" style="Popup" layer="MiddleFront">
+      <Property key="NeedMouse" value="false"/>
+    </Widget>
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0 0.7961862 0.13 0.1966149" name="MedicalPanelDragAndMove" align="Left Bottom" style="Popup" layer="MiddleFront">
       <Property key="Snap" value="true"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="MedicalPanel">
         <Property key="Depth" value="0"/>
@@ -283,177 +454,6 @@
           <Widget type="Widget" skin="PanelEmpty" position_real="0.02 0.665 0.96 0.096" name="LifeBar7Tooltip" align="Default"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.02 0.772 0.96 0.096" name="LifeBar8Tooltip" align="Default"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.02 0.879 0.96 0.096" name="LifeBar9Tooltip" align="Default"/>
-        </Widget>
-      </Widget>
-    </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.801000000000 0.667000000000 0.048303035165 0.048500000000" name="FloorPanelDragAndMove" align="Right Bottom">
-      <Property key="Snap" value="false"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
-        <Property key="Alpha" value="0.75"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.0882353 0.2116 0.3823529" name="FloorArrowUp" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.11 0.73125 0.78" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.775 0.5294118 0.2116 0.3823529" name="FloorArrowDown" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.11 0.73125 0.78" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.0357143 0.1176471 0.68 0.7647059" name="FloorText" align="Default">
-          <Property key="Caption" value="Floor 1"/>
-          <Property key="TextAlign" value="Center"/>
-        </Widget>
-      </Widget>
-    </Widget>
-    <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.7990211705 0.7230000000 0.1677753009 0.1930000000" name="SquadPanelDragAndMove" align="Right Bottom">
-      <Property key="Snap" value="true"/>
-      <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
-        <Property key="ButtonAutoWidth" value="false"/>
-        <Property key="ButtonWidth" value="112"/>
-        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-          <Property key="Caption" value="Squad 1"/>
-        </Widget>
-        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-          <Property key="Caption" value="Squad 2"/>
-        </Widget>
-        <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-          <Property key="Caption" value="Squad 3"/>
-        </Widget>
-      </Widget>
-    </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.134 0.5222 0.025 0.4764" name="OrdersPanelDragAndMove" align="Left Bottom">
-      <Property key="Snap" value="false"/>
-      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="OrdersPanel">
-        <Property key="Alpha" value="0.94"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.104 0.90 0.092" name="OrdersBlockButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.202 0.90 0.092" name="OrdersHoldButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_hold" name="NUE_Art_OrdersHoldButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.300 0.90 0.092" name="OrdersChaseButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_jobs" name="NUE_Art_OrdersChaseButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.496 0.90 0.092" name="OrdersRangedButton" align="Default">
-          <Property key="Enabled" value="true"/>
-          <Widget type="Widget" skin="NUE_Icon_ranged" name="NUE_Art_OrdersRangedButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.398 0.90 0.092" name="OrdersTauntButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_taunt" name="NUE_Art_OrdersTauntButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.790 0.90 0.092" name="OrdersSneakButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_sneak" name="NUE_Art_OrdersSneakButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Widget" skin="PanelEmpty" position_real="1.12 0.300 0.325 0.085" style="Popup" layer="Middle" align="Default">
-          <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
-            <Property key="InheritsAlpha" value="false"/>
-            <Property key="Alpha" value="0.75"/>
-            <Property key="NeedDragDrop" value="true"/>
-            <Property key="VerticalAlignment" value="true"/>
-          </Widget>
-          <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.0520231 0.0909091 0.904624 0.812834" align="Stretch" name="JobsPanelInfo">
-            <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
-            <Property key="WordWrap" value="true"/>
-            <Property key="InheritsAlpha" value="false"/>
-            <Property key="Alpha" value="0.5"/>
-            <Property key="NeedKey" value="false"/>
-            <Property key="NeedMouse" value="false"/>
-            <Property key="NeedToolTip" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.692 0.90 0.092" name="OrdersMedicButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_medic" name="NUE_Art_OrdersMedicButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.594 0.90 0.092" name="OrdersRescueButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_rescue" name="NUE_Art_OrdersRescueButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.888 0.90 0.092" name="OrdersProspectButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_prospect" name="NUE_Art_OrdersProspectButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-        <Widget type="Widget" skin="Kenshi_FrameSkin" position_real="0.663223 0.315385 0.307851 0.384615">
-          <Property key="Visible" value="false"/>
-          <Property key="Enabled" value="false"/>
-          <Widget type="ScrollBar" skin="Kenshi_BehaviorSlider" position_real="0.0671141 0.1 0.375839 0.8" name="BehaviorSlider">
-            <Property key="Range" value="3"/>
-            <Property key="RangePosition" value="0"/>
-          </Widget>
-          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.15 0.57047 0.21">
-            <Property key="TextColour" value="0.803922 0.741176 0.654902"/>
-            <Property key="Caption" value="AGRESSIVE"/>
-            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
-          </Widget>
-          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.44 0.536913 0.15">
-            <Property key="TextColour" value="0.662745 0.607843 0.537255"/>
-            <Property key="Caption" value="CONFIDENT"/>
-            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
-          </Widget>
-          <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.436242 0.7 0.536913 0.15">
-            <Property key="TextColour" value="0.662745 0.607843 0.537255"/>
-            <Property key="Caption" value="SUBMISSIVE"/>
-            <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
-          </Widget>
-        </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.05 0.006 0.90 0.092" name="OrdersPassiveButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_passive" name="NUE_Art_OrdersPassiveButton" position_real="0.11 0.1477419 0.78 0.7045161" align="Default">
-            <Property key="NeedMouse" value="false"/>
-          </Widget>
-        </Widget>
-      </Widget>
-    </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000000000 0.297000000000 0.173809500000 0.506347000000" style="Overlapped" name="InformationPanel" align="Left Bottom">
-      <Property key="InheritsPick" value="true"/>
-      <Property key="NeedMouse" value="false"/>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 0.701681" name="ExtendingPanel">
-        <Property key="InheritsPick" value="true"/>
-        <Property key="NeedMouse" value="false"/>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 0.7479453 0.10989" name="BountyPanel">
-          <Property key="Alpha" value="0.85"/>
-          <Widget type="Widget" skin="Kenshi_GenericTextBoxFlat" position_real="0.00478469 0 1.00478 1.025">
-            <Widget type="Widget" skin="PanelEmpty" position_real="0.0333333 0.195122 0.919048 0.609756" name="BountyText"/>
-          </Widget>
-        </Widget>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.0688623 0.7479453 0.167582" name="NamePanel">
-          <Property key="Alpha" value="0.85"/>
-          <Widget type="Widget" skin="PanelEmpty" position_real="0.024 0.42623 0.952 0.377049" name="NameText"/>
-        </Widget>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.227545 0.7479453 0.10211" name="StatusPanel">
-          <Property key="Alpha" value="0.85"/>
-          <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0 1 1" name="HealthText">
-            <Property key="TextAlign" value="Center"/>
-            <Property key="TextColour" value="0.956863 0.913725 0.835294"/>
-          </Widget>
-        </Widget>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.329341 0.7479453 0.722527" name="ExtendedStatsPanel">
-          <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.423237 0.917695 0.481328" name="ExtendedStatsText"/>
-          <Widget type="Widget" skin="PanelEmpty" position_real="0.0246914 0.0494297 0.934156 0.307985" name="StateText"/>
-        </Widget>
-      </Widget>
-      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0.701681 0.7479453 0.278" style="Overlapped" name="StatsPanel">
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.0329218 0.1888492086330935251798561151 0.917695 0.7911507913669064748201438849" name="StatsText"/>
-      </Widget>
-      <Widget type="Button" skin="NUE_IconOnlyButtonSurface" position_real="0.31991865 0.680672 0.108108 0.053" style="Overlapped" name="ExtendedStatsButton">
-        <Property key="StateSelected" value="true"/>
-        <Widget type="Widget" skin="NUE_Icon_up" position_real="0.25 0.22 0.50 0.56" name="NUE_Art_ExtendedStatsButton">
-          <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
     </Widget>
