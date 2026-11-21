@@ -121,24 +121,6 @@
         </Widget>
     </Widget>
   </Resource>
-  <Resource type="ResourceLayout" name="NUE_HudViewTabs" version="3.2.0">
-    <Widget type="Widget" skin="PanelEmpty" position="0 0 390 164" name="Root">
-      <Property key="InheritsPick" value="true"/>
-      <Property key="NeedMouse" value="false"/>
-      <UserString key="LE_TargetWidgetType" value="TabControl"/>
-      <UserString key="ButtonSkin" value="NUE_IconOnlyButtonSurface"/>
-      <Widget type="Widget" skin="PanelEmpty" position="0 64 72 36" align="Left VCenter" name="HeaderPlace">
-        <Widget type="Widget" skin="PanelEmpty" position="0 0 72 36" align="Stretch" name="Empty"/>
-      </Widget>
-      <Widget type="Widget" skin="NUE_Icon_squad" position="8 72 20 20" align="Left VCenter">
-        <Property key="NeedMouse" value="false"/>
-      </Widget>
-      <Widget type="Widget" skin="NUE_Icon_jobs" position="44 72 20 20" align="Left VCenter">
-        <Property key="NeedMouse" value="false"/>
-      </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position="0 0 390 164" align="Stretch" name="TabItem"/>
-    </Widget>
-  </Resource>
   <Resource type="ResourceLayout" name="Kenshi_ScrollBar" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position="0 0 260 50" name="Root">
       <Property key="VerticalAlignment" value="false"/>
