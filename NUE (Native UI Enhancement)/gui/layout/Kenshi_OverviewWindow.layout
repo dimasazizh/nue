@@ -176,7 +176,7 @@
         <Widget type="Button" skin="Kenshi_Button2" position_real="0.6486485 0.0135952 0.166667 0.0377644" name="NewSquadButton">
           <Property key="Caption" value="NEW SQUAD"/>
         </Widget>
-        <Widget type="ItemBox" skin="NUE_SquadsItemBox" position_real="0.0022525 0.0770393 0.995495 0.862538" name="SquadsPanel">
+        <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0022525 0.0770393 0.995495 0.862538" name="SquadsPanel">
           <Property key="NeedDragDrop" value="true"/>
           <Property key="VerticalAlignment" value="true"/>
         </Widget>

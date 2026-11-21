@@ -121,6 +121,24 @@
         </Widget>
     </Widget>
   </Resource>
+  <Resource type="ResourceLayout" name="NUE_HudViewTabs" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" position="0 0 390 164" name="Root">
+      <Property key="InheritsPick" value="true"/>
+      <Property key="NeedMouse" value="false"/>
+      <UserString key="LE_TargetWidgetType" value="TabControl"/>
+      <UserString key="ButtonSkin" value="NUE_IconOnlyButtonSurface"/>
+      <Widget type="Widget" skin="PanelEmpty" position="0 64 72 36" align="Left VCenter" name="HeaderPlace">
+        <Widget type="Widget" skin="PanelEmpty" position="0 0 72 36" align="Stretch" name="Empty"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Icon_squad" position="8 72 20 20" align="Left VCenter">
+        <Property key="NeedMouse" value="false"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_Icon_jobs" position="44 72 20 20" align="Left VCenter">
+        <Property key="NeedMouse" value="false"/>
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position="78 0 312 164" align="Stretch" name="TabItem"/>
+    </Widget>
+  </Resource>
   <Resource type="ResourceLayout" name="Kenshi_ScrollBar" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position="0 0 260 50" name="Root">
       <Property key="VerticalAlignment" value="false"/>
@@ -605,17 +623,6 @@
       <Widget type="Widget" skin="PanelEmpty" position="1 1 87 77" align="Stretch" name="Client"/>
       <Widget type="ScrollBar" skin="Kenshi_ScrollBarV" position="88 1 15 77" align="Right VStretch" name="VScroll"/>
       <Widget type="ScrollBar" skin="Kenshi_ScrollBarH" position="1 78 87 15" align="HStretch Bottom" name="HScroll"/>
-    </Widget>
-  </Resource>
-  <Resource type="ResourceLayout" name="NUE_SquadsItemBox" version="3.2.0">
-    <Widget type="Widget" skin="PanelEmpty" position="7 7 103 93" name="Root">
-      <UserString key="LE_TargetWidgetType" value="ItemBox"/>
-      <UserString key="DragLayer" value="DragAndDrop"/>
-      <Widget type="Widget" skin="PanelEmpty" position="1 1 101 77" align="Stretch" name="Client"/>
-      <Widget type="ScrollBar" skin="Kenshi_ScrollBarV" position="88 1 15 77" align="Right VStretch" name="VScroll">
-        <Property key="Visible" value="false"/>
-      </Widget>
-      <Widget type="ScrollBar" skin="Kenshi_ScrollBarH" position="1 78 101 15" align="HStretch Bottom" name="HScroll"/>
     </Widget>
   </Resource>
   <Resource type="ResourceLayout" name="Kenshi_EditBox" version="3.2.0">
