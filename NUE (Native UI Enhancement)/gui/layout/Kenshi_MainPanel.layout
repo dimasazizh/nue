@@ -32,52 +32,32 @@
             </Widget>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.565294578754 0.044049295775 0.258906098473 0.054929577464" align="Default" name="MoneyLabelText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.565294578754 0.026443661972 0.258906098473 0.054929577464" align="Default" name="MoneyLabelText">
           <Property key="Alpha" value="0.85"/>
           <Property key="Caption" value="Money:"/>
           <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.565294578754 0.101725352112 0.258906098473 0.054929577464" align="Default" name="MoneyAmountText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.565294578754 0.084119718309 0.258906098473 0.054929577464" align="Default" name="MoneyAmountText">
           <Property key="Alpha" value="0.85"/>
           <Property key="Caption" value="c. 100.000"/>
           <Property key="TextAlign" value="Right VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.295158506187 0.044049295775 0.247059430307 0.054929577464" align="Default" name="DayText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.295158506187 0.026443661972 0.247059430307 0.054929577464" align="Default" name="DayText">
           <Property key="Alpha" value="0.85"/>
           <Property key="Caption" value="Day: 12345"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.295158506187 0.101725352112 0.247059430307 0.054929577464" align="Default" name="TimeText">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.295158506187 0.084119718309 0.247059430307 0.054929577464" align="Default" name="TimeText">
           <Property key="Alpha" value="0.85"/>
           <Property key="Caption" value="23:38"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0.035506322320 0.184197528918 0.804922622015 0.650309513336" name="NUE_HudViews">
+        <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0.035506322320 0.163732394366 0.804922622015 0.670774647887" name="NUE_HudViews">
           <Property key="ButtonAutoWidth" value="false"/>
           <Property key="ButtonWidth" value="100"/>
-          <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
-            <Property key="Caption" value="SQUAD"/>
-            <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.000000000000 0.000000000000 1.000000000000 1.000000000000" name="SquadPanelDragAndMove" align="Stretch">
-              <Property key="Snap" value="true"/>
-              <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
-                <Property key="ButtonAutoWidth" value="false"/>
-                <Property key="ButtonWidth" value="112"/>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 1"/>
-                </Widget>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 2"/>
-                </Widget>
-                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-                  <Property key="Caption" value="Squad 3"/>
-                </Widget>
-              </Widget>
-            </Widget>
-          </Widget>
           <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
             <Property key="Caption" value="JOBS"/>
-            <Property key="Visible" value="false"/>
-            <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.000000000000 1.000000000000 1.000000000000" align="Stretch">
+            <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" align="Stretch">
               <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
                 <Property key="InheritsAlpha" value="false"/>
                 <Property key="Alpha" value="0.75"/>
@@ -92,6 +72,26 @@
                 <Property key="NeedKey" value="false"/>
                 <Property key="NeedMouse" value="false"/>
                 <Property key="NeedToolTip" value="false"/>
+              </Widget>
+            </Widget>
+          </Widget>
+          <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
+            <Property key="Caption" value="SQUAD"/>
+            <Property key="Visible" value="false"/>
+            <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" name="SquadPanelDragAndMove" align="Stretch">
+              <Property key="Snap" value="true"/>
+              <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
+                <Property key="ButtonAutoWidth" value="false"/>
+                <Property key="ButtonWidth" value="112"/>
+                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+                  <Property key="Caption" value="Squad 1"/>
+                </Widget>
+                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+                  <Property key="Caption" value="Squad 2"/>
+                </Widget>
+                <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+                  <Property key="Caption" value="Squad 3"/>
+                </Widget>
               </Widget>
             </Widget>
           </Widget>
@@ -140,7 +140,7 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.966518776329 0.725000000000 0.032132023671 0.039000000000" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.966518776329 0.720000000000 0.032132023671 0.039000000000" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
         <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.123 0.52 0.754" align="Default">
@@ -171,7 +171,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.809000000000 0.725000000000 0.046347949320 0.039000000000" name="FloorPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.809000000000 0.720000000000 0.046347949320 0.039000000000" name="FloorPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
