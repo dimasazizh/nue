@@ -55,8 +55,11 @@
         <Widget type="TabControl" skin="Kenshi_TabControlEmpty" position_real="0.035506322320 0.163732394366 0.804922622015 0.670774647887" name="NUE_HudViews">
           <Property key="ButtonAutoWidth" value="false"/>
           <Property key="ButtonWidth" value="100"/>
+          <!-- Let the header receive clicks through the empty area of each page. -->
           <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
             <Property key="Caption" value="JOBS"/>
+            <Property key="NeedMouse" value="false"/>
+            <Property key="InheritsPick" value="true"/>
             <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" align="Stretch">
               <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0289017 0.0534759 0.947977 0.887701" align="Stretch" name="JobsPanel">
                 <Property key="InheritsAlpha" value="false"/>
@@ -78,6 +81,8 @@
           <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_SquadView">
             <Property key="Caption" value="SQUAD"/>
             <Property key="Visible" value="false"/>
+            <Property key="NeedMouse" value="false"/>
+            <Property key="InheritsPick" value="true"/>
             <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0.000000000000 0.200627326089 1.000000000000 0.799372673911" name="SquadPanelDragAndMove" align="Stretch">
               <Property key="Snap" value="true"/>
               <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
