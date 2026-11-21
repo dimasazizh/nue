@@ -3,7 +3,7 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" layer="Window" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0 0 0.130208 0.462963" name="TooltipsPanel">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0 0 0.130208 0.324074111" name="TooltipsPanel">
       <Property key="NeedMouse" value="false"/>
       <Property key="InheritsPick" value="true"/>
       <Property key="Depth" value="1"/>
