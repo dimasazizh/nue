@@ -147,11 +147,12 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="TabControl" skin="NUE_HudTabControl" position_real="0.807101264464 0.674 0.160984524403 0.279" name="NUE_HudViews" align="Right Bottom">
+    <Widget type="TabControl" skin="NUE_HudTabControl" position_real="0.807101264464 0.674 0.160984524403 0.279" name="NUE_HudViews" align="Right Bottom" style="Popup" layer="MiddleFront">
       <Property key="NeedMouse" value="false"/>
       <Property key="InheritsPick" value="true"/>
       <Property key="ButtonAutoWidth" value="false"/>
       <Property key="ButtonWidth" value="100"/>
+      <Property key="SmoothShow" value="false"/>
       <!-- Keep the page content below the floor controls and readouts. -->
       <Widget type="TabItem" skin="" position_real="0 0 1 1" name="NUE_JobsView">
         <Property key="Caption" value="JOBS"/>
