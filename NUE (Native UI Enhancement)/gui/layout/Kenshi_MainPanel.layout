@@ -282,7 +282,7 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000000000 0.297000000000 0.173809500000 0.506347000000" style="Overlapped" name="InformationPanel" align="Left Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.000000000000 0.341444444444 0.173809500000 0.506347000000" style="Overlapped" name="InformationPanel" align="Left Bottom">
       <Property key="InheritsPick" value="true"/>
       <Property key="NeedMouse" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 0.701681" name="ExtendingPanel">
