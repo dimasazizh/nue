@@ -76,10 +76,10 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.967794665722 0.72 0.032132023671 0.039" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.967794665722 0.72 0.032132023671 0.079" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
-      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
-        <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.123 0.52 0.754" align="Default">
+      <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.029039449367 0.8787879 0.932827639241" align="Default" name="BuildButton">
+        <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.323956587789 0.52 0.352086824422" align="Default">
           <Property key="NeedMouse" value="false"/>
         </Widget>
       </Widget>
@@ -107,21 +107,21 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.809000000000 0.720000000000 0.046347949320 0.075000000000" name="FloorPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.809 0.72 0.04634794932 0.079" name="FloorPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.78 0.046800000001 0.2 0.207999999997" name="FloorArrowUp" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.77 0.016582278481 0.22 0.253164556962" name="FloorArrowUp" align="Default">
           <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.54 0.046800000001 0.2 0.207999999997" name="FloorArrowDown" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.53 0.016582278481 0.22 0.253164556962" name="FloorArrowDown" align="Default">
           <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="PanelEmpty" position_real="0 0.31 1 0.513139043439" name="NUE_TravelSpeedPanel">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0 0.503366116199 1 0.487157319721" name="NUE_TravelSpeedPanel">
           <Property key="InheritsAlpha" value="false"/>
           <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.0588235 0.252 0.8823529" name="SpeedArrowLeft" align="Default">
             <Widget type="Widget" skin="NUE_Icon_left" name="NUE_Art_SpeedArrowLeft" position_real="0.11 0.266 0.78 0.468" align="Default">
@@ -141,7 +141,7 @@
             </Widget>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0.046800000001 0.52 0.207999999997" name="FloorText" align="Default">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0.016582278481 0.51 0.253164556962" name="FloorText" align="Default">
           <Property key="Caption" value="Floor 1"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
@@ -245,25 +245,25 @@
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="PanelEmpty" style="Popup" position_real="0.807101264464 0.044444444444 0.187 0.152280494380" align="Right Top" layer="Middle">
-          <Property key="NeedMouse" value="false"/>
-          <Property key="InheritsPick" value="true"/>
-          <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0 0 1 1" align="Stretch" name="JobsPanel">
-            <Property key="InheritsAlpha" value="false"/>
-            <Property key="Alpha" value="0.75"/>
-            <Property key="NeedDragDrop" value="true"/>
-            <Property key="VerticalAlignment" value="true"/>
-          </Widget>
-          <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.022 0.037 0.956 0.91" align="Stretch" name="JobsPanelInfo">
-            <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
-            <Property key="WordWrap" value="true"/>
-            <Property key="InheritsAlpha" value="false"/>
-            <Property key="Alpha" value="0.85"/>
-            <Property key="NeedKey" value="false"/>
-            <Property key="NeedMouse" value="false"/>
-            <Property key="NeedToolTip" value="false"/>
-          </Widget>
-        </Widget>
+      </Widget>
+    </Widget>
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.807101264464 0.044444444444 0.187 0.152280494380" align="Right Top" name="NUE_JobsList">
+      <Property key="NeedMouse" value="false"/>
+      <Property key="InheritsPick" value="true"/>
+      <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0 0 1 1" align="Stretch" name="JobsPanel">
+        <Property key="InheritsAlpha" value="false"/>
+        <Property key="Alpha" value="0.75"/>
+        <Property key="NeedDragDrop" value="true"/>
+        <Property key="VerticalAlignment" value="true"/>
+      </Widget>
+      <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.022 0.037 0.956 0.91" align="Stretch" name="JobsPanelInfo">
+        <Property key="Caption" value="[No jobs assigned]\n[To add jobs, hold shift key when giving an order]"/>
+        <Property key="WordWrap" value="true"/>
+        <Property key="InheritsAlpha" value="false"/>
+        <Property key="Alpha" value="0.85"/>
+        <Property key="NeedKey" value="false"/>
+        <Property key="NeedMouse" value="false"/>
+        <Property key="NeedToolTip" value="false"/>
       </Widget>
     </Widget>
     <Widget type="Widget" skin="PanelEmpty" position_real="0.000000000000 0.297000000000 0.173809500000 0.506347000000" style="Overlapped" name="InformationPanel" align="Left Bottom">
