@@ -76,7 +76,7 @@
         <Widget type="Widget" skin="Kenshi_FloorArrowDownSkin" position_real="0 0 1 0.5" name="ShortcutsPanelArrow" align="Default" layer="Middle"/>
       </Widget>
     </Widget>
-    <Widget type="Widget" skin="PanelEmpty" position_real="0.966518776329 0.720000000000 0.032132023671 0.039000000000" name="BuildPanel" align="Right Bottom">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0.967794665722 0.72 0.032132023671 0.039" name="BuildPanel" align="Right Bottom">
       <Property key="Alpha" value="0.75"/>
       <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.0606061 0.0588235 0.8787879 0.8823529" align="Default" name="BuildButton">
         <Widget type="Widget" skin="NUE_Icon_build" name="NUE_Art_BuildButton" position_real="0.24 0.123 0.52 0.754" align="Default">
@@ -107,21 +107,21 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_RightHudDragWindow" position_real="0.809000000000 0.720000000000 0.046347949320 0.075000000000" name="FloorPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.809000000000 0.720000000000 0.046347949320 0.075000000000" name="FloorPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.3942 0.155 0.2116 0.153" name="FloorArrowUp" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.78 0.046800000001 0.2 0.207999999997" name="FloorArrowUp" align="Default">
           <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.3942 0.832 0.2116 0.155" name="FloorArrowDown" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.54 0.046800000001 0.2 0.207999999997" name="FloorArrowDown" align="Default">
           <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.11 0.73125 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Widget" skin="PanelEmpty" position_real="0 0.310 1 0.346" name="NUE_TravelSpeedPanel">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0 0.31 1 0.513139043439" name="NUE_TravelSpeedPanel">
           <Property key="InheritsAlpha" value="false"/>
           <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.018 0.0588235 0.252 0.8823529" name="SpeedArrowLeft" align="Default">
             <Widget type="Widget" skin="NUE_Icon_left" name="NUE_Art_SpeedArrowLeft" position_real="0.11 0.266 0.78 0.468" align="Default">
@@ -141,9 +141,9 @@
             </Widget>
           </Widget>
         </Widget>
-        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0.657 1 0.165" name="FloorText" align="Default">
+        <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0 0.046800000001 0.52 0.207999999997" name="FloorText" align="Default">
           <Property key="Caption" value="Floor 1"/>
-          <Property key="TextAlign" value="Center"/>
+          <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
       </Widget>
     </Widget>
@@ -167,53 +167,53 @@
         </Widget>
       </Widget>
     </Widget>
-    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.8575 0.7405 0.1065 0.0575" name="OrdersPanelDragAndMove" align="Right Bottom">
+    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.8565 0.7405 0.111585788867 0.0575" name="OrdersPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
-      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="OrdersPanel">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="OrdersPanel">
         <Property key="Alpha" value="0.94"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.231 0.035 0.138 0.450" name="OrdersBlockButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.208 0.035 0.192 0.45" name="OrdersBlockButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_block" name="NUE_Art_OrdersBlockButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.431 0.035 0.138 0.450" name="OrdersHoldButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_hold" name="NUE_Art_OrdersHoldButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.408 0.035 0.192 0.45" name="OrdersHoldButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_hold" name="NUE_Art_OrdersHoldButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.631 0.515 0.138 0.450" name="OrdersChaseButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_jobs" name="NUE_Art_OrdersChaseButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.608 0.515 0.192 0.45" name="OrdersChaseButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_jobs" name="NUE_Art_OrdersChaseButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.831 0.035 0.138 0.450" name="OrdersRangedButton" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.808 0.035 0.192 0.45" name="OrdersRangedButton" align="Default">
           <Property key="Enabled" value="true"/>
-          <Widget type="Widget" skin="NUE_Icon_ranged" name="NUE_Art_OrdersRangedButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_ranged" name="NUE_Art_OrdersRangedButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.631 0.035 0.138 0.450" name="OrdersTauntButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_taunt" name="NUE_Art_OrdersTauntButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.608 0.035 0.192 0.45" name="OrdersTauntButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_taunt" name="NUE_Art_OrdersTauntButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.431 0.515 0.138 0.450" name="OrdersSneakButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_sneak" name="NUE_Art_OrdersSneakButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.408 0.515 0.192 0.45" name="OrdersSneakButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_sneak" name="NUE_Art_OrdersSneakButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.231 0.515 0.138 0.450" name="OrdersMedicButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_medic" name="NUE_Art_OrdersMedicButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.208 0.515 0.192 0.45" name="OrdersMedicButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_medic" name="NUE_Art_OrdersMedicButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.031 0.515 0.138 0.450" name="OrdersRescueButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_rescue" name="NUE_Art_OrdersRescueButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.008 0.515 0.192 0.45" name="OrdersRescueButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_rescue" name="NUE_Art_OrdersRescueButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.831 0.515 0.138 0.450" name="OrdersProspectButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_prospect" name="NUE_Art_OrdersProspectButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.808 0.515 0.192 0.45" name="OrdersProspectButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_prospect" name="NUE_Art_OrdersProspectButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
@@ -240,8 +240,8 @@
             <Property key="FontName" value="Kenshi_PaintedTextFont_Small"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.031 0.035 0.138 0.450" name="OrdersPassiveButton" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_passive" name="NUE_Art_OrdersPassiveButton" position_real="0.110000000000 0.110000000000 0.780000000000 0.780000000000" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.008 0.035 0.192 0.45" name="OrdersPassiveButton" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_passive" name="NUE_Art_OrdersPassiveButton" position_real="0.232463411756 0.11 0.535073176488 0.78" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
