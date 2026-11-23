@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Meitou.Data.Gameplay;
+using Meitou.Data.Gameplay.Combat;
 using Meitou.Data.Characters;
 using Meitou.Data.Ui;
 using Meitou.Game.Rendering.Characters;
@@ -156,21 +157,54 @@ public sealed class AvatarMod : IMod
             2 => [new("sitting idle",t*.55f,1)],
             3 => [new("sleeponfloor",t*.1f,1)],
             _ => [StandingPose(look.Body?.IdleStance ?? "idle_stand_relax")] };
-        if(choice==1 && Library.GetValue(__instance) is AnimationLibrary lib)
+        bool drawn = false, backDrawn = false;
+        if (choice == 1 && Library.GetValue(__instance) is AnimationLibrary lib)
         {
-            var weapon = look.Parts.FirstOrDefault(p => p.Shown == WeaponShown.Drawn)
-                ?? look.Parts.FirstOrDefault(p => p.Shown == WeaponShown.BackDrawn);
-            var stance = new AnimationStance { Combat = true, Left = HandHold.Empty,
-                Right = weapon == null ? HandHold.Empty : HandHold.OfCategory(weapon.Record.GetInt("skill category")) };
-            int guard=lib.CombatGuard(stance,0);
-            if(guard>=0) poses=[poses[0],StandingPose(lib.Definitions[guard].Name)];
+            var preferred = c.BackDrawn ? WeaponShown.BackDrawn : WeaponShown.Drawn;
+            var weapon = look.Parts.FirstOrDefault(p => p.Shown == preferred)
+                ?? look.Parts.FirstOrDefault(p => p.Shown is WeaponShown.Drawn or WeaponShown.BackDrawn);
+            var hand = weapon == null ? HandHold.Empty : HandHold.OfCategory(WeaponData.From(weapon.Record).AnimationCategory);
+            var layers = CombatLayers(lib, hand);
+            if (layers.Count > 0)
+            {
+                var combat = new CharacterPose[layers.Count];
+                for (int i = 0; i < combat.Length; i++)
+                {
+                    var (index, weight) = layers[i];
+                    var clip = lib.Definitions[index];
+                    // A movement-driven layer holds its standing phase at zero speed.
+                    float time = clip.MoveSpeed == 0 ? (float)ClipTime.Invoke(bar, [clip.Name, t])! :
+                        clip.Synchs ? (clip.SynchOffset - MathF.Floor(clip.SynchOffset)) * ClipLength(__instance, clip.Clip) : 0;
+                    combat[i] = new CharacterPose(clip.Name, time, weight);
+                }
+                poses = combat;
+                drawn = weapon != null;
+                backDrawn = weapon?.Shown == WeaponShown.BackDrawn;
+            }
         }
         long key=long.MinValue+((long)(uint)c.Id.Slot<<32)+(uint)c.Id.Generation;
         list.Items.Add(new CharacterInstance(key,look,c.Position,0,poses) { Hidden=true, FullRateAnimation=true,
-            Scale=c.Scale,Build=c.Build,WeaponDrawn=choice==1,BackDrawn=c.BackDrawn,UnitMovement=choice==3 });
+            Scale=c.Scale,Build=c.Build,WeaponDrawn=drawn,BackDrawn=backDrawn,UnitMovement=choice==3 });
         float distance=choice==3 ? 78 : 54*Math.Max(1,c.Scale);
         request=new(key,width,height,yaw,choice==3?.87f:.09f,distance*zoom,false,.66f,0);
         Stage.SetValue(renderer,request);
+    }
+
+    private static readonly FieldInfo Lengths = AccessTools.Field(Host, "AnimationLengths");
+
+    private static float ClipLength(object host, string clip) =>
+        (Lengths.GetValue(host) as AnimationLengths)?.Of(clip) ?? 1;
+
+    private static List<(int Index, float Weight)> CombatLayers(AnimationLibrary library, HandHold hand)
+    {
+        var stance = new AnimationStance { Combat = true, Right = hand };
+        List<(int Index, float Weight)> layers = [];
+        int guard = library.CombatGuard(stance, 0);
+        if (guard < 0) return layers;
+        if (library.Definitions[guard].Area != AnimationArea.All)
+            library.Movement(AnimationArea.Lower, 0, stance, layers);
+        layers.Add((guard, 1));
+        return layers;
     }
 
     private static void Paint(object __instance)
