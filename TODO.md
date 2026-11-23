@@ -1,9 +1,9 @@
 # NUE UI improvements
 
-1. [ ] Add a search bar to crafting stations.
-2. [ ] Add a search bar to research stations.
-3. [ ] Compare an inventory item with the gear currently equipped in its slot.
-4. [ ] Add a search bar to inventory and trade windows.
+1. [x] Add a search bar to crafting stations.
+2. [x] Add a search bar to research stations.
+3. [x] Compare an inventory item with the gear currently equipped in its slot.
+4. [x] Add a search bar to inventory and trade windows.
 5. [ ] Add small, configurable status markers to squad portraits so critical downed and injury states are visible at a glance. Reference the Vital Read mod.
 6. [ ] Add custom map markers.
 7. [ ] Improve the map widget with a 3D height map. Reference the TimeLight mod in the MeitouClient Discord.
