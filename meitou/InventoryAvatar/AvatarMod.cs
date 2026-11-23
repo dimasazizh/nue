@@ -20,6 +20,8 @@ public sealed class AvatarMod : IMod
     private static readonly string[] Labels = ["Idle", "Attack stance", "Sitting on mat", "Sleeping / lying"];
     private static readonly Stopwatch Clock = Stopwatch.StartNew();
     private static int choice;
+    private static float yaw = .12f, zoom = 1f, lastDragX;
+    private static MyGuiScreenHost? dragHost;
     private static bool expanded;
     private static object? ui, renderer;
     private static EditorStageRequest? request;
@@ -40,6 +42,10 @@ public sealed class AvatarMod : IMod
     private static readonly MethodInfo Publish = AccessTools.Method(Player, "SetUiTexture");
     private static readonly FieldInfo Library = AccessTools.Field(Host, "AnimationLibrary");
 
+    private static readonly FieldInfo Editor = AccessTools.Field(Host, "CharacterEditor");
+    private static readonly MethodInfo Bar = AccessTools.PropertyGetter(Editor.FieldType, "Bar");
+    private static readonly MethodInfo ClipTime = AccessTools.Method(Bar.ReturnType, "EditorClipTime");
+
     public void Initialize(ModContext context)
     {
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
@@ -49,6 +55,12 @@ public sealed class AvatarMod : IMod
         After(GameType("Ui.ScreenRouter"), "FaithfulAction", nameof(Click));
         After(Host, "FillDrawList", nameof(Prepare));
         After(Render, "DrawPortraits", nameof(Paint));
+        void Before(string target, string method) => context.Harmony.Patch(
+            AccessTools.Method(typeof(MyGuiScreenHost), target), prefix: new HarmonyMethod(typeof(AvatarMod), method));
+        Before("PointerDown", nameof(StartDrag));
+        Before("PointerMove", nameof(Rotate));
+        Before("PointerUp", nameof(EndDrag));
+        Before("Wheel", nameof(Zoom));
     }
 
     private static float PaneWidth(float h) => MathF.Round(h * .49f);
@@ -76,11 +88,43 @@ public sealed class AvatarMod : IMod
         width = Math.Max(1,(int)image.Width);
         height = Math.Max(1,(int)image.Height);
         controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
-            new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:false,Clip:root));
+            new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
         void Button(int index, string label, float y) => controls.Add(new("NuePose"+index,"Button",menu with { Y=y },
             label,"nue-avatar:"+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
         Button(-1,Labels[choice]+"  ▾",menu.Y);
         if (expanded) for(int i=0;i<Labels.Length;i++) Button(i,Labels[i],menu.Y+(i+1)*row);
+    }
+
+    private static bool OverAvatar(MyGuiScreenHost host, Vector2 p) =>
+        host.IsOpen("inventory") && host.HitTest(p) is { Screen: "inventory", Control.Name: "NueAvatar" };
+
+    private static bool StartDrag(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    {
+        dragHost = null;
+        if (!OverAvatar(__instance, p)) return true;
+        dragHost = __instance;
+        lastDragX = p.X;
+        __result = true;
+        return false;
+    }
+
+    private static bool Rotate(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    {
+        if (dragHost != __instance) return true;
+        yaw = MathF.IEEERemainder(yaw - (p.X - lastDragX) * MathF.Tau / width, MathF.Tau);
+        lastDragX = p.X;
+        __result = true;
+        return false;
+    }
+
+    private static void EndDrag() => dragHost = null;
+
+    private static bool Zoom(MyGuiScreenHost __instance, Vector2 p, float steps, ref bool __result)
+    {
+        if (!OverAvatar(__instance, p)) return true;
+        zoom = Math.Clamp(zoom * MathF.Pow(.87f, steps), .4f, 2f);
+        __result = true;
+        return false;
     }
 
     private static void Click(MyGuiEvent e)
@@ -101,14 +145,17 @@ public sealed class AvatarMod : IMod
         if(!screens.IsOpen("inventory") || screens.IsOpen("editor") || Stage.GetValue(renderer)!=null ||
            Owner.Invoke(GetInventory.Invoke(ui,null),["inventory"]) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
         {
-            subject=CharacterId.None; expanded=false; choice=0; return;
+            dragHost=null; subject=CharacterId.None; expanded=false; choice=0; return;
         }
-        if(subject!=c.Id) { subject=c.Id; choice=0; expanded=false; Clock.Restart(); }
+        if(subject!=c.Id) { subject=c.Id; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=false; Clock.Restart(); }
         float t=(float)Clock.Elapsed.TotalSeconds;
+        var bar = Bar.Invoke(Editor.GetValue(__instance), null);
+        CharacterPose StandingPose(string name) =>
+            new(name, (float)ClipTime.Invoke(bar, [name, t])!, 1);
         IReadOnlyList<CharacterPose> poses = choice switch {
             2 => [new("sitting idle",t*.55f,1)],
             3 => [new("sleeponfloor",t*.1f,1)],
-            _ => [new("idle_stand_relax",t,1)] };
+            _ => [StandingPose(look.Body?.IdleStance ?? "idle_stand_relax")] };
         if(choice==1 && Library.GetValue(__instance) is AnimationLibrary lib)
         {
             var weapon = look.Parts.FirstOrDefault(p => p.Shown == WeaponShown.Drawn)
@@ -116,13 +163,13 @@ public sealed class AvatarMod : IMod
             var stance = new AnimationStance { Combat = true, Left = HandHold.Empty,
                 Right = weapon == null ? HandHold.Empty : HandHold.OfCategory(weapon.Record.GetInt("skill category")) };
             int guard=lib.CombatGuard(stance,0);
-            if(guard>=0) poses=[poses[0],new(lib.Definitions[guard].Name,t,1)];
+            if(guard>=0) poses=[poses[0],StandingPose(lib.Definitions[guard].Name)];
         }
         long key=long.MinValue+((long)(uint)c.Id.Slot<<32)+(uint)c.Id.Generation;
         list.Items.Add(new CharacterInstance(key,look,c.Position,0,poses) { Hidden=true, FullRateAnimation=true,
             Scale=c.Scale,Build=c.Build,WeaponDrawn=choice==1,BackDrawn=c.BackDrawn,UnitMovement=choice==3 });
         float distance=choice==3 ? 78 : 54*Math.Max(1,c.Scale);
-        request=new(key,width,height,.12f,choice==3?.87f:.09f,distance,false,.66f,0);
+        request=new(key,width,height,yaw,choice==3?.87f:.09f,distance*zoom,false,.66f,0);
         Stage.SetValue(renderer,request);
     }
 
