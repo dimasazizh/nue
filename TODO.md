@@ -9,9 +9,11 @@
 7. [ ] Improve the map widget with a 3D height map. Reference the TimeLight mod in the MeitouClient Discord.
 8. [ ] Show a local map when zoomed in far enough. Reference the Guild and Quest mod in the MeitouClient Discord.
 9. [ ] Let players hide more of the stats panel.
+   - Add tabs for the health and stats panels.
 10. [ ] Rework the equipment slots in the inventory to move away from the rigid grid.
 11. [ ] Add equipment slots for eyes, hands, and neck.
 12. [ ] Add a consolidated armor information view. Reference the Character Inspector mod.
-13. [ ] Show racial XP multipliers. Reference the Racial XP Multipliers - RaceMetrics mod.
-14. [ ] Update the stats panels when hovering over a character.
+13. [x] Show racial XP multipliers. Reference the Racial XP Multipliers - RaceMetrics mod.
+14. [x] Update the stats panels when hovering over a character.
 15. [ ] Add an on/off toggle in the mod options for each improvement.
+16. [ ] Add customizable inventory sorting with **Sort By Type**, **Sort By Item**, and **Sort All** modes.
