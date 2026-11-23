@@ -4,14 +4,34 @@
   <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch" layer="Middle" name="Root">
     <Property key="InheritsPick" value="true"/>
     <Property key="NeedMouse" value="false"/>
+    <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.8 0.716 0.2 0.284" name="SquadPanelDragAndMove" align="Right Bottom">
+      <Property key="Snap" value="true"/>
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="NUE_RightHudBackdrop" align="Stretch">
+        <Property key="NeedMouse" value="false"/>
+      </Widget>
+      <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.03550632232 0.29830811838 0.804922622015 0.536198923873" align="Stretch">
+        <Property key="NeedMouse" value="false"/>
+        <Property key="InheritsPick" value="true"/>
+        <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0.048643179401 0.9955 0.951356820599" name="SquadPanel">
+          <Property key="ButtonAutoWidth" value="false"/>
+          <Property key="ButtonWidth" value="112"/>
+          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+            <Property key="Caption" value="Squad 1"/>
+          </Widget>
+          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+            <Property key="Caption" value="Squad 2"/>
+          </Widget>
+          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
+            <Property key="Caption" value="Squad 3"/>
+          </Widget>
+        </Widget>
+      </Widget>
+    </Widget>
     <Widget type="Window" skin="NUE_HudReadoutWindow" position_real="0.800000000000 0.716000000000 0.200000000000 0.284000000000" name="TimeMoneyPanelDragAndMove" align="Right Bottom">
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="TimeMoneyPanel">
         <Property key="InheritsPick" value="true"/>
         <Property key="NeedMouse" value="false"/>
-        <Widget type="Widget" skin="NUE_PanelBackground" position_real="0 0 1 1" name="NUE_RightHudBackdrop" align="Stretch">
-          <Property key="NeedMouse" value="false"/>
-        </Widget>
         <Widget type="TextBox" skin="Kenshi_TextboxStandardText" position_real="0.27800632232 0.026443661972 0.235 0.054929577464" align="Default" name="MoneyLabelText">
           <Property key="Alpha" value="0.85"/>
           <Property key="Caption" value="Money:"/>
@@ -146,26 +166,6 @@
           <Property key="TextAlign" value="Center"/>
           <Property key="NeedMouse" value="false"/>
           <Property key="NeedKey" value="false"/>
-        </Widget>
-      </Widget>
-    </Widget>
-    <Widget type="Widget" skin="NUE_PanelBackground" position_real="0.807101264464 0.800719505620 0.160984524403 0.152280494380" align="Right Bottom">
-      <Property key="NeedMouse" value="false"/>
-      <Property key="InheritsPick" value="true"/>
-      <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0 1 1" name="SquadPanelDragAndMove" align="Stretch">
-        <Property key="Snap" value="true"/>
-        <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0.048643179401 0.9955 0.951356820599" name="SquadPanel">
-          <Property key="ButtonAutoWidth" value="false"/>
-          <Property key="ButtonWidth" value="112"/>
-          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-            <Property key="Caption" value="Squad 1"/>
-          </Widget>
-          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-            <Property key="Caption" value="Squad 2"/>
-          </Widget>
-          <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
-            <Property key="Caption" value="Squad 3"/>
-          </Widget>
         </Widget>
       </Widget>
     </Widget>
