@@ -84,13 +84,13 @@
     <Widget type="Widget" skin="PanelEmpty" position="0 0 716 220" name="Root">
       <UserString key="LE_TargetWidgetType" value="TabControl"/>
       <UserString key="ButtonSkin" value="Kenshi_SquadTabButton"/>
-      <Widget type="Widget" skin="Kenshi_SquadPanelHeaderSkin" position="0 6 716 35" align="HStretch Top"/>
-      <Widget type="Widget" skin="PanelEmpty" position="20 6 670 37" align="HStretch Top" name="HeaderPlace">
-        <Widget type="Widget" skin="PanelEmpty" position="0 0 645 37" align="Stretch" name="Empty"/>
-        <Widget type="Widget" skin="PanelEmpty" position="638 0 32 37" align="Right Top" name="Controls">
+      <Widget type="Widget" skin="Kenshi_SquadPanelHeaderSkin" position="0 0 716 31" align="HStretch Top"/>
+      <Widget type="Widget" skin="PanelEmpty" position="20 0 670 33" align="HStretch Top" name="HeaderPlace">
+        <Widget type="Widget" skin="PanelEmpty" position="0 0 645 33" align="Stretch" name="Empty"/>
+        <Widget type="Widget" skin="PanelEmpty" position="638 0 32 33" align="Right Top" name="Controls">
           <Property key="Visible" value="false"/>
-          <Widget type="Button" skin="Kenshi_SmallArrowLeftSkin" position="0 9 15 19" name="Left"/>
-          <Widget type="Button" skin="Kenshi_SmallArrowRightSkin" position="17 9 15 19" name="Right"/>
+          <Widget type="Button" skin="Kenshi_SmallArrowLeftSkin" position="0 7 15 19" name="Left"/>
+          <Widget type="Button" skin="Kenshi_SmallArrowRightSkin" position="17 7 15 19" name="Right"/>
         </Widget>
       </Widget>
       <Widget type="Widget" skin="Kenshi_SquadPanelSkin" position="0 53 716 167" align="Stretch">

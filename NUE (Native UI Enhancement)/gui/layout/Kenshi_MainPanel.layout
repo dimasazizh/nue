@@ -111,13 +111,13 @@
       <Property key="Snap" value="false"/>
       <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="FloorPanel">
         <Property key="Alpha" value="0.75"/>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.77 0.016582278481 0.22 0.515440136315" name="FloorArrowUp" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.134375 0.308446858793 0.73125 0.383106282414" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.748 0.067871542429 0.252 0.429844673812" name="FloorArrowUp" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_up" name="NUE_Art_FloorArrowUp" position_real="0.180803571429 0.270302662262 0.638392857143 0.459394675475" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
-        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0.53 0.016582278481 0.22 0.515440136315" name="FloorArrowDown" align="Default">
-          <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.134375 0.308446858793 0.73125 0.383106282414" align="Default">
+        <Widget type="Button" skin="NUE_ButtonSurface" position_real="0 0.067871542429 0.252 0.429844673812" name="FloorArrowDown" align="Default">
+          <Widget type="Widget" skin="NUE_Icon_down" name="NUE_Art_FloorArrowDown" position_real="0.180803571429 0.270302662262 0.638392857143 0.459394675475" align="Default">
             <Property key="NeedMouse" value="false"/>
           </Widget>
         </Widget>
@@ -141,7 +141,7 @@
             </Widget>
           </Widget>
         </Widget>
-        <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0 0.016582278481 0.42 0.515440136315" name="FloorText" align="Default">
+        <Widget type="EditBox" skin="Kenshi_WordWrapEmpty" position_real="0.29 0.067871542429 0.42 0.429844673812" name="FloorText" align="Default">
           <Property key="Caption" value="Floor 1"/>
           <Property key="TextAlign" value="Center"/>
           <Property key="NeedMouse" value="false"/>
@@ -154,7 +154,7 @@
       <Property key="InheritsPick" value="true"/>
       <Widget type="Window" skin="Kenshi_WindowSquadTabControlDragAndMove" position_real="0 0 1 1" name="SquadPanelDragAndMove" align="Stretch">
         <Property key="Snap" value="true"/>
-        <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0 0.9955 1" name="SquadPanel">
+        <Widget type="TabControl" skin="NUE_SquadTabClearance" position_real="0 0.048643179401 0.9955 0.951356820599" name="SquadPanel">
           <Property key="ButtonAutoWidth" value="false"/>
           <Property key="ButtonWidth" value="112"/>
           <Widget type="TabItem" skin="" position_real="0.0183727 0.906897 0.965879 0.737069">
