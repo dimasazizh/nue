@@ -3,6 +3,12 @@ NUE (Native UI Enhancement) is Kenshi GUI modification that seeks to improve qua
 
 Version: **0.0.5**
 
+## HUD compass for MeitouClient
+
+The top-center compass follows the camera and shows eight directions. Nearby discovered locations and player outposts appear as map icons. When icons overlap, the closest location takes priority.
+
+Extract the enclosed `NueCompass` folder into your mods directory and enable it in MeitouClient nightly `0.22.2-nightly.20261122.2`. [Download Compass 0.1.0](meitou/Compass/NueCompass-0.1.0.zip)
+
 ## Search and gear comparison for MeitouClient
 
 [Download Search & Compare 0.1.0](meitou/SearchCompare/NueSearchCompare-0.1.0.zip) for nightly `0.22.2-nightly.20261122.2`. Extract the enclosed `NueSearchCompare` folder into your mods directory and enable it.
