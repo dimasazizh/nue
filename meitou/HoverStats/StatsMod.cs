@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Reflection;
+using System.Numerics;
+using Meitou.Game.Ui;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
@@ -21,8 +23,86 @@ public sealed class StatsMod : IMod
     static readonly MethodInfo Selected = AccessTools.Method(Player,"Selected");
     static CharacterId? hovered;
 
+    public sealed class Options
+    {
+        [Setting("Show character hover outline", Hint = "Show the character under the pointer when the game’s hover outline is enabled.")]
+        public bool ShowOutline { get; set; } = true;
+    }
+
+    static readonly Options Settings = new();
+    sealed record Examination(World World, CharacterId Id, MyGuiScreenHost Screens);
+    static volatile Examination? examination;
+    [ThreadStatic] static IReadOnlyList<CharacterSnapshot>? statsSelection;
+    static readonly FieldInfo Screens = AccessTools.Field(Player,"FaithfulScreens");
+    static readonly Type Menu = Game("Ui.ContextMenuWindow");
+    static readonly FieldInfo MenuPlayer = Menu.GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
+
+    static void Outline(ref (CharacterId Id, Vector4 Colour)? __result)
+    {
+        if (!Settings.ShowOutline) __result = null;
+    }
+
+    static void AddExamine(object __instance, CharacterSnapshot target, List<(string Caption,Action Give)> __result)
+    {
+        if (target.IsPlayer) return;
+        var id = target.Id;
+        var player = MenuPlayer.GetValue(__instance)!;
+        __result.Add(("Examine", () =>
+        {
+            var session = (WorldSession)Session.GetValue(player)!;
+            if (!session.CurrentSnapshot.Characters.Any(c=>c.Id==id)) return;
+            var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+            AccessTools.Method(Player,"Inspect").Invoke(player,[id]);
+            examination = new(session.World,id,screens);
+            screens.Open("stats");
+        }));
+    }
+
+    static void Closed(MyGuiScreenHost __instance,string id)
+    {
+        if (id=="stats" && examination?.Screens==__instance) examination=null;
+    }
+
+    static bool NeedsDetails(bool shown, World world, CharacterId id) =>
+        shown || examination is {} e && ReferenceEquals(e.World,world) && e.Id==id;
+
+    static CharacterSnapshot? Examined(object player)
+    {
+        var e=examination;
+        if (e==null || Session.GetValue(player) is not WorldSession session || !ReferenceEquals(e.World,session.World)) return null;
+        return session.CurrentSnapshot.Characters.FirstOrDefault(c=>c.Id==e.Id);
+    }
+
+    static void StatsTitle(string id,ref CharacterSnapshot? lead,object __instance)
+    {
+        if (id=="stats" && examination!=null)
+            lead=Examined(AccessTools.Field(__instance.GetType(),"<player>P").GetValue(__instance)!);
+    }
+
+    static void BeginStats(object __instance,out IReadOnlyList<CharacterSnapshot>? __state)
+    {
+        __state=statsSelection;
+        if (examination!=null) statsSelection=Examined(StatsPlayer.GetValue(__instance)!) is {} npc ? [npc] : [];
+    }
+
+    static void EndStats(IReadOnlyList<CharacterSnapshot>? __state) => statsSelection=__state;
+    static bool StatsSubject(ref IReadOnlyList<CharacterSnapshot> __result)
+    {
+        if (statsSelection==null) return true;
+        __result=statsSelection;
+        return false;
+    }
+
     public void Initialize(ModContext context)
     {
+        context.AddSettings(Settings);
+        HarmonyMethod Hook(string name) => new(typeof(StatsMod),name);
+        context.Harmony.Patch(AccessTools.PropertyGetter(Game("Ui.PointerView"),"HoverTarget"),postfix:Hook(nameof(Outline)));
+        context.Harmony.Patch(AccessTools.Method(Menu,"Verbs"),postfix:Hook(nameof(AddExamine)));
+        context.Harmony.Patch(AccessTools.Method(typeof(MyGuiScreenHost),"Close"),postfix:Hook(nameof(Closed)));
+        context.Harmony.Patch(AccessTools.Method(Game("Ui.ScreenRouter"),"BindCharacterWindow"),prefix:Hook(nameof(StatsTitle)));
+        context.Harmony.Patch(Selected,prefix:Hook(nameof(StatsSubject)));
+        context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),prefix:Hook(nameof(BeginStats)),finalizer:Hook(nameof(EndStats)));
         void Rewrite(Type type,string method,string patch) => context.Harmony.Patch(AccessTools.Method(type,method),
             transpiler:new HarmonyMethod(typeof(StatsMod),patch));
         Rewrite(Game("Ui.PointerView"),"Point",nameof(ObservePointer));
@@ -64,6 +144,10 @@ public sealed class StatsMod : IMod
                 yield return new CodeInstruction(OpCodes.Ldloca,local);
                 yield return new CodeInstruction(OpCodes.Ldloca,local);
                 yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertyGetter(type,"Shown"));
+                yield return new CodeInstruction(OpCodes.Ldarg_0);
+                yield return new CodeInstruction(OpCodes.Ldloca,local);
+                yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertyGetter(type,"Id"));
+                yield return new CodeInstruction(OpCodes.Call,AccessTools.Method(typeof(StatsMod),nameof(NeedsDetails)));
                 yield return new CodeInstruction(OpCodes.Ldloca,local);
                 yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertyGetter(type,"Cold"));
                 yield return new CodeInstruction(OpCodes.Ldnull);

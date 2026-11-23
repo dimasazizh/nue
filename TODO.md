@@ -17,3 +17,6 @@
 14. [x] Update the stats panels when hovering over a character.
 15. [ ] Add an on/off toggle in the mod options for each improvement.
 16. [ ] Add customizable inventory sorting with **Sort By Type**, **Sort By Item**, and **Sort All** modes.
+17. [ ] Add a bestiary panel that shows complete stats and skills for NPCs and beasts.
+18. [x] Add an **Examine** option to the NPC right-click menu that opens the NPC’s full skill details.
+19. [ ] Add a Skyrim-inspired HUD compass bar that shows cardinal directions and nearby points of interest.
