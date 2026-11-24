@@ -1,7 +1,7 @@
 # nue
 NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes.
 
-Version: **0.1.1**
+Version: **0.1.0**
 
 [Download the complete MeitouClient mod bundle](NUE-0.1.1.zip). Extract its folders into your mods directory and enable them in the launcher.
 
