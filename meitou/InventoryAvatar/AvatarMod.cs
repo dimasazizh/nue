@@ -16,7 +16,7 @@ using System.Reflection;
 
 namespace Nue.InventoryAvatar;
 
-public sealed class AvatarMod : IMod
+public sealed partial class AvatarMod : IMod
 {
     private const string Texture = "nue:inventory-avatar";
     private static readonly string[] Labels = ["Idle", "Attack stance", "Sitting on mat", "Sleeping / lying"];
@@ -52,6 +52,8 @@ public sealed class AvatarMod : IMod
     {
         foreach (var slot in Accessories)
             context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
+        context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
+            prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
         After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
             postfix: new HarmonyMethod(typeof(AvatarMod),method));
@@ -157,7 +159,7 @@ public sealed class AvatarMod : IMod
     private static void Controls(string id, List<UiControl> controls,object __instance)
     {
         if (id != "inventory" || controls.Find(c=>c.Type=="Window") is not {} window ||
-            Subject(RouterPlayer.GetValue(__instance)!)==null) return;
+            Subject(RouterPlayer.GetValue(__instance)!) is not {} owner) return;
         var root = window.Bounds;
         if(controls.Find(c=>c.Name=="main") is {} grid && controls.Find(c=>c.Name=="ArrangeButton") is {} arrange)
             bagAnchor=new(grid.Bounds.X,Math.Max(grid.Bounds.Y+grid.Bounds.Height,arrange.Bounds.Y+arrange.Bounds.Height)+6);
@@ -170,6 +172,7 @@ public sealed class AvatarMod : IMod
             new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
         void Button(int index, string label, float y) => controls.Add(new("NuePose"+index,"Button",menu with { Y=y },
             label,"nue-avatar:"+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
+        ArrangeEquipment(controls,root,owner,RouterPlayer.GetValue(__instance)!);
         Button(-1,Labels[choice]+"  ▾",menu.Y);
         if (expanded) for(int i=0;i<Labels.Length;i++) Button(i,Labels[i],menu.Y+(i+1)*row);
     }
@@ -215,6 +218,12 @@ public sealed class AvatarMod : IMod
 
     private static void Click(MyGuiEvent e)
     {
+        if(e.Screen=="inventory" && e.Action is "nue-rack:back" or "nue-rack:hip")
+        {
+            var section=e.Action[9..];
+            openRack=openRack==section ? null : section;
+            return;
+        }
         if(e.Screen!="inventory" || !e.Action.StartsWith("nue-avatar:") || !int.TryParse(e.Action[11..],out int index)) return;
         if(index==-1) expanded=!expanded;
         else if((uint)index<Labels.Length) { choice=index; expanded=false; Clock.Restart(); }
@@ -231,9 +240,9 @@ public sealed class AvatarMod : IMod
         if(!screens.IsOpen("inventory") || screens.IsOpen("editor") || Stage.GetValue(renderer)!=null ||
            Subject(ui) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
         {
-            dragHost=null; subject=CharacterId.None; expanded=false; choice=0; return;
+            dragHost=null; subject=CharacterId.None; openRack=null; expanded=false; choice=0; return;
         }
-        if(subject!=c.Id) { subject=c.Id; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=false; Clock.Restart(); }
+        if(subject!=c.Id) { subject=c.Id; openRack=null; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=false; Clock.Restart(); }
         float t=(float)Clock.Elapsed.TotalSeconds;
         var bar = Bar.Invoke(Editor.GetValue(__instance), null);
         CharacterPose StandingPose(string name) =>

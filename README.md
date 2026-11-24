@@ -13,13 +13,15 @@ Extract the enclosed `NueHudTabs` folder into your mods directory and enable it 
 
 ## Inventory inspection for MeitouClient
 
-Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Equipment slots keep their compact arrangement in the middle, with weight, disguise, and ownership information underneath. The personal inventory and open backpack share the right column.
+Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, with weight, disguise, and ownership information underneath. The personal inventory and open backpack share the right column.
 
-Eyes, Hands, and Neck each accept one compatible accessory. Item mods should use FCS slot 4 for eyes, 10 for hands, and 11 for neck.
+Open the badge on Primary or Secondary to access the individual weapons in that section. Equipment thumbnails preserve their proportions, and storage uses each item’s ordinary footprint.
+
+Eyes, Hands, and Neck sit in a fourth row and each accept one compatible accessory. Item mods should use FCS slot 4 for eyes, 10 for hands, and 11 for neck.
 
 Drag the preview to rotate it and scroll over it to zoom. Use the pose menu to select idle, attack stance, sitting, or lying. The preview uses the character stage’s lighting.
 
-Replace the existing `NueInventoryAvatar` folder, merge the enclosed `NUE (Native UI Enhancement)` layout into your installed NUE folder, and enable both mods on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.3.1](meitou/InventoryAvatar/NueInventoryAvatar-0.3.1.zip)
+Replace the existing `NueInventoryAvatar` folder, merge the enclosed `NUE (Native UI Enhancement)` layout into your installed NUE folder, and enable both mods on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.4.0](meitou/InventoryAvatar/NueInventoryAvatar-0.4.0.zip)
 
 ## HUD compass for MeitouClient
 
