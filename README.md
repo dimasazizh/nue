@@ -1,7 +1,7 @@
 # nue
 NUE (Native UI Enhancement) is Kenshi GUI modification that seeks to improve quality of life but still maintaining the vanilla GUI vibes.
 
-Version: **0.0.5**
+Version: **0.1.0**
 
 ## Character tabs and building information for MeitouClient
 
