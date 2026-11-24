@@ -3,11 +3,13 @@ NUE (Native UI Enhancement) is Kenshi GUI modification that seeks to improve qua
 
 Version: **0.0.5**
 
-## Health and Stats HUD tabs for MeitouClient
+## Character tabs and building information for MeitouClient
 
 With the NUE layout enabled, the lower-left character panel opens on Health. Click the vertical Stats tab to see combat attributes, XP rates, KO point, run speed and hunger rate. The character name, condition and current activity sit immediately above either view.
 
-Extract the enclosed `NueHudTabs` folder into your mods directory and enable it alongside NUE on nightly `0.22.2-nightly.20261122.2`. [Download HUD Tabs 0.1.0](meitou/HudTabs/NueHudTabs-0.1.0.zip)
+Selecting a building shows a compact bottom-left panel. It grows with the visible actions and condition meters. Buildings with extended stats have an expand button.
+
+Extract the enclosed `NueHudTabs` folder into your mods directory and enable it alongside NUE on nightly `0.22.2-nightly.20261122.2`. [Download HUD Tabs 0.1.1](meitou/HudTabs/NueHudTabs-0.1.1.zip)
 
 ## HUD compass for MeitouClient
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Meitou.Data.Ui;
 using Meitou.Game.Ui;
@@ -21,6 +22,10 @@ public sealed class HudTabsMod : IMod, IUiExtension
     static readonly FieldInfo Expanded = AccessTools.Field(Player, "InfoExpanded");
     static readonly PropertyInfo BuildingSelection = AccessTools.Property(Player, "BuildingSelection");
     static readonly MethodInfo BuildingFocus = AccessTools.Method(BuildingSelection.PropertyType, "BuildingFocus");
+    static readonly MethodInfo BuildingLines = AccessTools.Method(BuildingSelection.PropertyType, "BuildingLines");
+    static readonly PropertyInfo ModButtons = AccessTools.Property(BuildingSelection.PropertyType, "ModButtons");
+    static readonly MethodInfo ButtonLines = AccessTools.Method(ModButtons.PropertyType, "Lines");
+    static readonly PropertyInfo UiScale = AccessTools.Property(Player, "UiScale");
     static readonly FieldInfo Layout = AccessTools.Field(Player, "FaithfulHud");
     static readonly FieldInfo Width = AccessTools.Field(Player, "Width");
     static readonly FieldInfo Height = AccessTools.Field(Player, "Height");
@@ -46,13 +51,72 @@ public sealed class HudTabsMod : IMod, IUiExtension
         __state = null;
         var layout = (MyGuiLayout)Layout.GetValue(__instance)!;
         if (layout.Find("NUE_HealthBackdrop") is not { } backdrop || b.Hidden.Contains("InformationPanel")
-            || b.Hidden.Contains("MedicalPanel") || BuildingFocus.Invoke(BuildingSelection.GetValue(__instance), null) != null)
+            || b.Hidden.Contains("MedicalPanel"))
             return;
 
         var screen = new UiRect(0, 0, (int)Width.GetValue(__instance)!, (int)Height.GetValue(__instance)!);
         var dock = backdrop.Position.RelativeTo(screen, true);
+        var selection = BuildingSelection.GetValue(__instance);
+        if (BuildingFocus.Invoke(selection, null) is { } focus)
+        {
+            var lines = (ITuple)BuildingLines.Invoke(selection, [focus])!;
+            int buttons = ((Array)ButtonLines.Invoke(ModButtons.GetValue(selection), [focus])!).Length;
+            int meters = 0;
+            while (!b.Hidden.Contains($"LifeBar{meters + 1}") && layout.Find($"LifeBar{meters + 1}") != null)
+                meters++;
+            ArrangeBuilding(b, dock, (float)UiScale.GetValue(__instance)!, ((Array)lines[1]!).Length,
+                ((Array)lines[2]!).Length + buttons, ((Array)lines[5]!).Length, meters,
+                (bool)Expanded.GetValue(__instance)!);
+            return;
+        }
         __state = dock;
         ArrangePanels(b, dock, showStats);
+    }
+
+    static void ArrangeBuilding(UiBindings b, UiRect dock, float scale, int state, int stats, int extra, int meters, bool expanded)
+    {
+        float row = 20 * scale, pad = 4 * scale;
+        float bottom = dock.Y + dock.Height;
+        float cursor = bottom - pad;
+        var positions = b.Positions;
+        UiRect Above(float height)
+        {
+            cursor -= height;
+            return new(dock.X + pad, cursor, dock.Width - 2 * pad, height);
+        }
+
+        // Use the same row spacing as AddHudText, including the visible slice of a scrollable meter list.
+        var medical = Above(meters * row);
+        if (meters == 0) b.Hidden.Add("MedicalPanelDragAndMove");
+        foreach (var name in new[] { "MedicalPanelDragAndMove", "MedicalPanel", "MedicalPanel_Back", "MedicalPanel_Front" })
+            positions[name] = medical;
+        for (int i = 1; i <= meters; i++)
+        {
+            float y = medical.Y + (i - 1) * row;
+            var bar = new UiRect(medical.X + pad, y + scale, medical.Width * .72f, row - 2 * scale);
+            string name = $"LifeBar{i}";
+            positions[name] = bar;
+            positions[name + "Value"] = new(bar.X + bar.Width, y, medical.Width - bar.Width - 2 * pad, row);
+            positions[name + "Tooltip"] = medical with { Y = y, Height = row };
+        }
+        if (meters > 0) cursor -= pad;
+        positions["StatsText"] = Above(stats * row);
+        positions["StatsPanel"] = positions["StatsText"];
+        positions["ExtendedStatsText"] = Above(expanded ? extra * row : 0);
+        if (extra > 0)
+        {
+            var strip = Above(row);
+            positions["ExtendedStatsButton"] = strip with { X = strip.X + strip.Width / 2 - row, Width = row * 2 };
+        }
+        else b.Hidden.Add("ExtendedStatsButton");
+        positions["StateText"] = Above(state * row);
+        positions["HealthText"] = positions["StatusPanel"] = Above(row);
+        positions["NameText"] = positions["NamePanel"] = Above(row);
+        cursor -= pad;
+        var group = dock with { Y = cursor, Height = bottom - cursor };
+        positions["ExtendedStatsPanel"] = positions["ExtendingPanel"] = positions["InformationPanel"] = group;
+        b.Hidden.Add("NUE_HealthBackdrop");
+        b.Hidden.Add("BountyPanel");
     }
 
     static void ArrangePanels(UiBindings b, UiRect dock, bool stats)
@@ -87,9 +151,21 @@ public sealed class HudTabsMod : IMod, IUiExtension
 
     static UiRect Inset(UiRect r, float n) => new(r.X + n, r.Y + n, r.Width - 2 * n, r.Height - 2 * n);
 
-    static void Tabs(List<UiControl> __result, UiRect? __state)
+    static void Tabs(List<UiControl> __result, UiRect? __state, UiBindings b)
     {
-        if (__state is not { } dock) return;
+        if (__state is not { } dock)
+        {
+            if (b.Positions.ContainsKey("MedicalPanel_Front") && b.Positions.ContainsKey("InformationPanel"))
+                for (int i = 0; i < __result.Count; i++)
+                {
+                    var control = __result[i];
+                    if (control.Name == "InformationPanel")
+                        __result[i] = control with { Skin = "NUE_PanelBackground" };
+                    else if (control.Name is "NamePanel" or "StatusPanel" or "StatsPanel" or "ExtendedStatsPanel")
+                        __result[i] = control with { Skin = "PanelEmpty", Pickable = false };
+                }
+            return;
+        }
         float unit = dock.Height / 229f;
         if (showStats)
         {

@@ -1,6 +1,6 @@
 {
   "id": "nue.hud-tabs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "apiVersion": 2,
   "gameVersion": "0.22.2",
   "assemblies": ["Nue.HudTabs.dll"],
