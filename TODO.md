@@ -11,7 +11,7 @@
 9. [ ] Let players hide more of the stats panel.
    - [x] Switch between health and stats with vertical HUD tabs in MeitouClient.
 10. [ ] Rework the equipment slots in the inventory to move away from the rigid grid.
-11. [ ] Add equipment slots for eyes, hands, and neck.
+11. [x] Add equipment slots for eyes, hands, and neck.
 12. [ ] Add a consolidated armor information view. Reference the Character Inspector mod.
 13. [x] Show racial XP multipliers. Reference the Racial XP Multipliers - RaceMetrics mod.
 14. [x] Update the stats panels when hovering over a character.

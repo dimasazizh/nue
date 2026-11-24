@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Meitou.Simulation.Items;
 using Meitou.Data.Gameplay;
 using Meitou.Data.Gameplay.Combat;
 using Meitou.Data.Characters;
@@ -49,6 +50,9 @@ public sealed class AvatarMod : IMod
 
     public void Initialize(ModContext context)
     {
+        foreach (var slot in Accessories)
+            context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
+        After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
             postfix: new HarmonyMethod(typeof(AvatarMod),method));
         foreach(string name in new[]{"PlaceCharacterWindow","PlaceBagWindow"})
@@ -65,6 +69,33 @@ public sealed class AvatarMod : IMod
         Before("PointerMove", nameof(Rotate));
         Before("PointerUp", nameof(EndDrag));
         Before("Wheel", nameof(Zoom));
+    }
+
+    private static readonly (string Section, string Label, int Fcs, int X)[] Accessories =
+        [("nue.eyes", "EYES", 4, 12), ("nue.hands", "HANDS", 10, 75), ("nue.neck", "NECK", 11, 138)];
+
+    // AddModSlots runs before item icons and hit targets are generated from the slot bounds.
+    private static void PlaceAccessories(List<UiControl> controls)
+    {
+        if (controls.Find(c=>c.Name=="nue.eyes") is not {} first ||
+            controls.Find(c=>c.Name=="datapanel") is not {} summary) return;
+        float size=first.Bounds.Height, labelHeight=size*.34f;
+        // In the inspection window the summary follows the boots. In linked windows it precedes the grid.
+        bool belowGear=controls.Find(c=>c.Name=="boots") is {} boots && summary.Bounds.Y>boots.Bounds.Y;
+        float y=belowGear ? summary.Bounds.Y-size-labelHeight*.65f : summary.Bounds.Y+summary.Bounds.Height+labelHeight;
+        float step=Math.Max(first.Bounds.Width+3,summary.Bounds.Width/3);
+        for (int i=0;i<Accessories.Length;i++)
+        {
+            var (name,label,_,_)=Accessories[i];
+            int index=controls.FindIndex(c=>c.Name==name);
+            if(index<0) continue;
+            var tile=controls[index];
+            var bounds=tile.Bounds with { X=summary.Bounds.X+i*step,Y=y };
+            controls[index]=tile with { Bounds=bounds,Skin="Kenshi_InventorySlotSkin" };
+            controls.Add(new(name+"-label","TextBox",bounds with { Y=y-labelHeight,Height=labelHeight },
+                label,"","Kenshi_TextboxPaintedText",true,new Dictionary<string,string>{{"TextAlign","Left VCenter"}},
+                default,Pickable:false,Clip:tile.Clip));
+        }
     }
 
     private static readonly Type Layout = GameType("Ui.InventoryLayout");
@@ -112,7 +143,7 @@ public sealed class AvatarMod : IMod
             if(!b.RelativePositions.TryGetValue(child,out var r)) continue;
             var compact=new UiRect(.40f+(r.X-.42f)*sx,r.Y*sy,r.Width*sx,r.Height*sy);
             if(child.Children.Any(c=>c.Name=="datapanel"))
-                compact=new(.40f,.72f,.26f,.26f);
+                compact=new(.40f,.812f,.26f,.177f);
             else if(child.Name is "main" or "InventoryMainTitle" or "ArrangeButton")
             {
                 float y=child.Name=="main" ? .075f : child.Name=="InventoryMainTitle" ? .04f : .075f+(gridHeight+gap)/(root.Height*.95f);
