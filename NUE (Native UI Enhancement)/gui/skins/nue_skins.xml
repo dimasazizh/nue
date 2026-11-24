@@ -197,7 +197,7 @@
   </Resource>
   <Resource type="ResourceSkin" name="NUE_Panel" size="174 68" texture="Kenshi_UI.png">
     <BasisSkin type="SubSkin" offset="0 0 174 68" align="Stretch">
-      <State name="normal" offset="1185 1572 174 68"/>
+      <State name="normal" offset="1634 733 174 68"/>
     </BasisSkin>
   </Resource>
   <Resource type="ResourceSkin" name="NUE_Body" size="96 128" texture="nue_body.png">
