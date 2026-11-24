@@ -52,7 +52,9 @@ public sealed partial class AvatarMod : IMod
     private static readonly MethodInfo Bar = AccessTools.PropertyGetter(Editor.FieldType, "Bar");
     private static readonly MethodInfo ClipTime = AccessTools.Method(Bar.ReturnType, "EditorClipTime");
 
-    public void Initialize(ModContext context)
+    public void Initialize(ModContext context) => Install(context, true);
+
+    internal void Install(ModContext context, bool preview)
     {
         folder = context.Folder;
         inspection = MyGuiReader.ReadLayout(Path.Combine(folder, "InventoryInspection.layout"));
@@ -62,16 +64,17 @@ public sealed partial class AvatarMod : IMod
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(BeforeLoad)),
             postfix: new HarmonyMethod(typeof(AvatarMod), nameof(FitSavedPockets)),
             finalizer: new HarmonyMethod(typeof(AvatarMod), nameof(EndLoad)));
+        foreach (var slot in Accessories)
+            context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
+        After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
+        if (!preview) return;
         After(Render, "StageCamera", nameof(FrameAvatar));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen"),
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
-        foreach (var slot in Accessories)
-            context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
             prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
-        After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
             postfix: new HarmonyMethod(typeof(AvatarMod),method));
         foreach(string name in new[]{"PlaceCharacterWindow","PlaceBagWindow"})

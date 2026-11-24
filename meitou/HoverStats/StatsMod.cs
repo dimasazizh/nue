@@ -46,13 +46,13 @@ public sealed class StatsMod : IMod
     static void EndPanel(bool __state) => characterPanel = __state;
     static bool UseSelectedBuilding() => !characterPanel;
 
-    public sealed class Options
+    public class Options
     {
         [Setting("Show character hover outline", Hint = "Show the character under the pointer when the game’s hover outline is enabled.")]
         public bool ShowOutline { get; set; } = true;
     }
 
-    static readonly Options Settings = new();
+    static Options Settings = new();
     sealed record Examination(World World, CharacterId Id, MyGuiScreenHost Screens);
     static volatile Examination? examination;
     [ThreadStatic] static IReadOnlyList<CharacterSnapshot>? statsSelection;
@@ -119,6 +119,12 @@ public sealed class StatsMod : IMod
     public void Initialize(ModContext context)
     {
         context.AddSettings(Settings);
+        Install(context, Settings);
+    }
+
+    internal void Install(ModContext context, Options options)
+    {
+        Settings = options;
         HarmonyMethod Hook(string name) => new(typeof(StatsMod),name);
         context.Harmony.Patch(AccessTools.PropertyGetter(Game("Ui.PointerView"),"HoverTarget"),postfix:Hook(nameof(Outline)));
         context.Harmony.Patch(AccessTools.Method(Menu,"Verbs"),postfix:Hook(nameof(AddExamine)));
