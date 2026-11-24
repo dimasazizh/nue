@@ -25,10 +25,11 @@
     - [x] Show the expander only when there are extended stats. Allow room for construction materials, crops, wind and power, or ammo when the selected building supplies those rows.
     - [x] Preserve the anchor MeitouClient uses to place storage windows.
 21. [ ] Rework the MeitouClient Inventory Avatar mod to use the in-world camera.
-    - [ ] Animate the main camera into a close-up of the selected character with a higher camera origin. Reuse the existing world render and measure the performance impact of removing the separate 3D preview.
-    - [ ] Frame the character to the left of the inventory window. Put the bag and inventory grids below the character.
-    - [ ] Keep the pose animations and mouse-wheel zoom. Click and release on the character to capture mouse movement for rotation. Click and release again anywhere in the world or inventory window to end rotation.
-    - [ ] Block world commands such as movement while inventory camera mode is active. Keep inventory controls available when rotation is inactive, and consume the click that ends rotation.
-    - [ ] Restore the pre-inventory camera position, orientation, and zoom when the close button or Escape closes the window.
-    - [ ] Add a lighting dropdown beside the pose selector with Night, Daylight, and Current World Lighting. Apply the choice only to the character’s lighting without changing the in-game clock.
+    - [x] Animate the main camera into a close-up of the selected character with a higher camera origin. Reuse the existing world render.
+    - [ ] Measure frame time against the separate 3D preview under matching in-game conditions.
+    - [x] Frame the character to the left of the inventory window. Put the bag and inventory grids below the character.
+    - [x] Keep the pose animations and mouse-wheel zoom. Click and release on the character to capture mouse movement for rotation. Click and release again anywhere in the world or inventory window to end rotation.
+    - [x] Block world commands such as movement while inventory camera mode is active. Keep inventory controls available when rotation is inactive, and consume the click that ends rotation.
+    - [x] Restore the pre-inventory camera position, orientation, and zoom when the close button or Escape closes the window.
+    - [x] Add a lighting dropdown beside the pose selector with Night, Daylight, and Current World Lighting. Apply the choice only to the character’s lighting without changing the in-game clock.
     - Trade-window design is deferred.

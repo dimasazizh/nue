@@ -11,6 +11,14 @@ Selecting a building shows a compact bottom-left panel. It grows with the visibl
 
 Extract the enclosed `NueHudTabs` folder into your mods directory and enable it alongside NUE on nightly `0.22.2-nightly.20261122.2`. [Download HUD Tabs 0.1.1](meitou/HudTabs/NueHudTabs-0.1.1.zip)
 
+## Inventory inspection for MeitouClient
+
+Opening a human character’s standalone inventory brings the world camera in close. Equipment is on the right, with the inventory grid and open backpack below the character. Close the inventory or press Escape to return to the previous camera position.
+
+Click and release on the character, then move the mouse to rotate. Click again anywhere to release rotation. Use the wheel over the world view to zoom. The two menus select a pose (idle, attack stance, sitting, or lying) and character lighting (world, daylight, or night). The lighting presets leave the game clock alone.
+
+Replace the existing `NueInventoryAvatar` folder in your mods directory with the folder from this archive and enable it on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.2.0](meitou/InventoryAvatar/NueInventoryAvatar-0.2.0.zip)
+
 ## HUD compass for MeitouClient
 
 The top-center compass follows the camera and shows eight directions. Nearby discovered locations and player outposts appear as map icons. When icons overlap, the closest location takes priority.
