@@ -13,11 +13,11 @@ Extract the enclosed `NueHudTabs` folder into your mods directory and enable it 
 
 ## Inventory inspection for MeitouClient
 
-Opening a human character’s standalone inventory brings the world camera in close. The live character appears on the far left at 1.5× the previous default magnification. Equipment occupies the middle column. The personal inventory and open backpack stack on the right. The NUE character inventory layout uses 80% of the screen height at default interface scale. Close the inventory or press Escape to return to the previous camera position.
+Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Equipment slots keep their compact arrangement in the middle, with weight, disguise, and ownership information underneath. The personal inventory and open backpack share the right column.
 
-Click and release on the character, then move the mouse to rotate. Click again anywhere to release rotation. Use the wheel over the world view to zoom. The two menus select a pose (idle, attack stance, sitting, or lying) and character lighting (world, daylight, or night). The lighting presets leave the game clock alone.
+Drag the preview to rotate it and scroll over it to zoom. Use the pose menu to select idle, attack stance, sitting, or lying. The preview uses the character stage’s lighting.
 
-Replace the existing `NueInventoryAvatar` folder, merge the enclosed `NUE (Native UI Enhancement)` layout into your installed NUE folder, and enable both mods on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.2.1](meitou/InventoryAvatar/NueInventoryAvatar-0.2.1.zip)
+Replace the existing `NueInventoryAvatar` folder, merge the enclosed `NUE (Native UI Enhancement)` layout into your installed NUE folder, and enable both mods on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.3.0](meitou/InventoryAvatar/NueInventoryAvatar-0.3.0.zip)
 
 ## HUD compass for MeitouClient
 

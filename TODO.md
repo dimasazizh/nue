@@ -24,12 +24,5 @@
     - [x] Size each section to its visible rows. Group the building name, owner, type, and town at the top. Keep warnings, access controls, and condition meters visible when applicable.
     - [x] Show the expander only when there are extended stats. Allow room for construction materials, crops, wind and power, or ammo when the selected building supplies those rows.
     - [x] Preserve the anchor MeitouClient uses to place storage windows.
-21. [ ] Rework the MeitouClient Inventory Avatar mod to use the in-world camera.
-    - [x] Animate the main camera into a close-up of the selected character with a higher camera origin. Reuse the existing world render.
-    - [ ] Measure frame time against the separate 3D preview under matching in-game conditions.
-    - [x] Frame the character on the far left, center the equipment window, and stack the personal and bag inventories on the right.
-    - [x] Keep the pose animations and mouse-wheel zoom. Click and release on the character to capture mouse movement for rotation. Click and release again anywhere in the world or inventory window to end rotation.
-    - [x] Block world commands such as movement while inventory camera mode is active. Keep inventory controls available when rotation is inactive, and consume the click that ends rotation.
-    - [x] Restore the pre-inventory camera position, orientation, and zoom when the close button or Escape closes the window.
-    - [x] Add a lighting dropdown beside the pose selector with Night, Daylight, and Current World Lighting. Apply the choice only to the character’s lighting without changing the in-game clock.
+21. [x] Restore the separate inventory avatar preview with compact equipment, details below the slots, and aligned personal and bag storage. Preserve the gameplay camera.
     - Trade-window design is deferred.

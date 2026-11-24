@@ -5,9 +5,7 @@ using Meitou.Data.Characters;
 using Meitou.Data.Ui;
 using Meitou.Game.Rendering.Characters;
 using Meitou.Game.Rendering.Frame;
-using Meitou.Game.Host;
-using Meitou.Game.Host.Cameras;
-using Meitou.Game.Host.Input;
+using Meitou.Game.Rendering.Gpu;
 using Meitou.Game.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
@@ -19,229 +17,192 @@ namespace Nue.InventoryAvatar;
 
 public sealed class AvatarMod : IMod
 {
+    private const string Texture = "nue:inventory-avatar";
     private static readonly string[] Labels = ["Idle", "Attack stance", "Sitting on mat", "Sleeping / lying"];
-    private static readonly string[] Lights = ["World lighting", "Daylight", "Night"];
-    private static readonly Stopwatch Clock = Stopwatch.StartNew(), Transition = new();
-    private static int choice, light, menu;
-    private static float yaw, zoom, lastX;
-    private static bool captured, toggleOnRelease;
-    private static readonly HashSet<MouseButton> blocked = [];
+    private static readonly Stopwatch Clock = Stopwatch.StartNew();
+    private static int choice;
+    private static float yaw = .12f, zoom = 1f, lastDragX;
+    private static MyGuiScreenHost? dragHost;
+    private static bool expanded;
+    private static object? ui, renderer;
+    private static EditorStageRequest? request;
     private static CharacterId subject = CharacterId.None;
-    private static long drawKey;
-    private static CameraRig? rig;
-    private static CameraRig.Saved saved;
-    private static CameraState start;
+    private static int width = 280, height = 540;
+
     private static Type GameType(string name) => typeof(IMod).Assembly.GetType("Meitou.Game." + name, true)!;
     private static readonly Type Player = GameType("PlayerInterface"), Host = GameType("GameHost"),
-        Layout = GameType("Ui.InventoryLayout"), Router = GameType("Ui.ScreenRouter");
-    private static readonly FieldInfo PlayerField = AccessTools.Field(Host, "Player"),
-        Screens = AccessTools.Field(Player, "FaithfulScreens"), Session = AccessTools.Field(Host,"Session"),
-        Camera = AccessTools.Field(Host,"Camera"), Width = AccessTools.Field(Player,"Width"), Height = AccessTools.Field(Player,"Height"),
-        Library = AccessTools.Field(Host, "AnimationLibrary"), Editor = AccessTools.Field(Host, "CharacterEditor");
-    private static readonly MethodInfo GetInventory = AccessTools.PropertyGetter(Player, "InventoryWindows"),
-        Owner = AccessTools.Method(GameType("Ui.InventoryWindows"), "WindowCharacter"),
-        GetLayout = AccessTools.PropertyGetter(Player,"InventoryLayout"), Linked = AccessTools.Method(Layout,"InWindowRow"),
-        KeyOf = AccessTools.Method(Host,"DrawKey"), Contains = AccessTools.Method(Player,"ContainsUi"),
-        Picking = AccessTools.PropertyGetter(Player,"Picking"),
-        Pick = AccessTools.Method(GameType("Ui.WorldPicking"),"PickWhere"),
-        Bar = AccessTools.PropertyGetter(Editor.FieldType,"Bar"), ClipTime = AccessTools.Method(Bar.ReturnType,"EditorClipTime");
-    private static readonly FieldInfo LayoutPlayer = Layout.GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player),
-        RouterPlayer = Router.GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
+        Render = GameType("Rendering.Characters.CharacterRenderer");
+    private static readonly FieldInfo PlayerField = AccessTools.Field(Host, "Player");
+    private static readonly FieldInfo Screens = AccessTools.Field(Player, "FaithfulScreens");
+    private static readonly MethodInfo GetInventory = AccessTools.PropertyGetter(Player, "InventoryWindows");
+    private static readonly MethodInfo Owner = AccessTools.Method(GameType("Ui.InventoryWindows"), "WindowCharacter");
+    private static readonly MethodInfo GetRenderer = AccessTools.PropertyGetter(Host, "ActiveCharacters");
+    private static readonly PropertyInfo Stage = AccessTools.Property(Render, "StageRequest");
+    private static readonly MethodInfo Draw = AccessTools.Method(Render, "DrawStage"), Resolve = AccessTools.Method(Render, "ResolveStage");
+    private static readonly PropertyInfo Picture = AccessTools.Property(Render, "StageTexture");
+    private static readonly MethodInfo Publish = AccessTools.Method(Player, "SetUiTexture");
+    private static readonly FieldInfo Library = AccessTools.Field(Host, "AnimationLibrary");
+
+    private static readonly FieldInfo Editor = AccessTools.Field(Host, "CharacterEditor");
+    private static readonly MethodInfo Bar = AccessTools.PropertyGetter(Editor.FieldType, "Bar");
+    private static readonly MethodInfo ClipTime = AccessTools.Method(Bar.ReturnType, "EditorClipTime");
 
     public void Initialize(ModContext context)
     {
-        void Patch(Type type,string target,string method,bool before=false)
-        {
-            var hook = new HarmonyMethod(typeof(AvatarMod),method);
-            context.Harmony.Patch(AccessTools.Method(type,target),prefix:before?hook:null,postfix:before?null:hook);
-        }
-        Patch(Host,"ApplyCamera",nameof(FrameCamera),true);
-        Patch(Host,"FillDrawList",nameof(Prepare));
-        Patch(Layout,"PlaceCharacterWindow",nameof(UseNormalPlacement),true);
-        Patch(Layout,"PlaceBagWindow",nameof(UseNormalPlacement),true);
-        Patch(Layout,"BindInventoryGeometry",nameof(Place));
-        Patch(Router,"AddInventoryContent",nameof(MoveGrid),true);
-        Patch(Router,"AddInventoryContent",nameof(Controls));
-        Patch(Router,"FaithfulAction",nameof(Click));
-        Patch(Player,"MouseDown",nameof(Press),true);
-        Patch(Player,"MouseUp",nameof(Release),true);
-        Patch(Player,"MouseMove",nameof(Move),true);
-        Patch(Player,"UiScroll",nameof(Wheel),true);
-        InspectionLighting.Install(context.Harmony);
+        void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
+            postfix: new HarmonyMethod(typeof(AvatarMod),method));
+        foreach(string name in new[]{"PlaceCharacterWindow","PlaceBagWindow"})
+            context.Harmony.Patch(AccessTools.Method(Layout,name),prefix:new HarmonyMethod(typeof(AvatarMod),nameof(NormalPlacement)));
+        After(GameType("Ui.InventoryLayout"), "BindInventoryGeometry", nameof(Widen));
+        After(GameType("Ui.ScreenRouter"), "AddInventoryContent", nameof(Controls));
+        After(GameType("Ui.ScreenRouter"), "FaithfulAction", nameof(Click));
+        After(Host, "FillDrawList", nameof(Prepare));
+        After(typeof(MyGuiScreenHost),"Raise",nameof(KeepBagAbove));
+        After(Render, "DrawPortraits", nameof(Paint));
+        void Before(string target, string method) => context.Harmony.Patch(
+            AccessTools.Method(typeof(MyGuiScreenHost), target), prefix: new HarmonyMethod(typeof(AvatarMod), method));
+        Before("PointerDown", nameof(StartDrag));
+        Before("PointerMove", nameof(Rotate));
+        Before("PointerUp", nameof(EndDrag));
+        Before("Wheel", nameof(Zoom));
     }
 
-    private static CharacterSnapshot? Inventory(object? player)
+    private static readonly Type Layout = GameType("Ui.InventoryLayout");
+    private static readonly FieldInfo LayoutPlayer = Layout.GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
+    private static readonly FieldInfo Width = AccessTools.Field(Player,"Width"), Height = AccessTools.Field(Player,"Height");
+    private static readonly MethodInfo GetLayout = AccessTools.PropertyGetter(Player,"InventoryLayout"),
+        Linked = AccessTools.Method(Layout,"InWindowRow"), CellHeight = AccessTools.PropertyGetter(Player,"InventoryCellHeight");
+
+    private static CharacterSnapshot? Subject(object player)
     {
-        if (player == null || Screens.GetValue(player) is not MyGuiScreenHost screens ||
-            !screens.IsOpen("inventory") || screens.IsOpen("trader") || screens.IsOpen("editor") ||
-            (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
+        var screens=(MyGuiScreenHost)Screens.GetValue(player)!;
+        if(!screens.IsOpen("inventory") || screens.IsOpen("trader") || (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
         return Owner.Invoke(GetInventory.Invoke(player,null),["inventory"]) is CharacterSnapshot { Animal:false, Appearance:not null } c ? c : null;
     }
 
-    private static void FrameCamera(object __instance, ref CameraState s)
+    private static Vector2? bagAnchor;
+    private const float Left=.15f, FrameWidth=.645f, Storage=.70f;
+    private static bool NormalPlacement(object __instance) => Subject(LayoutPlayer.GetValue(__instance)!)==null;
+
+    private static void Widen(string id, UiBindings b, object __instance)
     {
-        var player = PlayerField.GetValue(__instance);
-        var currentRig = ((WorldSession?)Session.GetValue(__instance))?.Camera;
-        var c = Inventory(player);
-        if (rig != null && (currentRig != rig || c == null))
+        if(id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root",out var root)) return;
+        var player=LayoutPlayer.GetValue(__instance)!;
+        if(Subject(player)?.ItemGrid is not {} grid) return;
+        var screens=(MyGuiScreenHost)Screens.GetValue(player)!;
+        float w=(int)Width.GetValue(player)!, h=(int)Height.GetValue(player)!;
+        float frame=w*FrameWidth, gap=h*.008f, top=h*.10f;
+        float storageX=w*Left+frame*Storage;
+        float gridHeight=grid.Height*(float)CellHeight.Invoke(player,null)!;
+        if(id=="bag")
         {
-            if (currentRig == rig) { rig.Restore(saved); s = rig.Current; }
-            rig = null;
-            subject = CharacterId.None;
-            captured = toggleOnRelease = false;
-            menu = light = 0;
-            drawKey = 0;
+            float y=top+h*.095f+gridHeight+h*.04f+gap;
+            var anchor=bagAnchor ?? new Vector2(storageX,y);
+            b.WindowPosition=Vector2.Clamp(anchor,Vector2.Zero,new Vector2(Math.Max(0,w-root.Width),Math.Max(0,h-root.Height)))-screens.GetOffset(id);
+            return;
         }
-        if (c == null || currentRig == null) return;
-        if (rig == null) { rig = currentRig; saved = rig.Save(); }
-        if (subject != c.Id)
+        var parent=screens.Layout(id).Widgets.FirstOrDefault(node=>node.Children.Any(c=>c.Name=="main"));
+        if(parent==null) return;
+        b.Positions["Root"]=root with { Width=frame };
+        b.WindowPosition=new Vector2(w*Left,top)-screens.GetOffset(id);
+        // Keep the original 0.572-screen-height equipment block inside the taller frame.
+        float sx=root.Width/frame, sy=.572266f/.8f;
+        foreach(var child in parent.Children)
         {
-            subject = c.Id;
-            start = s;
-            drawKey = (long)KeyOf.Invoke(__instance,[subject])!;
-            yaw = s.Yaw;
-            zoom = 1;
-            captured = toggleOnRelease = false;
-            menu = choice = 0;
-            Transition.Restart();
-            Clock.Restart();
-        }
-        var world = (WorldCamera)Camera.GetValue(__instance)!;
-        float aspect = (int)Width.GetValue(player)! / (float)Math.Max(1,(int)Height.GetValue(player)!);
-        float pitch = choice == 3 ? .62f : .10f;
-        float halfHeight = (choice == 3 ? 30 : 25) * Math.Max(.6f,c.Scale) * zoom / 1.5f;
-        float distance = halfHeight / MathF.Tan(world.FieldOfView * .5f);
-        var right = new Vector3(MathF.Cos(start.Yaw),0,-MathF.Sin(start.Yaw));
-        var forward = Vector3.Normalize(-CameraState.EyeFor(Vector3.Zero,start.Yaw,pitch,1));
-        var up = Vector3.Cross(right,forward);
-        var pivot = c.Position + Vector3.UnitY * ((choice >= 2 ? 6 : 12) * c.Scale);
-        var target = pivot + right * (.60f * halfHeight * aspect) - up * (.02f * halfHeight);
-        var end = new CameraState(CameraState.EyeFor(target,start.Yaw,pitch,distance),forward,up,target,start.Yaw,pitch,distance,false);
-        float t = Math.Clamp((float)Transition.Elapsed.TotalSeconds / .4f,0,1);
-        s = CameraState.Lerp(start with { IsFree=false },end,t*t*(3-2*t));
-    }
-
-    private static bool UseNormalPlacement(object __instance) => Inventory(LayoutPlayer.GetValue(__instance)) == null;
-
-    private static readonly MethodInfo CellHeight = AccessTools.PropertyGetter(Player,"InventoryCellHeight");
-    private const float StorageLeft = .69f;
-    private const float StorageTop = .15f;
-    private static void Place(object __instance,string id,UiBindings b)
-    {
-        if (id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root",out var r)) return;
-        var p = LayoutPlayer.GetValue(__instance)!;
-        if (Inventory(p)?.ItemGrid is not {} grid) return;
-        float w=(int)Width.GetValue(p)!, h=(int)Height.GetValue(p)!;
-        var screens=(MyGuiScreenHost)Screens.GetValue(p)!;
-        // The inspection layout owns the transient placement. Leave the engine's drag offset intact.
-        float x=id=="inventory" ? w*.50f-r.Width*.5f : Math.Min(w*StorageLeft,w-r.Width-6);
-        float y=id=="inventory" ? h*.10f : h*StorageTop + grid.Height*(float)CellHeight.Invoke(p,null)! + h*.06f;
-        b.WindowPosition = new Vector2(Math.Max(0,x),Math.Clamp(y,0,Math.Max(0,h-r.Height))) - screens.GetOffset(id);
-    }
-
-    private static void MoveGrid(object __instance,string id,List<UiControl> controls)
-    {
-        if (id!="inventory") return;
-        var p=RouterPlayer.GetValue(__instance)!;
-        if (Inventory(p)==null || controls.Find(c=>c.Name=="main") is not {} main) return;
-        float w=(int)Width.GetValue(p)!, h=(int)Height.GetValue(p)!;
-        float x=Math.Max(0,Math.Min(w*StorageLeft,w-main.Bounds.Width-6));
-        float y=Math.Clamp(h*StorageTop,0,Math.Max(0,h-main.Bounds.Height-40));
-        float pad = Math.Max(4, h*.006f);
-        var panel = new UiRect(x-pad,y-h*.032f,main.Bounds.Width+2*pad,main.Bounds.Height+h*.082f);
-        controls.Insert(controls.IndexOf(main),new("NuePersonalStorage","Widget",panel,"","","NUE_PanelBackground",
-            true,new Dictionary<string,string>(),default,Pickable:false));
-        foreach (string name in new[]{"main","InventoryMainTitle","ArrangeButton"})
-        {
-            int index=controls.FindIndex(c=>c.Name==name);
-            if(index<0) continue;
-            var control=controls[index];
-            var bounds=control.Bounds with { X=x+control.Bounds.X-main.Bounds.X,
-                Y=name=="ArrangeButton" ? y+main.Bounds.Height+4 : name=="InventoryMainTitle" ? y-h*.028f : y };
-            controls[index]=control with { Bounds=bounds,Clip=new UiRect(0,0,w,h) };
+            if(!b.RelativePositions.TryGetValue(child,out var r)) continue;
+            var compact=new UiRect(.40f+(r.X-.42f)*sx,r.Y*sy,r.Width*sx,r.Height*sy);
+            if(child.Children.Any(c=>c.Name=="datapanel"))
+                compact=new(.40f,.72f,.26f,.26f);
+            else if(child.Name is "main" or "InventoryMainTitle" or "ArrangeButton")
+            {
+                float y=child.Name=="main" ? .075f : child.Name=="InventoryMainTitle" ? .04f : .075f+(gridHeight+gap)/(root.Height*.95f);
+                compact=new(Storage,y,r.Width*sx,r.Height*(child.Name=="main"?1:sy));
+            }
+            b.RelativePositions[child]=compact;
         }
     }
 
-    private static void Controls(object __instance,string id,List<UiControl> controls)
+    private static readonly FieldInfo RouterPlayer = GameType("Ui.ScreenRouter").GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
+    private static void Controls(string id, List<UiControl> controls,object __instance)
     {
-        if(id!="inventory" || Inventory(RouterPlayer.GetValue(__instance))==null ||
-            controls.Find(c=>c.Type=="Window") is not {} window) return;
-        var r=window.Bounds;
-        float row=Math.Max(22,r.Height*.045f), width=r.Width*.46f;
-        float x=Math.Max(0,r.X-width*2-8), y=Math.Max(2,r.Y-row*2);
-        void Button(int column,int index,string caption,float top) =>
-            controls.Add(new($"NueChoice{column}_{index}","Button",new(x+column*width,top,width-2,row),
-                caption,$"nue.inspect.{column}.{index}","Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true));
-        Button(0,-1,Labels[choice]+" ▾",y);
-        Button(1,-1,Lights[light]+" ▾",y);
-        if(menu==0) return;
-        var labels=menu==1?Labels:Lights;
-        for(int i=0;i<labels.Length;i++) Button(menu-1,i,labels[i],y+(i+1)*row);
+        if (id != "inventory" || controls.Find(c=>c.Type=="Window") is not {} window ||
+            Subject(RouterPlayer.GetValue(__instance)!)==null) return;
+        var root = window.Bounds;
+        if(controls.Find(c=>c.Name=="main") is {} grid && controls.Find(c=>c.Name=="ArrangeButton") is {} arrange)
+            bagAnchor=new(grid.Bounds.X,Math.Max(grid.Bounds.Y+grid.Bounds.Height,arrange.Bounds.Y+arrange.Bounds.Height)+6);
+        float pane=root.Width*.38f, row=Math.Max(18, MathF.Round(root.Height*.042f));
+        var menu=new UiRect(root.X+6,root.Y+row+6,pane-12,row);
+        var image = new UiRect(menu.X,menu.Y+row+3,menu.Width,root.Y+root.Height-menu.Y-row-9);
+        width = Math.Max(1,(int)image.Width);
+        height = Math.Max(1,(int)image.Height);
+        controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
+            new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
+        void Button(int index, string label, float y) => controls.Add(new("NuePose"+index,"Button",menu with { Y=y },
+            label,"nue-avatar:"+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
+        Button(-1,Labels[choice]+"  ▾",menu.Y);
+        if (expanded) for(int i=0;i<Labels.Length;i++) Button(i,Labels[i],menu.Y+(i+1)*row);
+    }
+
+    private static readonly MethodInfo Raise=AccessTools.Method(typeof(MyGuiScreenHost),"Raise");
+    private static void KeepBagAbove(MyGuiScreenHost __instance,string id)
+    {
+        if(id=="inventory" && __instance.IsOpen("bag") && ui!=null && Subject(ui)!=null)
+            Raise.Invoke(__instance,["bag"]);
+    }
+
+    private static bool OverAvatar(MyGuiScreenHost host, Vector2 p) =>
+        host.IsOpen("inventory") && host.HitTest(p) is { Screen: "inventory", Control.Name: "NueAvatar" };
+
+    private static bool StartDrag(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    {
+        dragHost = null;
+        if (!OverAvatar(__instance, p)) return true;
+        dragHost = __instance;
+        lastDragX = p.X;
+        __result = true;
+        return false;
+    }
+
+    private static bool Rotate(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    {
+        if (dragHost != __instance) return true;
+        yaw = MathF.IEEERemainder(yaw - (p.X - lastDragX) * MathF.Tau / width, MathF.Tau);
+        lastDragX = p.X;
+        __result = true;
+        return false;
+    }
+
+    private static void EndDrag() => dragHost = null;
+
+    private static bool Zoom(MyGuiScreenHost __instance, Vector2 p, float steps, ref bool __result)
+    {
+        if (!OverAvatar(__instance, p)) return true;
+        zoom = Math.Clamp(zoom * MathF.Pow(.87f, steps), .4f, 2f);
+        __result = true;
+        return false;
     }
 
     private static void Click(MyGuiEvent e)
     {
-        if(e.Screen!="inventory" || !e.Action.StartsWith("nue.inspect.",StringComparison.Ordinal)) return;
-        var parts=e.Action.Split('.');
-        if(parts.Length!=4 || !int.TryParse(parts[2],out int column) || !int.TryParse(parts[3],out int i)) return;
-        if(i==-1) menu=menu==column+1?0:column+1;
-        else
-        {
-            if(column==0 && (uint)i<Labels.Length) { choice=i; Clock.Restart(); }
-            if(column==1 && (uint)i<Lights.Length) light=i;
-            menu=0;
-        }
+        if(e.Screen!="inventory" || !e.Action.StartsWith("nue-avatar:") || !int.TryParse(e.Action[11..],out int index)) return;
+        if(index==-1) expanded=!expanded;
+        else if((uint)index<Labels.Length) { choice=index; expanded=false; Clock.Restart(); }
     }
-
-    private static bool OverUi(object player,Vector2 p) => (bool)Contains.Invoke(player,[p])!;
-    private static readonly Func<CharacterSnapshot,bool> AnyCharacter = _=>true;
-    private static bool Press(object __instance,MouseButton button,Vector2 p,ref bool __result)
-    {
-        blocked.Remove(button);
-        if(Inventory(__instance)==null || (!captured && OverUi(__instance,p))) return true;
-        blocked.Add(button);
-        if(button==MouseButton.Left)
-            toggleOnRelease=captured || Equals(Pick.Invoke(Picking.Invoke(__instance,null),[p,AnyCharacter]),subject);
-        __result=true;
-        return false;
-    }
-
-    private static bool Release(MouseButton button,Vector2 p)
-    {
-        if(!blocked.Remove(button)) return true;
-        if(button==MouseButton.Left && toggleOnRelease)
-        {
-            captured=!captured;
-            lastX=p.X;
-            toggleOnRelease=false;
-        }
-        return false;
-    }
-
-    private static bool Move(object __instance,Vector2 p)
-    {
-        if(!captured) return true;
-        yaw += (p.X-lastX)*MathF.Tau/Math.Max(1,(int)Width.GetValue(__instance)!*.45f);
-        lastX=p.X;
-        return false;
-    }
-
-    private static bool Wheel(object __instance,Vector2 p,float steps,ref bool __result)
-    {
-        if(Inventory(__instance)==null || (!captured && OverUi(__instance,p))) return true;
-        zoom=Math.Clamp(zoom*MathF.Pow(.87f,steps),.55f,1.8f);
-        __result=true;
-        return false;
-    }
-
-    internal static uint InspectionMark(uint original,long key) =>
-        rig!=null && key==drawKey && light!=0 ? (uint)(light<<7) : original;
 
     private static void Prepare(object __instance, CharacterDrawList list)
     {
-        if(rig==null || Inventory(PlayerField.GetValue(__instance)) is not {Appearance:{} look} c || c.Id!=subject) return;
-        int drawIndex=list.Items.FindIndex(item=>item.Key==drawKey);
-        if(drawIndex<0) return;
+        ui=PlayerField.GetValue(__instance);
+        renderer=GetRenderer.Invoke(__instance,null);
+        if(renderer==null || ui==null) return;
+        if(Stage.GetValue(renderer) is EditorStageRequest prior && prior==request) Stage.SetValue(renderer,null);
+        request=null;
+        var screens=(MyGuiScreenHost)Screens.GetValue(ui)!;
+        if(!screens.IsOpen("inventory") || screens.IsOpen("editor") || Stage.GetValue(renderer)!=null ||
+           Subject(ui) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
+        {
+            dragHost=null; subject=CharacterId.None; expanded=false; choice=0; return;
+        }
+        if(subject!=c.Id) { subject=c.Id; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=false; Clock.Restart(); }
         float t=(float)Clock.Elapsed.TotalSeconds;
         var bar = Bar.Invoke(Editor.GetValue(__instance), null);
         CharacterPose StandingPose(string name) =>
@@ -275,8 +236,12 @@ public sealed class AvatarMod : IMod
                 backDrawn = weapon?.Shown == WeaponShown.BackDrawn;
             }
         }
-        list.Items[drawIndex]=list.Items[drawIndex] with { Yaw=yaw, Poses=poses, FullRateAnimation=true,
-            WeaponDrawn=drawn, BackDrawn=backDrawn, RangedDrawn=false, UnitMovement=choice==3 };
+        long key=long.MinValue+((long)(uint)c.Id.Slot<<32)+(uint)c.Id.Generation;
+        list.Items.Add(new CharacterInstance(key,look,c.Position,0,poses) { Hidden=true, FullRateAnimation=true,
+            Scale=c.Scale,Build=c.Build,WeaponDrawn=drawn,BackDrawn=backDrawn,UnitMovement=choice==3 });
+        float distance=choice==3 ? 78 : 54*Math.Max(1,c.Scale);
+        request=new(key,width,height,yaw,choice==3?.87f:.09f,distance*zoom,false,.66f,0);
+        Stage.SetValue(renderer,request);
     }
 
     private static readonly FieldInfo Lengths = AccessTools.Field(Host, "AnimationLengths");
@@ -296,4 +261,14 @@ public sealed class AvatarMod : IMod
         return layers;
     }
 
+    private static void Paint(object __instance)
+    {
+        if(request==null || !ReferenceEquals(renderer,__instance) || !Equals(Stage.GetValue(renderer),request)) return;
+        try {
+            Draw.Invoke(renderer,null);
+            Resolve.Invoke(renderer,null);
+            if(Picture.GetValue(renderer) is ValueTuple<GpuTexture,SampledTexture> image)
+                Publish.Invoke(ui,[Texture,image.Item1,image.Item2]);
+        } finally { Stage.SetValue(renderer,null); request=null; }
+    }
 }
