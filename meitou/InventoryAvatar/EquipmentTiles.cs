@@ -11,8 +11,7 @@ public sealed partial class AvatarMod
     private static readonly (string Section,string Caption)[] Tiles = [
         ("back","lbWeapon1"),("hip","lbWeapon2"),("backpack_attach","lbBackpack"),
         ("head","lbHead"),("shirt","lbShirt"),("armour","lbArmor"),
-        ("belt","lbBelt"),("legs","lbPants"),("boots","lbBoots"),
-        ("nue.eyes","nue.eyes-label"),("nue.hands","nue.hands-label"),("nue.neck","nue.neck-label")
+        ("belt","lbBelt"),("legs","lbPants"),("boots","lbBoots")
     ];
     private static readonly System.Reflection.MethodInfo CellSize=AccessTools.PropertyGetter(Player,"InventoryCellSize");
     private static string? openRack;
@@ -20,34 +19,22 @@ public sealed partial class AvatarMod
     private static void ArrangeEquipment(List<UiControl> controls,UiRect root,CharacterSnapshot owner,object player)
     {
         if(owner.ItemGrid is not {} inventory) return;
-        float x=root.X+root.Width*.40f, top=root.Y+root.Height*.13f;
-        float pitch=Math.Min(root.Width*.26f/3,root.Height*.66f/4);
-        float label=Math.Min(root.Height*.028f,pitch*.24f), side=Math.Min(pitch-4,root.Height*.139f);
-        side=Math.Min(side,root.Height*.66f/4-label-3);
-        float row=side+label+4;
         var cell=(Vector2)CellSize.Invoke(player,null)!;
-        int buttonColumn=0;
-        foreach(string button in new[]{"OpenBagButton","LimbsButton"})
+        foreach(var (section,caption) in Tiles)
         {
-            int at=controls.FindIndex(c=>c.Name==button);
-            if(at>=0) controls[at]=controls[at] with {Bounds=new(x+buttonColumn*pitch,top-label*1.7f,pitch-3,label*1.5f),Clip=root};
-            buttonColumn++;
-        }
-        for(int i=0;i<Tiles.Length;i++)
-        {
-            var (section,caption)=Tiles[i];
             int at=controls.FindIndex(c=>c.Name==section);
-            if(at<0) continue;
+            if(at<0 || controls.Find(c=>c.Name=="NueTile-"+section) is not {} region) continue;
             var native=controls[at];
-            var tile=new UiRect(x+i%3*pitch,top+i/3*row+label,side,side);
+            var box=region.Bounds;
+            float side=Math.Min(box.Width,box.Height);
+            var tile=new UiRect(box.X+(box.Width-side)/2,box.Y,side,side);
+            float label=controls.Find(c=>c.Name==caption)?.Bounds.Height ?? side*.2f;
             var props=new Dictionary<string,string>(native.Properties){["TileSize"]=FormattableString.Invariant($"{side} {side}"),["NueEquipmentTile"]="1"};
             controls[at]=native with {Bounds=tile,Clip=root,Properties=props};
-            int title=controls.FindIndex(c=>c.Name==caption);
-            if(title>=0) controls[title]=controls[title] with {Bounds=tile with {Y=tile.Y-label,Height=label,Width=pitch},Clip=root};
             var items=inventory.Items.Where(item=>item.Section==section).ToArray();
             bool weapon=section is "back" or "hip";
             var capacity=InventoryCommands.SectionSize(section);
-            var rack=new UiRect(x-capacity.Width*cell.X-6,tile.Y,capacity.Width*cell.X,capacity.Height*cell.Y);
+            var rack=new UiRect(tile.X-capacity.Width*cell.X-6,tile.Y,capacity.Width*cell.X,capacity.Height*cell.Y);
             bool opened=weapon && openRack==section;
             if(opened) controls.Add(native with {Bounds=rack,Clip=root});
             bool first=true;
@@ -57,7 +44,7 @@ public sealed partial class AvatarMod
                 var parts=controls.Where(c=>c.Name==name || c.Name.StartsWith(name+"-",StringComparison.Ordinal)).ToList();
                 if(parts.Count==0) continue; // Already lifted.
                 foreach(var part in parts) controls.Remove(part);
-                if(first) PlaceItem(controls,parts,name,tile,item);
+                if(first) PlaceItem(controls,parts,name,tile,item,weapon);
                 if(opened) PlaceItem(controls,parts,name,new(rack.X+item.X*cell.X,rack.Y+item.Y*cell.Y,item.Width*cell.X,item.Height*cell.Y),item);
                 first=false;
             }
@@ -68,9 +55,11 @@ public sealed partial class AvatarMod
         }
     }
 
-    private static void PlaceItem(List<UiControl> output,List<UiControl> parts,string name,UiRect target,InventoryItemView item)
+    private static void PlaceItem(List<UiControl> output,List<UiControl> parts,string name,UiRect target,InventoryItemView item,bool diagonal=false)
     {
         float scale=Math.Min(target.Width/item.Width,target.Height/item.Height);
+        if (diagonal)
+            scale = MathF.Sqrt(2) * Math.Min(target.Width,target.Height) / (item.Width + item.Height);
         float w=item.Width*scale,h=item.Height*scale;
         var icon=new UiRect(target.X+(target.Width-w)/2,target.Y+(target.Height-h)/2,w,h);
         foreach(var part in parts)
@@ -82,7 +71,10 @@ public sealed partial class AvatarMod
                 var original=parts.First(c=>c.Name==name).Bounds;
                 bounds=new(target.X,target.Y+target.Height-3,target.Width*part.Bounds.Width/original.Width,3);
             }
-            output.Add(part with {Bounds=bounds,Clip=target});
+            var properties = diagonal && part.Name == name+"-icon"
+                ? new Dictionary<string,string>(part.Properties) { ["ImageAngle"] = (MathF.PI/4).ToString(System.Globalization.CultureInfo.InvariantCulture) }
+                : part.Properties;
+            output.Add(part with {Bounds=bounds,Clip=target,Properties=properties});
         }
     }
 
@@ -90,6 +82,21 @@ public sealed partial class AvatarMod
     // rectangle first, then offers the displayed weapon's position for a native swap.
     private static void WeaponDrop(string section,ref UiControl slot,ref Vector2 topLeft,HeldItemView h,object __instance)
     {
+        if (slot.Properties.ContainsKey("NueFittedGrid"))
+        {
+            var playerForGrid = InventoryPlayer.GetValue(__instance)!;
+            if (Subject(playerForGrid)?.ItemGrid is {} gridView)
+            {
+                var size = section == "main" ? (gridView.Width,gridView.Height) : (gridView.BagWidth,gridView.BagHeight);
+                if (size.Item1 > 0 && size.Item2 > 0)
+                {
+                    var nativeCell = (Vector2)CellSize.Invoke(playerForGrid,null)!;
+                    var fittedCell = new Vector2(slot.Bounds.Width/size.Item1,slot.Bounds.Height/size.Item2);
+                    topLeft += (Vector2)HeldGrab.GetValue(__instance)! * (nativeCell-fittedCell);
+                }
+            }
+            return;
+        }
         if(section is not ("back" or "hip") || !slot.Properties.ContainsKey("NueEquipmentTile")) return;
         var player=InventoryPlayer.GetValue(__instance)!;
         if(Subject(player)?.ItemGrid is not {} grid) return;
@@ -107,5 +114,6 @@ public sealed partial class AvatarMod
         slot=slot with {Bounds=tile with {X=tile.X-dest.X*cell.X,Y=tile.Y-dest.Y*cell.Y},Clip=tile};
         topLeft=new(tile.X,tile.Y);
     }
+    private static readonly System.Reflection.FieldInfo HeldGrab=AccessTools.Field(GameType("Ui.InventoryWindows"),"_heldGrab");
     private static readonly System.Reflection.FieldInfo InventoryPlayer=GameType("Ui.InventoryWindows").GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
 }

@@ -24,5 +24,5 @@
     - [x] Size each section to its visible rows. Group the building name, owner, type, and town at the top. Keep warnings, access controls, and condition meters visible when applicable.
     - [x] Show the expander only when there are extended stats. Allow room for construction materials, crops, wind and power, or ammo when the selected building supplies those rows.
     - [x] Preserve the anchor MeitouClient uses to place storage windows.
-21. [x] Restore the separate inventory avatar preview with compact equipment, details below the slots, and aligned personal and bag storage. Preserve the gameplay camera.
+21. [x] Restore the separate inventory avatar preview with compact equipment, personal storage below the slots, and details above the backpack. Preserve the gameplay camera.
     - Trade-window design is deferred.

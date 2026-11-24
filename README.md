@@ -13,15 +13,15 @@ Extract the enclosed `NueHudTabs` folder into your mods directory and enable it 
 
 ## Inventory inspection for MeitouClient
 
-Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, with weight, disguise, and ownership information underneath. The personal inventory and open backpack share the right column.
+Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, above a 10×8 personal inventory. Arrange sits beside the inventory heading. Weight, disguise, and ownership appear above the open backpack in the right column.
 
-Open the badge on Primary or Secondary to access the individual weapons in that section. Equipment thumbnails preserve their proportions, and storage uses each item’s ordinary footprint.
+Open the badge on Primary or Secondary to access the individual weapons in that section. Equipped weapon thumbnails turn 45° clockwise. Stored items keep their usual footprints. When loading an older save, items that fit keep their positions where possible. If an oversized modded inventory cannot fit safely, it keeps its extra space.
 
-Eyes, Hands, and Neck sit in a fourth row and each accept one compatible accessory. Item mods should use FCS slot 4 for eyes, 10 for hands, and 11 for neck.
+The Eyes, Hands, and Neck sockets are hidden. Their registrations remain available to item mods. Item mods should use FCS slot 4 for eyes, 10 for hands, and 11 for neck.
 
-Drag the preview to rotate it and scroll over it to zoom. Use the pose menu to select idle, attack stance, sitting, or lying. The preview uses the character stage’s lighting.
+Drag the preview to rotate it and scroll over it to zoom. Use the pose menu to select idle, attack stance, sitting, or lying. The selector opposite the pose menu switches between Desert, Swamp, and Black. The preview camera frames the posed body from near shoulder height.
 
-Replace the existing `NueInventoryAvatar` folder, merge the enclosed `NUE (Native UI Enhancement)` layout into your installed NUE folder, and enable both mods on nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.4.0](meitou/InventoryAvatar/NueInventoryAvatar-0.4.0.zip)
+Replace the installed `NueInventoryAvatar` folder with the one in the archive. Edit its `InventoryInspection.layout` to adjust window dimensions, column positions, or pocket rows and columns. Built for nightly `0.22.2-nightly.20261122.2`. [Download Inventory Avatar 0.5.0](meitou/InventoryAvatar/NueInventoryAvatar-0.5.0.zip)
 
 ## HUD compass for MeitouClient
 

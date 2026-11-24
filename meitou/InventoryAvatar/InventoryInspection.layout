@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MyGUI type="Layout" version="3.2.0">
+  <Widget type="Window" skin="Kenshi_WindowCXP" position_real="0.15 0.10 0.645 0.80" layer="Window" name="Root">
+    <Property key="Caption" value="INVENTORY" />
+    <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch">
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".39 .009 .085 .045" name="OpenBagButton">
+        <Property key="Caption" value="OPEN BAG" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.568 0.090 .085 .127" name="NueTile-backpack_attach">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_backpack_attach" position_real="0 0 1 1" name="backpack_attach" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.568 0.061 .085 .027" name="lbBackpack">
+        <Property key="Caption" value="BACKPACK" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.390 0.090 .085 .127" name="NueTile-back">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_back" position_real="0 0 1 1" name="back" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.479 0.252 .085 .127" name="NueTile-shirt">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_shirt" position_real="0 0 1 1" name="shirt" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.390 0.252 .085 .127" name="NueTile-head">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_head" position_real="0 0 1 1" name="head" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.479 0.414 .085 .127" name="NueTile-legs">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_legs" position_real="0 0 1 1" name="legs" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.568 0.414 .085 .127" name="NueTile-boots">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_boots" position_real="0 0 1 1" name="boots" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.568 0.252 .085 .127" name="NueTile-armour">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_armour" position_real="0 0 1 1" name="armour" />
+      </Widget>
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real=".39 .614 .261 .369" name="main" />
+      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real=".678 .012 .311 .178">
+        <Widget type="Widget" skin="Kenshi_TextBoxEmptySkin" position_real=".025 .032 .95 .94" name="datapanel" />
+      </Widget>
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".52 .562 .131 .04" name="ArrangeButton">
+        <Property key="Caption" value="ARRANGE" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real=".39 .562 .113 .04" name="InventoryMainTitle">
+        <Property key="Caption" value="INVENTORY" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="TextAlign" value="Left VCenter" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.390 0.061 .085 .027" name="lbWeapon1">
+        <Property key="Caption" value="PRIMARY" />
+        <Property key="TextAlign" value="Left VCenter" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.479 0.223 .085 .027" name="lbShirt">
+        <Property key="Caption" value="SHIRT" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.390 0.223 .085 .027" name="lbHead">
+        <Property key="Caption" value="HELMET" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.479 0.385 .085 .027" name="lbPants">
+        <Property key="Caption" value="PANTS" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.568 0.223 .085 .027" name="lbArmor">
+        <Property key="Caption" value="BODY ARMOR" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.568 0.385 .085 .027" name="lbBoots">
+        <Property key="Caption" value="BOOTS" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.479 0.090 .085 .127" name="NueTile-hip">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_hip" position_real="0 0 1 1" name="hip" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.479 0.061 .085 .027" name="lbWeapon2">
+        <Property key="Caption" value="SECONDARY" />
+        <Property key="TextAlign" value="Left VCenter" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.390 0.414 .085 .127" name="NueTile-belt">
+        <Property key="NeedMouse" value="false" />
+        <Widget type="Widget" skin="NUE_Equipment_belt" position_real="0 0 1 1" name="belt" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.390 0.385 .085 .027" name="lbBelt">
+        <Property key="Caption" value="BELT" />
+        <Property key="TextColour" value="0.909804 0.741176 0.447059" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".479 .009 .085 .045" name="LimbsButton">
+        <Property key="Caption" value="LIMBS" />
+        <Property key="Visible" value="true" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".39 .614 .261 .369" name="NuePocketArea">
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".678 .204 .311 .779" name="NueBagArea">
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".008 .065 .367 .919" name="NuePreviewArea">
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".008 .008 .168 .049" name="NuePoseMenu">
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".21 .008 .165 .049" name="NueBackdropMenu">
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+    </Widget>
+    <UserString key="PocketColumns" value="10" />
+    <UserString key="PocketRows" value="8" />
+  </Widget>
+  <CodeGeneratorSettings />
+</MyGUI>

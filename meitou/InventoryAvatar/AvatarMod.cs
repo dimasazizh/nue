@@ -24,7 +24,11 @@ public sealed partial class AvatarMod : IMod
     private static int choice;
     private static float yaw = .12f, zoom = 1f, lastDragX;
     private static MyGuiScreenHost? dragHost;
-    private static bool expanded;
+    private static bool expanded, backgroundsOpen;
+    private static readonly string[] Backgrounds = ["Desert", "Swamp", "Black"];
+    private static int background;
+    private static string folder = "";
+    private static MyGuiLayout inspection = null!;
     private static object? ui, renderer;
     private static EditorStageRequest? request;
     private static CharacterId subject = CharacterId.None;
@@ -50,6 +54,19 @@ public sealed partial class AvatarMod : IMod
 
     public void Initialize(ModContext context)
     {
+        folder = context.Folder;
+        inspection = MyGuiReader.ReadLayout(Path.Combine(folder, "InventoryInspection.layout"));
+        ConfigurePockets(inspection.Roots[0]);
+        After(typeof(ItemFactory), nameof(ItemFactory.MainSize), nameof(PocketSize));
+        context.Harmony.Patch(AccessTools.Method(typeof(Meitou.Simulation.Saving.SavedKit), "ToInventory"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(BeforeLoad)),
+            postfix: new HarmonyMethod(typeof(AvatarMod), nameof(FitSavedPockets)),
+            finalizer: new HarmonyMethod(typeof(AvatarMod), nameof(EndLoad)));
+        After(Render, "StageCamera", nameof(FrameAvatar));
+        context.Harmony.Patch(AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)));
+        After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
+        After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
         foreach (var slot in Accessories)
             context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
@@ -59,7 +76,7 @@ public sealed partial class AvatarMod : IMod
             postfix: new HarmonyMethod(typeof(AvatarMod),method));
         foreach(string name in new[]{"PlaceCharacterWindow","PlaceBagWindow"})
             context.Harmony.Patch(AccessTools.Method(Layout,name),prefix:new HarmonyMethod(typeof(AvatarMod),nameof(NormalPlacement)));
-        After(GameType("Ui.InventoryLayout"), "BindInventoryGeometry", nameof(Widen));
+        After(GameType("Ui.InventoryLayout"), "BindInventoryGeometry", nameof(DockInventory));
         After(GameType("Ui.ScreenRouter"), "AddInventoryContent", nameof(Controls));
         After(GameType("Ui.ScreenRouter"), "FaithfulAction", nameof(Click));
         After(Host, "FillDrawList", nameof(Prepare));
@@ -76,9 +93,16 @@ public sealed partial class AvatarMod : IMod
     private static readonly (string Section, string Label, int Fcs, int X)[] Accessories =
         [("nue.eyes", "EYES", 4, 12), ("nue.hands", "HANDS", 10, 75), ("nue.neck", "NECK", 11, 138)];
 
+    private static readonly bool ShowAccessorySockets = false;
+
     // AddModSlots runs before item icons and hit targets are generated from the slot bounds.
     private static void PlaceAccessories(List<UiControl> controls)
     {
+        if (!ShowAccessorySockets)
+        {
+            controls.RemoveAll(c => Accessories.Any(slot => slot.Section == c.Name));
+            return;
+        }
         if (controls.Find(c=>c.Name=="nue.eyes") is not {} first ||
             controls.Find(c=>c.Name=="datapanel") is not {} summary) return;
         float size=first.Bounds.Height, labelHeight=size*.34f;
@@ -104,7 +128,7 @@ public sealed partial class AvatarMod : IMod
     private static readonly FieldInfo LayoutPlayer = Layout.GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
     private static readonly FieldInfo Width = AccessTools.Field(Player,"Width"), Height = AccessTools.Field(Player,"Height");
     private static readonly MethodInfo GetLayout = AccessTools.PropertyGetter(Player,"InventoryLayout"),
-        Linked = AccessTools.Method(Layout,"InWindowRow"), CellHeight = AccessTools.PropertyGetter(Player,"InventoryCellHeight");
+        Linked = AccessTools.Method(Layout,"InWindowRow");
 
     private static CharacterSnapshot? Subject(object player)
     {
@@ -113,68 +137,104 @@ public sealed partial class AvatarMod : IMod
         return Owner.Invoke(GetInventory.Invoke(player,null),["inventory"]) is CharacterSnapshot { Animal:false, Appearance:not null } c ? c : null;
     }
 
-    private static Vector2? bagAnchor;
-    private const float Left=.15f, FrameWidth=.645f, Storage=.70f;
+    private static UiRect bagArea;
     private static bool NormalPlacement(object __instance) => Subject(LayoutPlayer.GetValue(__instance)!)==null;
 
-    private static void Widen(string id, UiBindings b, object __instance)
+    private static void SelectLayout(string id, object __instance)
     {
-        if(id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root",out var root)) return;
-        var player=LayoutPlayer.GetValue(__instance)!;
-        if(Subject(player)?.ItemGrid is not {} grid) return;
-        var screens=(MyGuiScreenHost)Screens.GetValue(player)!;
-        float w=(int)Width.GetValue(player)!, h=(int)Height.GetValue(player)!;
-        float frame=w*FrameWidth, gap=h*.008f, top=h*.10f;
-        float storageX=w*Left+frame*Storage;
-        float gridHeight=grid.Height*(float)CellHeight.Invoke(player,null)!;
-        if(id=="bag")
+        if (id != "inventory") return;
+        var player = RouterPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        bool inspecting = Subject(player) != null;
+        if ((screens.Layout(id).Find("NuePreviewArea") != null) == inspecting) return;
+        if (inspecting) screens.Replace(id, inspection);
+        else
         {
-            float y=top+h*.095f+gridHeight+h*.04f+gap;
-            var anchor=bagAnchor ?? new Vector2(storageX,y);
-            b.WindowPosition=Vector2.Clamp(anchor,Vector2.Zero,new Vector2(Math.Max(0,w-root.Width),Math.Max(0,h-root.Height)))-screens.GetOffset(id);
-            return;
-        }
-        var parent=screens.Layout(id).Widgets.FirstOrDefault(node=>node.Children.Any(c=>c.Name=="main"));
-        if(parent==null) return;
-        b.Positions["Root"]=root with { Width=frame };
-        b.WindowPosition=new Vector2(w*Left,top)-screens.GetOffset(id);
-        // Keep the original 0.572-screen-height equipment block inside the taller frame.
-        float sx=root.Width/frame, sy=.572266f/.8f;
-        foreach(var child in parent.Children)
-        {
-            if(!b.RelativePositions.TryGetValue(child,out var r)) continue;
-            var compact=new UiRect(.40f+(r.X-.42f)*sx,r.Y*sy,r.Width*sx,r.Height*sy);
-            if(child.Children.Any(c=>c.Name=="datapanel"))
-                compact=new(.40f,.812f,.26f,.177f);
-            else if(child.Name is "main" or "InventoryMainTitle" or "ArrangeButton")
-            {
-                float y=child.Name=="main" ? .075f : child.Name=="InventoryMainTitle" ? .04f : .075f+(gridHeight+gap)/(root.Height*.95f);
-                compact=new(Storage,y,r.Width*sx,r.Height*(child.Name=="main"?1:sy));
-            }
-            b.RelativePositions[child]=compact;
+            var trade = AccessTools.PropertyGetter(Player, "TradeWindows").Invoke(player, null)!;
+            var original = (MyGuiLayout)AccessTools.Field(trade.GetType(), "CharacterInventoryLayout").GetValue(trade)!;
+            screens.Replace(id, original);
+            bagArea = default;
         }
     }
 
+    private static void DockInventory(string id, UiBindings b, object __instance)
+    {
+        if (id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root", out var root)) return;
+        var player = LayoutPlayer.GetValue(__instance)!;
+        if (Subject(player) == null) return;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (id == "bag")
+        {
+            if (bagArea.Width <= 0 || bagArea.Height <= 0) return;
+            float scale = Math.Min(1, Math.Min(bagArea.Width / root.Width, bagArea.Height / root.Height));
+            b.Positions["Root"] = root with { Width = root.Width * scale, Height = root.Height * scale };
+            b.WindowPosition = new Vector2(bagArea.X, bagArea.Y) - screens.GetOffset(id);
+            return;
+        }
+
+        var origin = inspection.Roots[0].Position.RelativeTo(new(0, 0, (int)Width.GetValue(player)!, (int)Height.GetValue(player)!), true);
+        b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
+        // The native character fitter bottom-anchors the heading for its own template.
+        var title = screens.Layout(id).Find("InventoryMainTitle")!;
+        b.RelativePositions[title] = title.Position;
+    }
+
+    private static void FitPocketGrid(List<UiControl> controls, InventoryView grid)
+    {
+        if (controls.Find(c => c.Name == "NuePocketArea") is not {} anchor) return;
+        int index = controls.FindIndex(c => c.Name == "main");
+        if (index < 0 || grid.Width <= 0 || grid.Height <= 0) return;
+        var slot = controls[index];
+        float side = Math.Min(slot.Bounds.Width / grid.Width,
+            Math.Min(anchor.Bounds.Width / grid.Width, anchor.Bounds.Height / grid.Height));
+        controls[index] = WithCells(slot with { Bounds = anchor.Bounds with {
+            Width = side * grid.Width, Height = side * grid.Height }, Clip = anchor.Bounds }, grid.Width, grid.Height);
+    }
+
+    private static UiControl WithCells(UiControl slot, int cols, int rows) => slot with {
+        Properties = new Dictionary<string,string>(slot.Properties) {
+            ["TileSize"] = FormattableString.Invariant($"{slot.Bounds.Width / cols} {slot.Bounds.Height / rows}"),
+            ["NueFittedGrid"] = "true" } };
+
+    private static void FitBagCells(string id, List<UiControl> controls, object __instance)
+    {
+        if (id != "bag" || Subject(LayoutPlayer.GetValue(__instance)!)?.ItemGrid is not {BagWidth: >0, BagHeight: >0} grid) return;
+        int i = controls.FindIndex(c => c.Name == "backpack_content");
+        if (i >= 0) controls[i] = WithCells(controls[i], grid.BagWidth, grid.BagHeight);
+    }
+
     private static readonly FieldInfo RouterPlayer = GameType("Ui.ScreenRouter").GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
+
+
     private static void Controls(string id, List<UiControl> controls,object __instance)
     {
-        if (id != "inventory" || controls.Find(c=>c.Type=="Window") is not {} window ||
-            Subject(RouterPlayer.GetValue(__instance)!) is not {} owner) return;
+        if (id != "inventory" || controls.Find(c => c.Name == "NuePreviewArea") is not {} preview ||
+            controls.Find(c=>c.Type=="Window") is not {} window) return;
+        var player = RouterPlayer.GetValue(__instance)!;
+        if (Subject(player) is not {} owner) return;
+        var image = preview.Bounds;
         var root = window.Bounds;
-        if(controls.Find(c=>c.Name=="main") is {} grid && controls.Find(c=>c.Name=="ArrangeButton") is {} arrange)
-            bagAnchor=new(grid.Bounds.X,Math.Max(grid.Bounds.Y+grid.Bounds.Height,arrange.Bounds.Y+arrange.Bounds.Height)+6);
-        float pane=root.Width*.38f, row=Math.Max(18, MathF.Round(root.Height*.042f));
-        var menu=new UiRect(root.X+6,root.Y+row+6,pane-12,row);
-        var image = new UiRect(menu.X,menu.Y+row+3,menu.Width,root.Y+root.Height-menu.Y-row-9);
+        bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
         width = Math.Max(1,(int)image.Width);
         height = Math.Max(1,(int)image.Height);
+        var backdrop = new Dictionary<string,string>();
+        if (background < 2) backdrop["ImageTexture"] = Meitou.Game.Rendering.Ui.UiPainter.IconTexture(
+            Path.Combine(folder, Backgrounds[background] + ".png"));
+        controls.Add(new("NueBackdrop", backdrop.Count == 0 ? "Widget" : "ImageBox", image,"","","",true,
+            backdrop, backdrop.Count == 0 ? new Vector4(0,0,0,1) : default, Pickable:false, Clip:root));
         controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
             new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
-        void Button(int index, string label, float y) => controls.Add(new("NuePose"+index,"Button",menu with { Y=y },
-            label,"nue-avatar:"+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
-        ArrangeEquipment(controls,root,owner,RouterPlayer.GetValue(__instance)!);
-        Button(-1,Labels[choice]+"  ▾",menu.Y);
-        if (expanded) for(int i=0;i<Labels.Length;i++) Button(i,Labels[i],menu.Y+(i+1)*row);
+        ArrangeEquipment(controls,root,owner,player);
+        void Menu(string anchor, string action, string[] options, int selected, bool open)
+        {
+            var bounds = controls.First(c => c.Name == anchor).Bounds;
+            void Button(int index, string label, float y) => controls.Add(new(anchor+index,"Button",bounds with { Y=y },
+                label,action+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
+            Button(-1,options[selected]+"  ▾",bounds.Y);
+            if (open) for(int i=0;i<options.Length;i++) Button(i,options[i],bounds.Y+(i+1)*bounds.Height);
+        }
+        Menu("NuePoseMenu","nue-avatar:",Labels,choice,expanded);
+        Menu("NueBackdropMenu","nue-background:",Backgrounds,background,backgroundsOpen);
     }
 
     private static readonly MethodInfo Raise=AccessTools.Method(typeof(MyGuiScreenHost),"Raise");
@@ -224,7 +284,15 @@ public sealed partial class AvatarMod : IMod
             openRack=openRack==section ? null : section;
             return;
         }
+        if(e.Screen == "inventory" && e.Action.StartsWith("nue-background:") && int.TryParse(e.Action[15..],out int bg))
+        {
+            expanded = false;
+            if(bg == -1) backgroundsOpen = !backgroundsOpen;
+            else if ((uint)bg < Backgrounds.Length) { background = bg; backgroundsOpen = false; }
+            return;
+        }
         if(e.Screen!="inventory" || !e.Action.StartsWith("nue-avatar:") || !int.TryParse(e.Action[11..],out int index)) return;
+        backgroundsOpen = false;
         if(index==-1) expanded=!expanded;
         else if((uint)index<Labels.Length) { choice=index; expanded=false; Clock.Restart(); }
     }
@@ -240,9 +308,9 @@ public sealed partial class AvatarMod : IMod
         if(!screens.IsOpen("inventory") || screens.IsOpen("editor") || Stage.GetValue(renderer)!=null ||
            Subject(ui) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
         {
-            dragHost=null; subject=CharacterId.None; openRack=null; expanded=false; choice=0; return;
+            dragHost=null; subject=CharacterId.None; openRack=null; expanded=backgroundsOpen=false; choice=0; return;
         }
-        if(subject!=c.Id) { subject=c.Id; openRack=null; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=false; Clock.Restart(); }
+        if(subject!=c.Id) { framePoints=null; subject=c.Id; openRack=null; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=backgroundsOpen=false; Clock.Restart(); }
         float t=(float)Clock.Elapsed.TotalSeconds;
         var bar = Bar.Invoke(Editor.GetValue(__instance), null);
         CharacterPose StandingPose(string name) =>
@@ -304,11 +372,13 @@ public sealed partial class AvatarMod : IMod
     private static void Paint(object __instance)
     {
         if(request==null || !ReferenceEquals(renderer,__instance) || !Equals(Stage.GetValue(renderer),request)) return;
+        float clearColour = PreviewStudio.Background;
         try {
+            PreviewStudio.Background = -1;
             Draw.Invoke(renderer,null);
             Resolve.Invoke(renderer,null);
             if(Picture.GetValue(renderer) is ValueTuple<GpuTexture,SampledTexture> image)
                 Publish.Invoke(ui,[Texture,image.Item1,image.Item2]);
-        } finally { Stage.SetValue(renderer,null); request=null; }
+        } finally { PreviewStudio.Background = clearColour; Stage.SetValue(renderer,null); request=null; }
     }
 }
