@@ -109,13 +109,13 @@ public sealed class AvatarMod : IMod
         var world = (WorldCamera)Camera.GetValue(__instance)!;
         float aspect = (int)Width.GetValue(player)! / (float)Math.Max(1,(int)Height.GetValue(player)!);
         float pitch = choice == 3 ? .62f : .10f;
-        float halfHeight = (choice == 3 ? 30 : 25) * Math.Max(.6f,c.Scale) * zoom;
+        float halfHeight = (choice == 3 ? 30 : 25) * Math.Max(.6f,c.Scale) * zoom / 1.5f;
         float distance = halfHeight / MathF.Tan(world.FieldOfView * .5f);
         var right = new Vector3(MathF.Cos(start.Yaw),0,-MathF.Sin(start.Yaw));
         var forward = Vector3.Normalize(-CameraState.EyeFor(Vector3.Zero,start.Yaw,pitch,1));
         var up = Vector3.Cross(right,forward);
         var pivot = c.Position + Vector3.UnitY * ((choice >= 2 ? 6 : 12) * c.Scale);
-        var target = pivot + right * (.34f * halfHeight * aspect) - up * (.39f * halfHeight);
+        var target = pivot + right * (.60f * halfHeight * aspect) - up * (.02f * halfHeight);
         var end = new CameraState(CameraState.EyeFor(target,start.Yaw,pitch,distance),forward,up,target,start.Yaw,pitch,distance,false);
         float t = Math.Clamp((float)Transition.Elapsed.TotalSeconds / .4f,0,1);
         s = CameraState.Lerp(start with { IsFree=false },end,t*t*(3-2*t));
@@ -123,7 +123,9 @@ public sealed class AvatarMod : IMod
 
     private static bool UseNormalPlacement(object __instance) => Inventory(LayoutPlayer.GetValue(__instance)) == null;
 
-    private static readonly MethodInfo CellWidth = AccessTools.PropertyGetter(Player,"InventoryCell");
+    private static readonly MethodInfo CellHeight = AccessTools.PropertyGetter(Player,"InventoryCellHeight");
+    private const float StorageLeft = .69f;
+    private const float StorageTop = .15f;
     private static void Place(object __instance,string id,UiBindings b)
     {
         if (id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root",out var r)) return;
@@ -132,9 +134,8 @@ public sealed class AvatarMod : IMod
         float w=(int)Width.GetValue(p)!, h=(int)Height.GetValue(p)!;
         var screens=(MyGuiScreenHost)Screens.GetValue(p)!;
         // The inspection layout owns the transient placement. Leave the engine's drag offset intact.
-        float gridLeft = w*.33f - grid.Width*(float)CellWidth.Invoke(p,null)!*.5f;
-        float x=id=="inventory" ? Math.Min(w*.57f,w-r.Width-6) : gridLeft-r.Width-6;
-        float y=id=="inventory" ? h*.10f : h*.57f;
+        float x=id=="inventory" ? w*.50f-r.Width*.5f : Math.Min(w*StorageLeft,w-r.Width-6);
+        float y=id=="inventory" ? h*.10f : h*StorageTop + grid.Height*(float)CellHeight.Invoke(p,null)! + h*.06f;
         b.WindowPosition = new Vector2(Math.Max(0,x),Math.Clamp(y,0,Math.Max(0,h-r.Height))) - screens.GetOffset(id);
     }
 
@@ -144,15 +145,19 @@ public sealed class AvatarMod : IMod
         var p=RouterPlayer.GetValue(__instance)!;
         if (Inventory(p)==null || controls.Find(c=>c.Name=="main") is not {} main) return;
         float w=(int)Width.GetValue(p)!, h=(int)Height.GetValue(p)!;
-        float x=Math.Max(0,w*.33f-main.Bounds.Width*.5f);
-        float y=Math.Clamp(h*.60f,0,Math.Max(0,h-main.Bounds.Height-40));
+        float x=Math.Max(0,Math.Min(w*StorageLeft,w-main.Bounds.Width-6));
+        float y=Math.Clamp(h*StorageTop,0,Math.Max(0,h-main.Bounds.Height-40));
+        float pad = Math.Max(4, h*.006f);
+        var panel = new UiRect(x-pad,y-h*.032f,main.Bounds.Width+2*pad,main.Bounds.Height+h*.082f);
+        controls.Insert(controls.IndexOf(main),new("NuePersonalStorage","Widget",panel,"","","NUE_PanelBackground",
+            true,new Dictionary<string,string>(),default,Pickable:false));
         foreach (string name in new[]{"main","InventoryMainTitle","ArrangeButton"})
         {
             int index=controls.FindIndex(c=>c.Name==name);
             if(index<0) continue;
             var control=controls[index];
             var bounds=control.Bounds with { X=x+control.Bounds.X-main.Bounds.X,
-                Y=name=="ArrangeButton" ? y+main.Bounds.Height+4 : y+control.Bounds.Y-main.Bounds.Y };
+                Y=name=="ArrangeButton" ? y+main.Bounds.Height+4 : name=="InventoryMainTitle" ? y-h*.028f : y };
             controls[index]=control with { Bounds=bounds,Clip=new UiRect(0,0,w,h) };
         }
     }

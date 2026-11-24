@@ -27,7 +27,7 @@
 21. [ ] Rework the MeitouClient Inventory Avatar mod to use the in-world camera.
     - [x] Animate the main camera into a close-up of the selected character with a higher camera origin. Reuse the existing world render.
     - [ ] Measure frame time against the separate 3D preview under matching in-game conditions.
-    - [x] Frame the character to the left of the inventory window. Put the bag and inventory grids below the character.
+    - [x] Frame the character on the far left, center the equipment window, and stack the personal and bag inventories on the right.
     - [x] Keep the pose animations and mouse-wheel zoom. Click and release on the character to capture mouse movement for rotation. Click and release again anywhere in the world or inventory window to end rotation.
     - [x] Block world commands such as movement while inventory camera mode is active. Keep inventory controls available when rotation is inactive, and consume the click that ends rotation.
     - [x] Restore the pre-inventory camera position, orientation, and zoom when the close button or Escape closes the window.

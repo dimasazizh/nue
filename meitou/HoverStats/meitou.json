@@ -1,6 +1,6 @@
 {
   "id": "nue.hover-stats",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "apiVersion": 2,
   "gameVersion": "0.22.2",
   "assemblies": ["Nue.HoverStats.dll"],

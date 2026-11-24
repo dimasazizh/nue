@@ -22,6 +22,29 @@ public sealed class StatsMod : IMod
     static readonly FieldInfo StatsPlayer = Stats.GetFields(AccessTools.allDeclared).Single(f => f.FieldType == Player);
     static readonly MethodInfo Selected = AccessTools.Method(Player,"Selected");
     static CharacterId? hovered;
+    [ThreadStatic] static CharacterSnapshot? preview;
+    [ThreadStatic] static bool characterPanel;
+    static readonly PropertyInfo Pointer = AccessTools.Property(Player,"PointerPanel");
+    static readonly MethodInfo PointerName = AccessTools.PropertyGetter(Pointer.PropertyType,"PointerName");
+
+    // Sample the native cached pick before the HUD binds. Outline rendering is optional.
+    static void BeginFrame(object __instance, bool hud, out CharacterSnapshot? __state)
+    {
+        __state = preview;
+        preview = null;
+        if (!hud) return;
+        PointerName.Invoke(Pointer.GetValue(__instance), null);
+        preview = HoveredCharacter(__instance);
+    }
+
+    static void EndFrame(CharacterSnapshot? __state) => preview = __state;
+    static void BeginPanel(out bool __state)
+    {
+        __state = characterPanel;
+        characterPanel = preview != null;
+    }
+    static void EndPanel(bool __state) => characterPanel = __state;
+    static bool UseSelectedBuilding() => !characterPanel;
 
     public sealed class Options
     {
@@ -103,6 +126,13 @@ public sealed class StatsMod : IMod
         context.Harmony.Patch(AccessTools.Method(Game("Ui.ScreenRouter"),"BindCharacterWindow"),prefix:Hook(nameof(StatsTitle)));
         context.Harmony.Patch(Selected,prefix:Hook(nameof(StatsSubject)));
         context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),prefix:Hook(nameof(BeginStats)),finalizer:Hook(nameof(EndStats)));
+        context.Harmony.Patch(AccessTools.Method(Player,"ArrangeBase"),prefix:Hook(nameof(BeginFrame)),finalizer:Hook(nameof(EndFrame)));
+        foreach (var (type,method) in new[]{(Player,"BindBuildingFocus"),(Player,"ArrangeHud"),
+            (Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
+            context.Harmony.Patch(AccessTools.Method(type,method),
+                prefix:new HarmonyMethod(typeof(StatsMod),nameof(BeginPanel)) { priority=Priority.First },
+                finalizer:Hook(nameof(EndPanel)));
+        context.Harmony.Patch(AccessTools.Method(Game("Building.BuildingSelection"),"BuildingFocus"),prefix:Hook(nameof(UseSelectedBuilding)));
         void Rewrite(Type type,string method,string patch) => context.Harmony.Patch(AccessTools.Method(type,method),
             transpiler:new HarmonyMethod(typeof(StatsMod),patch));
         Rewrite(Game("Ui.PointerView"),"Point",nameof(ObservePointer));
@@ -183,13 +213,16 @@ public sealed class StatsMod : IMod
         }
     }
 
-    static CharacterSnapshot? DisplayLead(object player)
+    static CharacterSnapshot? HoveredCharacter(object player)
     {
         if (hovered is {} id && Session.GetValue(player) is WorldSession session &&
             session.CurrentSnapshot.Characters.FirstOrDefault(c=>c.Id==id && c.Hud!=null) is {} character)
             return character;
-        return (CharacterSnapshot?)Lead.Invoke(player,null);
+        return null;
     }
+
+    static CharacterSnapshot? DisplayLead(object player) =>
+        preview ?? HoveredCharacter(player) ?? (CharacterSnapshot?)Lead.Invoke(player,null);
 
     static void ShowXp(object __instance,List<UiControl> controls)
     {
