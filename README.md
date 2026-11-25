@@ -1,11 +1,11 @@
-# nue
-NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes.
+# NUE | 鵺
+NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes. Less interface. More Kenshi.
 
 Base UI version: **0.1.0** · Unified package: **0.1.2**
 
 [Download NUE Unified for MeitouClient](NUE-Unified-0.1.2.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
 
-In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
+In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
 
 ## Character tabs and building information for MeitouClient
 
@@ -51,9 +51,5 @@ Hold right-click on an NPC and release over **Examine** to open their Skills win
 
 See the [UI improvements checklist](TODO.md) for progress on changes to search, inventory and equipment, squad portraits, maps, and character stats. The checklist also tracks an on/off setting for each improvement.
 
-Planned fixes :
-- Trade window with vendor
-- Trade window squad member
-- Rework the inventory to incorporate limbs
-- Resize the 3D avatar, too big, make room for armor coverage stats
-- Comment the lines of code of not yet implemented features of neck, eye, and hand socket
+## Etymology
+In Japanese folklore, the Nue is traditionally depicted as a creature with the head of a monkey, the body of a tanuki, the limbs of a tiger, and a snake for a tail. The chimeric nature of the creature is also a fitting metaphor for a modular interface built from independent components.
