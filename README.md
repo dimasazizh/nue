@@ -50,3 +50,9 @@ Hold right-click on an NPC and release over **Examine** to open their Skills win
 ## Planned UI improvements
 
 See the [UI improvements checklist](TODO.md) for progress on changes to search, inventory and equipment, squad portraits, maps, and character stats. The checklist also tracks an on/off setting for each improvement.
+
+Planned fixes :
+- Trade window with vendor
+- Trade window squad member
+- Rework the inventory to incorporate limbs
+- Resize the 3D avatar, too big, make room for armor coverage stats
