@@ -56,3 +56,4 @@ Planned fixes :
 - Trade window squad member
 - Rework the inventory to incorporate limbs
 - Resize the 3D avatar, too big, make room for armor coverage stats
+- Comment the lines of code of not yet implemented features of neck, eye, and hand socket
