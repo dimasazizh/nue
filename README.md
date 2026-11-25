@@ -1,11 +1,13 @@
 # NUE | 鵺
 NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes. Less interface. More Kenshi.
 
-Base UI version: **0.1.0** · Unified package: **0.1.2**
+Base UI version: **0.1.0** · Unified package: **0.1.3** for **MeitouClient 0.23.1**
 
-[Download NUE Unified for MeitouClient](NUE-Unified-0.1.2.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
+[Download NUE Unified for MeitouClient](NUE-Unified-0.1.3.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
 
 In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
+
+In the unified inventory, personal storage uses the vanilla 8×10 grid. Four 2×5 prosthetic slots appear beside it. An equipped bag opens by default, with its toggle below the bag. The shared search field above the equipment matches item names and types across equipment, pockets, prosthetics, and the open bag. Use × to clear it. The avatar viewport is 80% of its previous width and height. Equipped weapon icons point up and right. Hover tooltips follow your cursor and have their own mod setting.
 
 ## Character tabs and building information for MeitouClient
 
@@ -17,7 +19,7 @@ Extract the enclosed `NueHudTabs` folder into your mods directory and enable it 
 
 ## Inventory inspection for MeitouClient
 
-Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, above a 10×8 personal inventory. Arrange sits beside the inventory heading. Weight, disguise, and ownership appear above the open backpack in the right column.
+Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, above a 10×8 personal inventory in the legacy standalone build. Arrange sits beside the inventory heading. Weight, disguise, and ownership appear above the open backpack in the right column.
 
 Open the badge on Primary or Secondary to access the individual weapons in that section. Equipped weapon thumbnails turn 45° clockwise. Stored items keep their usual footprints. When loading an older save, items that fit keep their positions where possible. If an oversized modded inventory cannot fit safely, it keeps its extra space.
 

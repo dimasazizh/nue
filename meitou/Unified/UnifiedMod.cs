@@ -8,6 +8,7 @@ public sealed class UnifiedMod : IMod
     public sealed class Options : StatsMod.Options
     {
         private const string Restart = "Takes effect after restarting MeitouClient.";
+        [Setting("Tooltips follow the cursor", Hint = Restart)] public bool CursorTooltips { get; set; } = true;
         [Setting("HUD compass", Hint = Restart)] public bool Compass { get; set; } = true;
         [Setting("Health and Stats tabs and building panel", Hint = Restart)] public bool Tabs { get; set; } = true;
         [Setting("Hover stats, Examine and racial XP", Hint = Restart)] public bool Hover { get; set; } = true;
@@ -16,10 +17,21 @@ public sealed class UnifiedMod : IMod
         [Setting("Skills window portrait", Hint = Restart)] public bool Portrait { get; set; } = true;
     }
 
+    private static void FollowPointer(ref Meitou.Game.Ui.TooltipKind kind, ref Meitou.Data.Ui.UiRect? given,
+        ref System.Numerics.Vector2? point, string prefix)
+    {
+        if(prefix!="tooltip" || kind==Meitou.Game.Ui.TooltipKind.Static) return;
+        kind=Meitou.Game.Ui.TooltipKind.Floating;
+        given=null;
+        point=null;
+    }
+
     public void Initialize(ModContext context)
     {
         var options = new Options();
         context.AddSettings(options);
+        if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),
+            prefix:new HarmonyLib.HarmonyMethod(typeof(UnifiedMod),nameof(FollowPointer)));
         if (options.Hover) new StatsMod().Install(context, options);
         if (options.Tabs) new HudTabs.HudTabsMod().Initialize(context);
         if (options.Compass) new Compass.CompassMod().Initialize(context);

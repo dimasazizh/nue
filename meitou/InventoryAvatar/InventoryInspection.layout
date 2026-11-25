@@ -3,7 +3,7 @@
   <Widget type="Window" skin="Kenshi_WindowCXP" position_real="0.15 0.10 0.645 0.80" layer="Window" name="Root">
     <Property key="Caption" value="INVENTORY" />
     <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" align="Stretch">
-      <Widget type="Button" skin="Kenshi_Button1" position_real=".39 .009 .085 .045" name="OpenBagButton">
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".678 .942 .31 .046" name="OpenBagButton">
         <Property key="Caption" value="OPEN BAG" />
       </Widget>
       <Widget type="Widget" skin="PanelEmpty" position_real="0.568 0.090 .085 .127" name="NueTile-backpack_attach">
@@ -113,17 +113,13 @@
         <Property key="FontName" value="Kenshi_StandardFont_Small" />
         <Property key="NeedMouse" value="false" />
       </Widget>
-      <Widget type="Button" skin="Kenshi_Button1" position_real=".479 .009 .085 .045" name="LimbsButton">
-        <Property key="Caption" value="LIMBS" />
-        <Property key="Visible" value="true" />
-      </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position_real=".39 .614 .261 .369" name="NuePocketArea">
+      <Widget type="Widget" skin="PanelEmpty" position_real=".39 .614 .173 .369" name="NuePocketArea">
         <Property key="NeedMouse" value="false" />
       </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position_real=".678 .204 .311 .779" name="NueBagArea">
+      <Widget type="Widget" skin="PanelEmpty" position_real=".678 .204 .311 .724" name="NueBagArea">
         <Property key="NeedMouse" value="false" />
       </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position_real=".008 .065 .367 .919" name="NuePreviewArea">
+      <Widget type="Widget" skin="PanelEmpty" position_real=".045 .155 .294 .735" name="NuePreviewArea">
         <Property key="NeedMouse" value="false" />
       </Widget>
       <Widget type="Widget" skin="PanelEmpty" position_real=".008 .008 .168 .049" name="NuePoseMenu">
@@ -132,9 +128,17 @@
       <Widget type="Widget" skin="PanelEmpty" position_real=".21 .008 .165 .049" name="NueBackdropMenu">
         <Property key="NeedMouse" value="false" />
       </Widget>
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.568 0.614 .043 .183" name="left_arm_replace" />
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.613 0.614 .043 .183" name="right_arm_replace" />
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.568 0.799 .043 .183" name="left_leg_replace" />
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.613 0.799 .043 .183" name="right_leg_replace" />
+      <Widget type="EditBox" skin="Kenshi_EditBox" position_real=".39 .009 .225 .045" name="NueSearch.inventory" />
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".617 .009 .038 .045" name="NueClear">
+        <Property key="Caption" value="×" />
+      </Widget>
     </Widget>
-    <UserString key="PocketColumns" value="10" />
-    <UserString key="PocketRows" value="8" />
+    <UserString key="PocketColumns" value="8" />
+    <UserString key="PocketRows" value="10" />
   </Widget>
   <CodeGeneratorSettings />
 </MyGUI>

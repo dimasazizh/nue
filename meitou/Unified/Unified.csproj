@@ -3,6 +3,7 @@
     <TargetFramework>net11.0</TargetFramework>
     <AssemblyName>Nue.Unified</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DefineConstants>$(DefineConstants);NUE_UNIFIED</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>

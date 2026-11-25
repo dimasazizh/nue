@@ -24,8 +24,8 @@ Core unique features:
 17. [ ] Add a bestiary panel that shows complete stats and skills for NPCs and beasts.
 18. [ ] Rework the trade/barter panel window with vendors.
 19. [ ] Rework the trade/barter panel window with squad members.
-20. [ ] Rework the inventory to incorporate limbs.
-21. [ ] 3D avatar is too big, resize to make room for planned armor coverage stats.
+20. [x] Show four 2×5 limb slots beside the vanilla 8×10 personal inventory.
+21. [x] Resize the avatar viewport to 80% to make room for planned armor coverage stats.
 22. [ ] Comment the lines of code of not yet implemented neck, eye, and hand socket.
    
 Features from other mods to implement:
@@ -35,3 +35,5 @@ Features from other mods to implement:
 4. [ ] Show a local map when zoomed in far enough. Reference the Guild and Quest mod in the MeitouClient Discord.
 5. [ ] Add a consolidated armor information view. Reference the Character Inspector mod.
 6. [ ] Add a patch for item markers. Or make our own.
+
+7. [x] Open hover tooltips beside the cursor and follow it as it moves.

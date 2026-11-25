@@ -72,7 +72,7 @@ public sealed partial class AvatarMod
                 bounds=new(target.X,target.Y+target.Height-3,target.Width*part.Bounds.Width/original.Width,3);
             }
             var properties = diagonal && part.Name == name+"-icon"
-                ? new Dictionary<string,string>(part.Properties) { ["ImageAngle"] = (MathF.PI/4).ToString(System.Globalization.CultureInfo.InvariantCulture) }
+                ? new Dictionary<string,string>(part.Properties) { ["ImageAngle"] = (-MathF.PI/4).ToString(System.Globalization.CultureInfo.InvariantCulture) }
                 : part.Properties;
             output.Add(part with {Bounds=bounds,Clip=target,Properties=properties});
         }
@@ -82,7 +82,7 @@ public sealed partial class AvatarMod
     // rectangle first, then offers the displayed weapon's position for a native swap.
     private static void WeaponDrop(string section,ref UiControl slot,ref Vector2 topLeft,HeldItemView h,object __instance)
     {
-        if (slot.Properties.ContainsKey("NueFittedGrid"))
+        if (section is ("main" or "backpack_content") && slot.Properties.ContainsKey("NueFittedGrid"))
         {
             var playerForGrid = InventoryPlayer.GetValue(__instance)!;
             if (Subject(playerForGrid)?.ItemGrid is {} gridView)

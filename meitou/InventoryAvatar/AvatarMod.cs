@@ -71,6 +71,8 @@ public sealed partial class AvatarMod : IMod
         After(Render, "StageCamera", nameof(FrameAvatar));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen"),
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)));
+        After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
+        After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
@@ -86,7 +88,7 @@ public sealed partial class AvatarMod : IMod
         After(typeof(MyGuiScreenHost),"Raise",nameof(KeepBagAbove));
         After(Render, "DrawPortraits", nameof(Paint));
         void Before(string target, string method) => context.Harmony.Patch(
-            AccessTools.Method(typeof(MyGuiScreenHost), target), prefix: new HarmonyMethod(typeof(AvatarMod), method));
+            AccessTools.Method(typeof(MyGuiScreenHost), target, target == "PointerDown" ? [typeof(Vector2), typeof(Func<string,UiControl,Vector2,bool>)] : null), prefix: new HarmonyMethod(typeof(AvatarMod), method));
         Before("PointerDown", nameof(StartDrag));
         Before("PointerMove", nameof(Rotate));
         Before("PointerUp", nameof(EndDrag));
@@ -175,11 +177,34 @@ public sealed partial class AvatarMod : IMod
             return;
         }
 
+#if NUE_UNIFIED
+        if (Nue.SearchCompare.SearchMod.Installed)
+        {
+            b.Disabled.Remove("NueClear");
+            b.Actions["NueClear"]="nue-search-clear";
+        }
+        else
+#endif
+        {
+            b.Hidden.Add("NueClear");
+            b.Hidden.Add("NueSearch.inventory");
+        }
         var origin = inspection.Roots[0].Position.RelativeTo(new(0, 0, (int)Width.GetValue(player)!, (int)Height.GetValue(player)!), true);
         b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
         // The native character fitter bottom-anchors the heading for its own template.
         var title = screens.Layout(id).Find("InventoryMainTitle")!;
         b.RelativePositions[title] = title.Position;
+    }
+
+    private static readonly string[] LimbSections = ["left_arm_replace","right_arm_replace","left_leg_replace","right_leg_replace"];
+    private static void IncludeLimbTargets(string screen, ref (string,string)[] __result)
+    {
+        if (screen == "inventory") __result = [..__result, ..LimbSections.Select(n => (n,n))];
+    }
+
+    private static void DefaultBag(CharacterId id, HashSet<CharacterId> ____bagClosed, ref bool __result, object __instance)
+    {
+        if (!__result && !____bagClosed.Contains(id) && Subject(InventoryPlayer.GetValue(__instance)!)?.Id == id) __result = true;
     }
 
     private static void FitPocketGrid(List<UiControl> controls, InventoryView grid)
@@ -218,6 +243,25 @@ public sealed partial class AvatarMod : IMod
         var image = preview.Bounds;
         var root = window.Bounds;
         bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
+        for (int i=0; i<LimbSections.Length; i++)
+        {
+            string section=LimbSections[i];
+            int at=controls.FindIndex(c=>c.Name==section);
+            if(at<0) continue;
+            var native=controls[at];
+            float unit=Math.Min(native.Bounds.Width/2,native.Bounds.Height/5);
+            var rect=native.Bounds with {Width=2*unit,Height=5*unit};
+            var slot=WithCells(native with {Bounds=rect},2,5);
+            controls[at]=slot with {Properties=new Dictionary<string,string>(slot.Properties) {
+                ["State"]=((owner.LimbBits >> (2*i)) & 3)==0 ? "disabled":"normal" }};
+            foreach(var item in owner.ItemGrid!.Items.Where(v=>v.Section==section))
+            {
+                string name=$"inventory-item-{owner.Id}-{item.Index}";
+                var parts=controls.Where(c=>c.Name==name || c.Name.StartsWith(name+"-",StringComparison.Ordinal)).ToList();
+                foreach(var part in parts) controls.Remove(part);
+                PlaceItem(controls,parts,name,rect,item);
+            }
+        }
         width = Math.Max(1,(int)image.Width);
         height = Math.Max(1,(int)image.Height);
         var backdrop = new Dictionary<string,string>();

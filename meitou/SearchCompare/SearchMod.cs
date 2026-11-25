@@ -28,8 +28,10 @@ public sealed class SearchMod : IMod
     static readonly MethodInfo ItemLines = AccessTools.Method(Tips,"ItemLines");
     static readonly MethodInfo SectionOf = AccessTools.Method(typeof(ItemFactory),"SectionOf");
 
+    internal static bool Installed { get; private set; }
     public void Initialize(ModContext context)
     {
+        Installed = true;
         HarmonyMethod Hook(string name) => new(typeof(SearchMod),name);
         foreach (var method in new[]{"AddCraftContent","AddResearchContent"})
             context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
@@ -38,8 +40,16 @@ public sealed class SearchMod : IMod
         context.Harmony.Patch(ItemLines, postfix:Hook(nameof(Compare)));
     }
 
-    static bool Input(MyGuiEvent e)
+    static bool Input(MyGuiEvent e,object __instance)
     {
+        if(e.Screen=="inventory" && e.Widget=="NueClear")
+        {
+            var player=AccessTools.Field(Router,"<player>P").GetValue(__instance)!;
+            var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
+            screens.SetText("inventory",Prefix+"inventory","");
+            Queries.Remove(Prefix+"inventory");
+            return false;
+        }
         if (!e.Widget.StartsWith(Prefix) || e.Action != "text") return true;
         Queries[e.Widget] = e.Text;
         return false;
@@ -107,21 +117,29 @@ public sealed class SearchMod : IMod
         if (kind is not ("trader" or "inventory" or "bag" or "loot" or "loot-bag")) return;
         if (controls.FirstOrDefault(c=>c.Type=="Window") is not {} window) return;
         var r = window.Bounds;
-        Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
+
         var player = AccessTools.Field(Router,"<player>P").GetValue(__instance)!;
         var runtime = Property(player,"TooltipRuntime");
         var tips = (IDictionary)AccessTools.Field(Tips,"ItemTips").GetValue(runtime)!;
         var lookup = (Func<string,GameRecord?>?)Property(runtime,"ItemRecordOf");
         var windows = Property(player,"InventoryWindows");
         var owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
-        var q = Query(id);
+        var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
+        bool shared=(id is "inventory" or "bag") && screens.IsOpen("inventory") && screens.Layout("inventory").Find("NuePreviewArea")!=null;
+        if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
+        if(shared && id=="inventory" && screens.Focus?.Widget!=Prefix+"inventory" && Query("inventory").Length==0 &&
+            controls.Find(c=>c.Name==Prefix+"inventory") is {} field)
+            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,new Dictionary<string,string>(),default,Pickable:false));
+        var q = Query(shared ? "inventory" : id);
         foreach (var cell in controls.ToArray())
         {
             if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-")) || tips[cell.Name] is not {} tip) continue;
-            if (q.Length>0 && !Match((string)Property(tip,"Name"),q))
+            var record=lookup?.Invoke((string)Property(tip,"Record"));
+            if (q.Length>0 && !Match((string)Property(tip,"Name"),q) && !Match(record?.Type.ToString() ?? "",q)
+                && !(record?.Type==FcsRecordType.Armour && Match((string)SectionOf.Invoke(null,[record])!,q)))
                 controls.Add(new(cell.Name+"-dim","Widget",cell.Bounds,"","","",true,new Dictionary<string,string>(),
                     new Vector4(.045f,.035f,.025f,.82f),Pickable:false,Clip:cell.Clip));
-            if (owner?.ItemGrid is not {} grid || lookup?.Invoke((string)Property(tip,"Record")) is not {} record) continue;
+            if (owner?.ItemGrid is not {} grid || record == null) continue;
             string slot = record.Type switch {
                 FcsRecordType.Weapon or FcsRecordType.Crossbow => "back",
                 FcsRecordType.Container => "backpack_attach",
