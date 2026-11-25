@@ -217,6 +217,17 @@ public sealed partial class AvatarMod : IMod
             Math.Min(anchor.Bounds.Width / grid.Width, anchor.Bounds.Height / grid.Height));
         controls[index] = WithCells(slot with { Bounds = anchor.Bounds with {
             Width = side * grid.Width, Height = side * grid.Height }, Clip = anchor.Bounds }, grid.Width, grid.Height);
+        int arrangeIndex = controls.FindIndex(c => c.Name == "ArrangeButton");
+        if (arrangeIndex >= 0)
+        {
+            var button = controls[arrangeIndex];
+            var gridBounds = controls[index].Bounds;
+            float gap = button.Bounds.Y - (anchor.Bounds.Y + anchor.Bounds.Height);
+            controls[arrangeIndex] = button with { Bounds = button.Bounds with {
+                X = gridBounds.X + (gridBounds.Width - button.Bounds.Width) / 2,
+                Y = gridBounds.Y + gridBounds.Height + gap } };
+        }
+
     }
 
     private static UiControl WithCells(UiControl slot, int cols, int rows) => slot with {
@@ -275,8 +286,9 @@ public sealed partial class AvatarMod : IMod
         void Menu(string anchor, string action, string[] options, int selected, bool open)
         {
             var bounds = controls.First(c => c.Name == anchor).Bounds;
+            var style = new Dictionary<string,string> { ["TextAlign"] = anchor == "NueBackdropMenu" ? "Right VCenter" : "Left VCenter" };
             void Button(int index, string label, float y) => controls.Add(new(anchor+index,"Button",bounds with { Y=y },
-                label,action+index,"Kenshi_Button1",true,new Dictionary<string,string>(),default,Pickable:true,Clip:root));
+                label,action+index,"Kenshi_Button1",true,style,default,Pickable:true,Clip:root));
             Button(-1,options[selected]+"  ▾",bounds.Y);
             if (open) for(int i=0;i<options.Length;i++) Button(i,options[i],bounds.Y+(i+1)*bounds.Height);
         }
