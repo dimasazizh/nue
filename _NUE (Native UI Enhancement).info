@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<ModData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <id>0</id>
-  <mod>NUE (Native UI Enhancement)</mod>
-  <title>NUE (Native UI Enhancement)</title>
-  <tags><string>Graphical</string></tags>
-  <visibility>2</visibility>
-  <lastUpdate>2026-11-19T00:00:00+07:00</lastUpdate>
-</ModData>
