@@ -16,8 +16,8 @@ public sealed partial class SearchMod
     const string Yellow = "0.909804 0.741176 0.447059";
     const string Green = "0.42 0.76 0.32";
     const string Red = "0.90 0.30 0.24";
-    const string UpArrow = "▲ ";
-    const string DownArrow = "▼ ";
+    // A measurable prefix reserves space in the native tooltip layout. The decoration replaces it with geometry.
+    const string ArrowSpace = "00 ";
     static readonly ConditionalWeakTable<IReadOnlyList<TooltipLine>,InventoryItemView> EquippedByLines = new();
 
     const string Number = @"[+-]?\d+(?:\.\d+)?";
@@ -25,7 +25,8 @@ public sealed partial class SearchMod
         $@"^\s*(?<first>{Number})(?:\s*(?<separator>[-/–])\s*(?<second>{Number}))?\s*(?<unit>%|[a-z]+(?:/[a-z]+)?)?\s*$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-    sealed record TooltipPair(int Start, IReadOnlyList<TooltipLine> Equipped, string?[] EquippedColours);
+    sealed record TooltipPair(int Start, IReadOnlyList<TooltipLine> Equipped, string?[] EquippedColours,
+        int[] HoveredDirections, int[] EquippedDirections);
 
     static void RememberComparison(object t, IReadOnlyList<TooltipLine> __result)
     {
@@ -57,6 +58,8 @@ public sealed partial class SearchMod
         var equippedColours = new string?[equippedLines.Count];
         var hoveredRows = lines.ToArray();
         var equippedRows = equippedLines.ToArray();
+        var hoveredDirections = new int[hoveredRows.Length];
+        var equippedDirections = new int[equippedRows.Length];
         for (int i = 0; i < lines.Count; i++)
         {
             if (hoveredColours[i] is not null || !UncolouredStat(lines[i])) continue;
@@ -71,15 +74,17 @@ public sealed partial class SearchMod
                     bool hoveredBetter = lines[i].Key == "-Weight" ? !higher : higher;
                     hoveredColours[i] = hoveredBetter ? Green : Red;
                     equippedColours[j] = hoveredBetter ? Red : Green;
-                    hoveredRows[i] = lines[i] with { Value = (higher ? UpArrow : DownArrow) + lines[i].Value };
-                    equippedRows[j] = equippedLines[j] with { Value = (higher ? DownArrow : UpArrow) + equippedLines[j].Value };
+                    hoveredRows[i] = lines[i] with { Value = ArrowSpace + lines[i].Value };
+                    equippedRows[j] = equippedLines[j] with { Value = ArrowSpace + equippedLines[j].Value };
+                    hoveredDirections[i] = order;
+                    equippedDirections[j] = -order;
                 }
                 break;
             }
         }
         valueColours = hoveredColours;
         lines = hoveredRows;
-        __state = new(controls.Count, equippedRows, equippedColours);
+        __state = new(controls.Count, equippedRows, equippedColours, hoveredDirections, equippedDirections);
     }
 
     static bool UncolouredStat(TooltipLine line) =>
@@ -119,6 +124,9 @@ public sealed partial class SearchMod
         int width = (int)AccessTools.Field(player.GetType(), "Width").GetValue(player)!;
         int height = (int)AccessTools.Field(player.GetType(), "Height").GetValue(player)!;
         float scale = (float)Property(player, "UiScale");
+        float minimum = (bool)Property(player, "TitleOpen") ? 0 : (float)Property(player, "StandardPixels");
+        DrawArrows(controls, pair.Start, "tooltip", pair.HoveredDirections, painter, height, minimum, scale);
+        DrawArrows(equipped, 0, EquippedPrefix, pair.EquippedDirections, painter, height, minimum, scale);
         float gap = Math.Max(6, 9 * scale), labelHeight = Math.Max(14, 22 * scale);
         float border = Math.Max(1, 2 * scale);
         var left = controls[pair.Start].Bounds;
@@ -150,6 +158,43 @@ public sealed partial class SearchMod
             new Dictionary<string,string> {
                 ["FontName"] = "Kenshi_StandardFont_Small", ["TextAlign"] = "Center VCenter", ["TextColour"] = Yellow
             }, default, Pickable:false));
+    }
+
+    static void DrawArrows(List<UiControl> controls, int start, string prefix, int[] directions,
+        UiPainter painter, int screenHeight, float minimum, float scale)
+    {
+        string valuePrefix = prefix + "-value-";
+        int end = controls.Count;
+        for (int i = start; i < end; i++)
+        {
+            var control = controls[i];
+            if (!control.Name.StartsWith(valuePrefix, StringComparison.Ordinal) ||
+                !int.TryParse(control.Name.AsSpan(valuePrefix.Length), NumberStyles.None, CultureInfo.InvariantCulture, out int row) ||
+                (uint)row >= (uint)directions.Length || directions[row] == 0 ||
+                !control.Caption.StartsWith(ArrowSpace, StringComparison.Ordinal)) continue;
+
+            string value = control.Caption[ArrowSpace.Length..];
+            controls[i] = control with { Caption = value };
+            var font = control.Properties["FontName"];
+            var size = painter.MeasureText(font, value, screenHeight, 0, minimum);
+            float unit = Math.Max(1, MathF.Round(scale));
+            float x = control.Bounds.X + control.Bounds.Width - size.Width - Math.Max(2, 3 * scale) - 3.5f * unit;
+            float y = control.Bounds.Y + (Math.Min(control.Bounds.Height, size.Height) - 7 * unit) / 2;
+            string[] channels = control.Properties["TextColour"].Split(' ');
+            var colour = new Vector4(float.Parse(channels[0], CultureInfo.InvariantCulture),
+                float.Parse(channels[1], CultureInfo.InvariantCulture), float.Parse(channels[2], CultureInfo.InvariantCulture), 1);
+            bool up = directions[row] > 0;
+            for (int strip = 0; strip < 4; strip++)
+                AddStrip(strip, up ? strip : 6 - strip, 1 + 2 * strip, 1);
+            AddStrip(4, up ? 4 : 0, 3, 3);
+
+            void AddStrip(int strip, int top, int width, int height)
+            {
+                var bounds = new UiRect(x - width * unit / 2, y + top * unit, width * unit, height * unit);
+                controls.Add(new(control.Name + "-arrow-" + strip, "Widget", bounds, "", "", "", true,
+                    control.Properties, colour, Pickable: false, Clip: control.Clip));
+            }
+        }
     }
 
     static UiControl MoveTooltipControl(UiControl control, float dx, float dy)

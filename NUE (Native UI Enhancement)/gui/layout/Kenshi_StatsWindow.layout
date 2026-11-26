@@ -34,7 +34,7 @@
     <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.720000 0.668487 0.268000 0.229821">
       <Widget type="Widget" skin="PanelEmpty" position_real="0.0547445 0.026087 0.890511 0.947826" align="Stretch" name="StatisticsPanel"/>
     </Widget>
-    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.272000000 0.037392000 0.723000000 0.649791042" name="NueSkillsFrame">
+    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.272000 0.037392 0.723000 0.595000" name="NueSkillsFrame">
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>
@@ -113,14 +113,14 @@
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>
-      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008000 0.624946 0.987000 0.360790">
+      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008000 0.559000 0.987000 0.426000">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.004000 0.555738 0.991000 0.427869">
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.015000 0.193398 0.352000 0.790000" align="HStretch Top" name="Description1Panel"/>
-        <Widget type="Widget" skin="PanelEmpty" position_real="0.383000 0.193398 0.601000 0.790000" name="Description2Panel" align="HStretch Top"/>
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.004000 0.559000 0.991000 0.426000" name="NueSkillsDescription">
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.015000 0.045000 0.352000 0.940000" align="HStretch Top" name="Description1Panel"/>
+        <Widget type="Widget" skin="PanelEmpty" position_real="0.383000 0.045000 0.601000 0.940000" name="Description2Panel" align="HStretch Top"/>
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>

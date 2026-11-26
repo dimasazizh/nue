@@ -30,8 +30,17 @@ internal static class SkillsLayout
     {
         var atlas = Path.Combine(context.Folder, "gui", "gfx", "nue_skill_xp.png");
         if (File.Exists(atlas)) pieTexture = UiPainter.IconTexture(atlas);
+        context.Harmony.Patch(AccessTools.Method(Stats, "BindStatsGeometry"),
+            postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(BindDescription)));
         context.Harmony.Patch(AccessTools.Method(Stats, "AddStatsContent"),
             postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(Arrange)));
+    }
+
+    private static void BindDescription(MyGuiLayout layout, UiBindings bindings)
+    {
+        // Native stats geometry overrides the container of Description1Panel.
+        if (layout.Find("NueSkillsDescription") is {} description)
+            bindings.RelativePositions[description] = description.Position;
     }
 
     private static void Arrange(object __instance, List<UiControl> controls)
@@ -64,8 +73,13 @@ internal static class SkillsLayout
         int[] left = [..columns[0], ..columns[1], ..columns[2].Skip(split), ..leftMods];
         int[] right = [..columns[2].Take(split), ..columns[3], ..rightMods];
         var area = frame.Bounds;
-        float margin = 5 * scale;
-        float row = Math.Min(20 * scale, (area.Height - 2 * margin) / Math.Max(left.Length, right.Length));
+        float topMargin = 10 * scale, bottomMargin = 5 * scale, groupGap = 6 * scale;
+        float FitRows(int[] rows)
+        {
+            int groups = rows.Count(index => Array.IndexOf(HeadingNames, controls[index].Name) >= 0);
+            return (area.Height - topMargin - bottomMargin - Math.Max(0, groups - 1) * groupGap) / rows.Length;
+        }
+        float row = Math.Min(20 * scale, Math.Min(FitRows(left), FitRows(right)));
         if (row <= 0 || area.Width <= 0) return;
         var clip = area.Intersect(frame.Clip ?? area);
         PlaceColumn(left, area.X + area.Width * .066f, area.X + area.Width * .362f);
@@ -73,7 +87,8 @@ internal static class SkillsLayout
 
         void PlaceColumn(int[] rows, float x, float oldValueRight)
         {
-            float y = area.Y + margin;
+            float y = area.Y + topMargin;
+            bool firstGroup = true;
             float valueRight = oldValueRight - Math.Min(40 * scale, (oldValueRight - x) * .22f);
             float valueWidth = Math.Min(32 * scale, (valueRight - x) * .22f);
             float gap = 4 * scale;
@@ -83,6 +98,8 @@ internal static class SkillsLayout
                 int heading = Array.IndexOf(HeadingNames, label.Name);
                 if (heading >= 0)
                 {
+                    if (!firstGroup) y += groupGap;
+                    firstGroup = false;
                     controls[index] = Move(label, new(x, y, oldValueRight - x, row), clip, row * .89f);
                     int iconIndex = controls.FindIndex(c => c.Skin == "NUE_Stats_" + HeadingIcons[heading]);
                     if (iconIndex >= 0)
@@ -125,7 +142,6 @@ internal static class SkillsLayout
         float level = mod ? lead.ModSkills.ElementAtOrDefault(index) : lead.AllSkills.ElementAtOrDefault(index);
         if (!float.IsFinite(level)) return;
         int progress = (int)MathF.Floor((level - MathF.Floor(level)) * 100);
-        if (progress == 0) return;
         float side = row * .76f;
         var style = new Dictionary<string, string>
         {

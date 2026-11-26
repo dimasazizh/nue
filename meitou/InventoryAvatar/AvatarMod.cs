@@ -36,6 +36,9 @@ public sealed partial class AvatarMod : IMod
         public long framedKey;
         public string? openRack;
         public UiRect bagArea;
+#if NUE_UNIFIED
+        public readonly Nue.Unified.CharacterInspector.View Inspector = new();
+#endif
     }
     private static readonly PreviewState own = new(), other = new();
     private static PreviewState active = own, dragged = own;
@@ -98,6 +101,10 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.InventoryLayout"), "BindInventoryGeometry", nameof(DockInventory));
         After(GameType("Ui.ScreenRouter"), "AddInventoryContent", nameof(Controls));
         After(GameType("Ui.ScreenRouter"), "FaithfulAction", nameof(Click));
+#if NUE_UNIFIED
+        context.Harmony.Patch(AccessTools.Method(GameType("Ui.ScreenRouter"), "FaithfulAction"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(InspectorAction)));
+#endif
         After(Host, "FillDrawList", nameof(Prepare));
         After(typeof(MyGuiScreenHost),"Raise",nameof(KeepBagAbove));
         After(Render,"GatherPortraitKeys",nameof(IncludePartnerPose));
@@ -201,7 +208,7 @@ public sealed partial class AvatarMod : IMod
             b.Actions["ArrangeButton"] = "ArrangeButton";
         }
         var player = LayoutPlayer.GetValue(__instance)!;
-        if (Subject(player) == null) return;
+        if (Subject(player) is not {} subject) return;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
         if (id is "bag" or "loot-bag")
         {
@@ -213,6 +220,16 @@ public sealed partial class AvatarMod : IMod
         }
 
 #if NUE_UNIFIED
+        if (Nue.Unified.CharacterInspector.Enabled)
+        {
+            active.Inspector.Use(subject.Id);
+            bool hasBag = subject.ItemGrid is { BagWidth: > 0, BagHeight: > 0 };
+            bool bagOpen = screens.IsOpen(id == "loot" ? "loot-bag" : "bag");
+            bool inspectorShown = !bagOpen && (hasBag || !active.Inspector.Hidden);
+            b.Text["OpenBagButton"] = inspectorShown ? "OPEN BAG | HIDE CHAR INSPECTOR" : "CLOSE BAG | SHOW CHAR INSPECTOR";
+            b.Disabled.Remove("OpenBagButton");
+            b.Actions["OpenBagButton"] = hasBag ? "OpenBagButton" : Nue.Unified.CharacterInspector.ActionPrefix + "toggle";
+        }
         if (Nue.SearchCompare.SearchMod.Installed)
         {
             b.Disabled.Remove("NueClear");
@@ -348,7 +365,18 @@ public sealed partial class AvatarMod : IMod
         ArrangeEquipment(controls,root,owner,player);
 #if NUE_UNIFIED
         PlaceMarkers(controls, player, markedCells);
-        Nue.Unified.CharacterInspector.AddSummary(controls, owner, image, root);
+        if (Nue.Unified.CharacterInspector.Enabled)
+        {
+            var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+            active.Inspector.Use(owner.Id);
+            if (!screens.IsOpen(id == "loot" ? "loot-bag" : "bag") &&
+                (owner.ItemGrid is { BagWidth: > 0, BagHeight: > 0 } || !active.Inspector.Hidden))
+            {
+                var hit = screens.HitTest((Vector2)Nue.Unified.CharacterInspector.Mouse.GetValue(player)!);
+                Nue.Unified.CharacterInspector.Draw(controls, player, owner, active.bagArea, active.Inspector,
+                    hit is {} target && target.Screen == id ? target.Control.Action : null);
+            }
+        }
 #endif
         void Menu(string anchor, string action, string[] options, int selected, bool open)
         {
@@ -429,6 +457,18 @@ public sealed partial class AvatarMod : IMod
         if(index==-1) active.expanded=!active.expanded;
         else if((uint)index<Labels.Length) { active.choice=index; active.expanded=false; active.Clock.Restart(); }
     }
+
+#if NUE_UNIFIED
+    private static bool InspectorAction(MyGuiEvent e)
+    {
+        const string prefix = Nue.Unified.CharacterInspector.ActionPrefix;
+        if (e.Screen is not ("inventory" or "loot") || !e.Action.StartsWith(prefix, StringComparison.Ordinal))
+            return true;
+        var view = (e.Screen == "loot" ? other : own).Inspector;
+        view.Act(e.Action[prefix.Length..]);
+        return false;
+    }
+#endif
 
     private static void Prepare(object __instance, CharacterDrawList list)
     {

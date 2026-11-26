@@ -15,7 +15,7 @@ Item comparison shows the hovered item on the left and the equipped item on the 
 
 NUE includes **Item Markers compatibility** under **Settings → Mods → NUE → Mod Compatibility**. With Item Markers enabled, it fits grade frames and badges to NUE's equipment slots. Disable the old standalone compatibility add-on when using a build with the integrated option.
 
-The inventory shows estimated armour coverage and cut, blunt, and harpoon resistances below the 3D avatar. The estimates account for overlapping armour layers and are averaged across body parts. **Armour protection summary** has its own toggle under **Core Features**.
+The **Character Inspector** uses the backpack area while the bag is closed. Use **SHOW CHAR INSPECTOR** or **HIDE CHAR INSPECTOR** below that area to switch views. Select a body part on the figure or list to see its protection and covering gear. The estimates below the figure account for overlapping armour layers. **Character inspector** has its own toggle under **Core Features**.
 
 ## Character tabs and building information for MeitouClient
 
