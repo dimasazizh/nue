@@ -21,6 +21,7 @@ public sealed partial class SearchMod : IMod
 {
     const string Prefix = "NueSearch.";
     const string StockView = "scrollview_backpack_content";
+    internal const float VendorSearchSpace = 36;
     const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
     static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
@@ -134,7 +135,7 @@ public sealed partial class SearchMod : IMod
 
         float contentHeight = root.Height * content.Position.Height;
         if (contentHeight <= 0) return;
-        float inset = Math.Min(36 * b.TemplateScale / contentHeight, bounds.Height / 2);
+        float inset = Math.Min(VendorSearchSpace * b.TemplateScale / contentHeight, bounds.Height / 2);
         b.RelativePositions[view] = bounds with { Y = bounds.Y + inset, Height = bounds.Height - inset };
     }
 

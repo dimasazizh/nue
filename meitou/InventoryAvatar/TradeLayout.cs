@@ -1,4 +1,5 @@
 using Meitou.Game.Ui;
+using HarmonyLib;
 using System.Numerics;
 using Meitou.Data.Ui;
 using Meitou.Simulation;
@@ -8,6 +9,9 @@ namespace Nue.InventoryAvatar;
 
 public sealed partial class AvatarMod
 {
+    private static readonly System.Reflection.MethodInfo BindVendorGeometry =
+        AccessTools.Method(GameType("Ui.TradeWindows"), "BindTraderGeometry");
+
     private static bool DockTrade(string id, UiBindings bindings, object layout, UiRect root)
     {
         if (id is not ("inventory" or "loot" or "trader" or "bag" or "loot-bag")) return false;
@@ -22,12 +26,15 @@ public sealed partial class AvatarMod
         int width = (int)Width.GetValue(player)!, height = (int)Height.GetValue(player)!;
         float gap = Math.Max(4, width * .005f);
         float half = (width - 3 * gap) / 2;
-        bool partner = id is "loot" or "loot-bag" or "trader";
-        bool bag = id is "bag" or "loot-bag";
         float panelHeight = Math.Min(height * .84f, half * inspection.Roots[0].Position.Height * height / (inspection.Roots[0].Position.Width * width));
+        if (merchant)
+            return DockVendorTrade(id, bindings, player, screens, width, height, gap, half, panelHeight);
+
+        bool partner = id is "loot" or "loot-bag";
+        bool bag = id is "bag" or "loot-bag";
         bindings.Positions["Root"] = root with {Width = half, Height = panelHeight};
         bindings.WindowPosition = new Vector2(partner ? half + 2 * gap : gap, (height-panelHeight)/2) - screens.GetOffset(id);
-        if (partner && !merchant && screens.IsOpen("loot-bag") &&
+        if (partner && screens.IsOpen("loot-bag") &&
             Owner.Invoke(inventories, ["loot"]) is CharacterSnapshot { Animal:true })
         {
             float header = Math.Min(panelHeight * .4f, root.Height);
@@ -42,6 +49,64 @@ public sealed partial class AvatarMod
             return true;
         }
         if (bag) bindings.Positions["Root"] = root; // DockInventory fits the native bag into its owner's bag area.
+        return true;
+    }
+
+    private static bool DockVendorTrade(string id, UiBindings bindings, object player, MyGuiScreenHost screens,
+        int width, int height, float gap, float playerWidth, float playerHeight)
+    {
+        if (id == "bag") return true; // DockInventory places the bag inside the player window.
+        if (id is not ("inventory" or "trader")) return false;
+
+        var vendor = bindings;
+        if (id == "inventory")
+        {
+            // Both panels need the same native vendor dimensions, regardless of binding order.
+            vendor = new UiBindings();
+            var trade = AccessTools.PropertyGetter(Player, "TradeWindows").Invoke(player, null);
+            BindVendorGeometry.Invoke(trade, [vendor]);
+        }
+
+        var layout = screens.Layout("trader");
+        if (!vendor.Positions.TryGetValue("Root", out var native) ||
+            layout.Find("Content") is not {} content || layout.Find("scrollview_backpack_content") is not {} view ||
+            !vendor.RelativePositions.TryGetValue(view, out var relative) ||
+            !vendor.Canvas.TryGetValue(view.Name, out var canvas)) return false;
+
+        var cell = (Vector2)CellSize.Invoke(player, null)!;
+        if (native.Width <= 0 || native.Height <= 0 || cell.X <= 0 ||
+            content.Position.Width <= 0 || content.Position.Height <= 0) return false;
+
+        float vendorWidth = Math.Min(native.Width, width - playerWidth - 3 * gap);
+        float nativeContentHeight = native.Height * content.Position.Height;
+        // Meitou initially sizes the stock viewport as a square. Fit the actual row count.
+        float stockHeightChange = canvas.Item2 - MathF.Round(canvas.Item1 / cell.X) * cell.Y;
+        float searchHeight = 0;
+#if NUE_UNIFIED
+        if (Nue.SearchCompare.SearchMod.Installed)
+            searchHeight = Nue.SearchCompare.SearchMod.VendorSearchSpace * bindings.TemplateScale;
+#endif
+        float nativeViewHeight = relative.Height * nativeContentHeight;
+        float desiredViewHeight = Math.Max(cell.Y, nativeViewHeight + stockHeightChange) + searchHeight;
+        float vendorHeight = Math.Min(height * .84f, native.Height + (desiredViewHeight - nativeViewHeight) / content.Position.Height);
+        float start = (width - playerWidth - gap - vendorWidth) / 2;
+
+        if (id == "inventory")
+        {
+            bindings.Positions["Root"] = bindings.Positions["Root"] with { Width = playerWidth, Height = playerHeight };
+            bindings.WindowPosition = new Vector2(start, (height - playerHeight) / 2) - screens.GetOffset(id);
+            return true;
+        }
+
+        float nativeContentWidth = native.Width * content.Position.Width;
+        float contentWidth = vendorWidth * content.Position.Width, contentHeight = vendorHeight * content.Position.Height;
+        float x = relative.X * nativeContentWidth, y = relative.Y * nativeContentHeight;
+        float viewWidth = relative.Width * nativeContentWidth + contentWidth - nativeContentWidth;
+        float viewHeight = nativeViewHeight + contentHeight - nativeContentHeight;
+        bindings.RelativePositions[view] = new(x / contentWidth, y / contentHeight,
+            Math.Max(1, viewWidth) / contentWidth, Math.Max(1, viewHeight) / contentHeight);
+        bindings.Positions["Root"] = native with { Width = vendorWidth, Height = vendorHeight };
+        bindings.WindowPosition = new Vector2(start + playerWidth + gap, (height - vendorHeight) / 2) - screens.GetOffset(id);
         return true;
     }
 
