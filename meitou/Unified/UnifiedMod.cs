@@ -21,6 +21,7 @@ public sealed class UnifiedMod : IMod
         [Setting("Inventory inspection and avatar", Hint = Restart, SubGroup = Core)] public bool Avatar { get; set; } = true;
         [Setting("Inventory, crafting and research search", Hint = Restart, SubGroup = Core)] public bool Search { get; set; } = true;
         [Setting("Gear comparison", Hint = Restart, SubGroup = Core)] public bool GearComparison { get; set; } = true;
+        [Setting("Armour protection summary", Hint = Restart, SubGroup = Core)] public bool CharacterInspector { get; set; } = true;
         [Setting("Skills window portrait", Hint = Restart, SubGroup = Core)] public bool Portrait { get; set; } = true;
         [Setting("Item Markers compatibility", Hint = "Fit Item Markers to NUE equipment slots. Requires Item Markers. " + Restart,
             SubGroup = "Mod Compatibility")]
@@ -52,5 +53,7 @@ public sealed class UnifiedMod : IMod
         if (options.Search || options.GearComparison)
             new SearchCompare.SearchMod().Install(context, options.Search, options.GearComparison);
         if (options.Portrait) new SkillPortrait.PortraitMod().Initialize(context);
+        SkillsLayout.Install(context);
+        if (options.CharacterInspector) CharacterInspector.Enable(context.Data);
     }
 }

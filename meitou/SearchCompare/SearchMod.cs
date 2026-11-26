@@ -21,7 +21,6 @@ public sealed partial class SearchMod : IMod
 {
     const string Prefix = "NueSearch.";
     const string StockView = "scrollview_backpack_content";
-    const float VendorSearchSpace = 36;
     const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
     static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
@@ -51,7 +50,6 @@ public sealed partial class SearchMod : IMod
             foreach (var method in new[]{"AddCraftContent","AddResearchContent"})
                 context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
             context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
-            context.Harmony.Patch(AccessTools.Method(Router,"BindFaithfulScreen"), postfix:Hook(nameof(ReserveVendorSearch)));
         }
         context.Harmony.Patch(AccessTools.Method(Router,"AddFaithfulContent"), postfix:Hook(nameof(Inventory)));
         if (gearComparison)
@@ -134,33 +132,37 @@ public sealed partial class SearchMod : IMod
 
     static object Property(object obj,string name) => AccessTools.Property(obj.GetType(),name).GetValue(obj)!;
 
-    static void ReserveVendorSearch(string id, UiBindings __result, object __instance)
+    static void VendorSearch(List<UiControl> controls, MyGuiScreenHost screens, string id, UiRect window)
     {
-        var b = __result;
-        if (id != "trader" || !b.Positions.TryGetValue("Root", out var root)) return;
-        var player = RouterPlayer.GetValue(__instance)!;
-        var screens = (MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
         var layout = screens.Layout(id);
-        if (layout.Find("Content") is not {} content || layout.Find(StockView) is not {} view ||
-            !b.RelativePositions.TryGetValue(view, out var bounds)) return;
-
-        float contentHeight = root.Height * content.Position.Height;
-        if (contentHeight <= 0) return;
-        float inset = Math.Min(VendorSearchSpace * b.TemplateScale / contentHeight, bounds.Height / 2);
-        b.RelativePositions[view] = bounds with { Y = bounds.Y + inset, Height = bounds.Height - inset };
-    }
-
-    static void VendorSearch(List<UiControl> controls, MyGuiScreenHost screens, string id)
-    {
-        if (controls.Find(c => c.Name == "datapanel-label-0") is not {} money ||
+        if (layout.Find("datapanel") is not {} panel ||
+            layout.Find("Content")?.Children.FirstOrDefault(w => w.Children.Contains(panel)) is not {} moneyBox ||
             controls.Find(c => c.Name == StockView) is not {} view) return;
+        int backgroundIndex = controls.FindIndex(c => c.Name == moneyBox.Name && c.Skin == moneyBox.Skin);
+        int labelIndex = controls.FindIndex(c => c.Name == "datapanel-label-0");
+        int valueIndex = controls.FindIndex(c => c.Name == "datapanel-value-0");
+        if (backgroundIndex < 0 || labelIndex < 0 || valueIndex < 0) return;
+        var background = controls[backgroundIndex];
+        var label = controls[labelIndex];
         var stock = view.Bounds;
-        float moneyBottom = money.Bounds.Y + money.Bounds.Height;
-        float top = Math.Max(moneyBottom, money.Clip is {} clip ? clip.Y + clip.Height : moneyBottom) + 3;
-        float height = Math.Min(money.Bounds.Height * 1.4f, stock.Y - top - 4);
-        if (height <= 0 || stock.Width <= 8) return;
-        float clearWidth = Math.Min(height * 1.35f, stock.Width / 4);
-        var field = new UiRect(stock.X, top, stock.Width - clearWidth - 4, height);
+        float top = background.Bounds.Y;
+        float gap = Math.Max(2, label.Bounds.Height * .20f);
+        float height = Math.Min(background.Bounds.Height, Math.Min(label.Bounds.Height * 1.20f, stock.Y - top - gap));
+        if (height <= 0 || stock.Width <= 4 * gap) return;
+        float moneyWidth = Math.Min(background.Bounds.Width, stock.Width * .44f);
+        float clearWidth = Math.Min(height * 1.25f, stock.Width * .18f);
+        float searchWidth = stock.Width - moneyWidth - clearWidth - 2 * gap;
+        if (searchWidth <= 0) return;
+
+        var money = new UiRect(stock.X, top, moneyWidth, height);
+        var moneyClip = window.Intersect(money);
+        controls[backgroundIndex] = background with { Bounds = money, Clip = moneyClip };
+        float inset = Math.Min(gap, moneyWidth * .05f);
+        float innerWidth = moneyWidth - 2 * inset;
+        MoveMoneyText(labelIndex, new(money.X + inset, top, innerWidth * .40f, height), "Left VCenter");
+        MoveMoneyText(valueIndex, new(money.X + inset + innerWidth * .40f, top, innerWidth * .60f, height), "Right VCenter");
+
+        var field = new UiRect(money.X + money.Width + gap, top, searchWidth, height);
         string name = Prefix + id;
         string query = screens.GetText(id, name);
         var style = new Dictionary<string,string> { ["TextPadding"] = "8 2", ["TextAlign"] = "Left VCenter" };
@@ -174,12 +176,21 @@ public sealed partial class SearchMod : IMod
             style["SelectionStart"] = edit.SelectionStart.ToString(CultureInfo.InvariantCulture);
             style["SelectionLength"] = edit.SelectionLength.ToString(CultureInfo.InvariantCulture);
         }
-        controls.Add(new(name,"EditBox",field,query,"","Kenshi_EditBox",true,style,default,Pickable:true));
+        // Runtime controls use the actual skin from the character inventory's EditBox template.
+        controls.Add(new(name,"EditBox",field,query,"","Kenshi_GenericInputBoxSkin",true,style,default,Pickable:true,Clip:window));
         if (!focused && query.Length == 0)
-            controls.Add(new("NueSearchHint","TextBox",field,"Search items","","",true,style,default,Pickable:false));
+            controls.Add(new("NueSearchHint","TextBox",field,"Search items","","",true,style,default,Pickable:false,Clip:field.Intersect(window)));
         var clear = new UiRect(stock.X + stock.Width - clearWidth, top, clearWidth, height);
-        controls.Add(new("NueClear","Button",clear,"×",ClearAction,"Kenshi_Button1",true,
-            new Dictionary<string,string> { ["TextAlign"] = "Center" },default,Pickable:true));
+        controls.Add(new("NueClear","Button",clear,"×",ClearAction,"Kenshi_Button1Skin",true,
+            new Dictionary<string,string> { ["TextAlign"] = "Center", ["FontName"] = "Kenshi_PaintedTextFont_Medium" },
+            default,Pickable:true,Clip:window));
+
+        void MoveMoneyText(int index, UiRect bounds, string align)
+        {
+            var control = controls[index];
+            var properties = new Dictionary<string,string>(control.Properties) { ["TextAlign"] = align };
+            controls[index] = control with { Bounds = bounds, Properties = properties, Clip = moneyClip };
+        }
     }
 
     static void Inventory(object __instance,string id,List<UiControl> controls)
@@ -229,7 +240,7 @@ public sealed partial class SearchMod : IMod
         var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
         string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
         bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
-        if(kind=="trader") VendorSearch(controls,screens,id);
+        if(kind=="trader") VendorSearch(controls,screens,id,r);
         else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
         if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
             controls.Find(c=>c.Name==Prefix+source) is {} field)

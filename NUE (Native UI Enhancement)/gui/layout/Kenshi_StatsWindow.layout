@@ -34,7 +34,7 @@
     <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.720000 0.668487 0.268000 0.229821">
       <Widget type="Widget" skin="PanelEmpty" position_real="0.0547445 0.026087 0.890511 0.947826" align="Stretch" name="StatisticsPanel"/>
     </Widget>
-    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.272000000 0.037392000 0.723000000 0.649791042">
+    <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.272000000 0.037392000 0.723000000 0.649791042" name="NueSkillsFrame">
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>

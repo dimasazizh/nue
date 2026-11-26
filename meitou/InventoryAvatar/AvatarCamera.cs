@@ -40,15 +40,22 @@ public sealed partial class AvatarMod
                 if (rig.Handle(name) is int h && h < bones.Length)
                     points.Add(Vector3.TransformNormal(Vector3.Transform(rig.BindPosition[h],bones[h]),world));
             if (points.Count < 3 || Vector3.DistanceSquared(points[0],points[^1]) < 1) return;
-            active.framePoints = points.ToArray();
             float stature = Math.Max(1, (rig.HeadBone >= 0 ? rig.BindPosition[rig.HeadBone].Length() : 20)
                 * Vector3.TransformNormal(Vector3.UnitY,world).Length());
-            active.framePadding = stature * .095f;
-            // The head joint sits at the base of the skull; estimate eye level along the posed neck.
+            active.framePadding = stature * .055f;
+            // The head joint is inside the skull. Extend the posed neck-to-head axis to frame the crown.
             active.eyeHeight = points.Max(p => p.Y);
             if (rig.Handle("Bip01 Head") is int head && head < bones.Length &&
                 rig.Handle("Bip01 Neck") is int neck && neck < bones.Length)
-                active.eyeHeight = points[0].Y + (points[0].Y - points[1].Y) * .35f;
+            {
+                var headPoint = Vector3.TransformNormal(Vector3.Transform(rig.BindPosition[head], bones[head]), world);
+                var neckPoint = Vector3.TransformNormal(Vector3.Transform(rig.BindPosition[neck], bones[neck]), world);
+                var neckToHead = headPoint - neckPoint;
+                var crown = neckToHead.LengthSquared() > 1e-4f ? Vector3.Normalize(neckToHead) : Vector3.UnitY;
+                points.Add(headPoint + crown * (stature * .12f));
+                active.eyeHeight = headPoint.Y + neckToHead.Y * .35f;
+            }
+            active.framePoints = points.ToArray();
             active.framedPose = active.choice;
             active.framedKey = r.Key;
             active.framedAsset = asset;
@@ -56,30 +63,32 @@ public sealed partial class AvatarMod
         var orbit = __result.Eye - __result.Pivot;
         var forward = Vector3.Normalize(new Vector3(orbit.X,0,orbit.Z));
         var right = Vector3.Cross(Vector3.UnitY, forward);
-        var lo = active.framePoints.Aggregate(Vector3.Min);
-        var hi = active.framePoints.Aggregate(Vector3.Max);
-        var centre = (lo + hi) / 2 + Vector3.UnitY * active.framePadding * .28f;
+        var frame = active.framePoints;
+        var lo = frame.Aggregate(Vector3.Min);
+        var hi = frame.Aggregate(Vector3.Max);
+        var centre = (lo + hi) / 2;
         float tanY = MathF.Tan(r.FieldOfView/2), tanX = tanY*r.Width/r.Height;
-        float tilt = 0;
-        float distance = 0;
-        Vector3 direction = default;
-        for (int pass = 0; pass < 4; pass++)
-        {
-            direction = forward*MathF.Cos(tilt) + Vector3.UnitY*MathF.Sin(tilt);
-            var up = Vector3.Cross(direction,right);
-            distance = 0;
-            foreach (var point in active.framePoints)
-            {
-                var delta = point-centre;
-                float horizontal = (Math.Abs(Vector3.Dot(delta,right)) + active.framePadding) / tanX;
-                float vertical = (Math.Abs(Vector3.Dot(delta,up)) + active.framePadding) / tanY;
-                distance = Math.Max(distance, Vector3.Dot(delta,direction)+Math.Max(horizontal,vertical));
-            }
-            tilt = MathF.Asin(Math.Clamp((active.eyeHeight-centre.Y) / Math.Max(1,distance),-.85f,.85f));
-        }
+        float levelDistance = Math.Max(1, FitDistance(forward, .87f));
+        float tilt = active.choice == 3 ? r.Elevation :
+            Math.Clamp(MathF.Atan2(active.eyeHeight - centre.Y, levelDistance), -.5f, .5f);
+        var direction = forward * MathF.Cos(tilt) + Vector3.UnitY * MathF.Sin(tilt);
+        // Fit with the actual camera angle. Keep clearance even at the closest zoom.
+        float distance = Math.Max(FitDistance(direction, .96f), FitDistance(direction, .87f) * active.zoom);
         var pivot = world.Translation + centre;
-        var eye = pivot + forward * (MathF.Cos(tilt) * distance * active.zoom);
-        eye.Y = world.Translation.Y + active.eyeHeight;
-        __result = (eye, pivot);
+        __result = (pivot + direction * distance, pivot);
+
+        float FitDistance(Vector3 viewDirection, float frameFraction)
+        {
+            var up = Vector3.Cross(viewDirection, right);
+            float fit = 0;
+            foreach (var point in frame)
+            {
+                var delta = point - centre;
+                float horizontal = (Math.Abs(Vector3.Dot(delta, right)) + active.framePadding) / (tanX * frameFraction);
+                float vertical = (Math.Abs(Vector3.Dot(delta, up)) + active.framePadding) / (tanY * frameFraction);
+                fit = Math.Max(fit, Vector3.Dot(delta, viewDirection) + Math.Max(horizontal, vertical));
+            }
+            return fit;
+        }
     }
 }

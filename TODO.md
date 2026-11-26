@@ -4,7 +4,7 @@ Core unique features:
 1. [x] Add a search bar to crafting stations.
 2. [x] Add a search bar to research stations.
 3. [x] Compare an inventory item with the gear currently equipped in its slot.
-   - [ ] Make it so the text is green if the gear in inventory has better stat, and red if worse.
+   - [x] Make it so the text is green if the gear in inventory has better stat, and red if worse.
 5. [x] Add a search bar to inventory and trade windows.
 6. [x] Switch between health and stats with vertical HUD tabs in MeitouClient.
 7. [x] Rework the equipment slots in the inventory to move away from the rigid grid.
@@ -28,13 +28,13 @@ Core unique features:
 20. [x] Show two 2×4 arm and two 2×5 leg slots beside the vanilla 8×10 personal inventory.
 21. [x] Resize the avatar viewport to 80% to make room for planned armor coverage stats.
 22. [x] Comment the lines of code of not yet implemented neck, eye, and hand socket.
-23. [ ] Make the mod options more varied. Each element must be toggleable.
-   
+23. [ ] Make the mod options more varied. Each element must be toggleable. Add a descriptive notes each one. Tell only once all changes requires restart.
+
 Features from other mods to implement:
 1. [ ] Add small, configurable status markers to squad portraits so critical downed and injury states are visible at a glance. Reference the Vital Read mod.
 2. [ ] Add custom map markers.
 3. [ ] Improve the map widget with a 3D height map. Reference the TimeLight mod in the MeitouClient Discord.
-4. [ ] Show a local map when zoomed in far enough. Reference the Guild and Quest mod in the MeitouClient Discord.
+4. [ ] Show a local map when zoomed in far enough. Reference the Quest Log and Town Map mod in the MeitouClient Discord.
 5. [ ] Add a consolidated armor information view. Reference the Character Inspector mod.
-6. [ ] Add a patch for item markers. Or make our own.
+6. [x] Add a patch for item markers. Or make our own.
 7. [x] Open hover tooltips beside the cursor and follow it as it moves.

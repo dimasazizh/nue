@@ -348,6 +348,7 @@ public sealed partial class AvatarMod : IMod
         ArrangeEquipment(controls,root,owner,player);
 #if NUE_UNIFIED
         PlaceMarkers(controls, player, markedCells);
+        Nue.Unified.CharacterInspector.AddSummary(controls, owner, image, root);
 #endif
         void Menu(string anchor, string action, string[] options, int selected, bool open)
         {
@@ -397,7 +398,7 @@ public sealed partial class AvatarMod : IMod
     private static void Zoom(MyGuiScreenHost __instance, Vector2 p, float steps)
     {
         if (!OverAvatar(__instance, p)) return;
-        active.zoom = Math.Clamp(active.zoom * MathF.Pow(.87f, steps), .4f, 2f);
+        active.zoom = Math.Clamp(active.zoom * MathF.Pow(.87f, steps), .9f, 2f);
     }
 
     private static void Click(MyGuiEvent e)
