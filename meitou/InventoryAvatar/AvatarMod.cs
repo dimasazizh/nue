@@ -293,9 +293,13 @@ public sealed partial class AvatarMod : IMod
             controls.Find(c=>c.Type=="Window") is not {} window) return;
         var player = RouterPlayer.GetValue(__instance)!;
         if (Subject(player) is not {} owner) return;
+#if NUE_UNIFIED
+        var markedCells = CaptureMarkedCells(controls);
+#endif
         var image = preview.Bounds;
         var root = window.Bounds;
         active.bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
+        var pocket = controls.Find(c => c.Name == "main");
         for (int i=0; i<LimbSections.Length; i++)
         {
             string section=LimbSections[i];
@@ -305,6 +309,20 @@ public sealed partial class AvatarMod : IMod
             int rows = i < 2 ? 4 : 5;
             float unit=Math.Min(native.Bounds.Width/2,native.Bounds.Height/rows);
             var rect=native.Bounds with {Width=2*unit,Height=rows*unit};
+            if (i >= 2 && pocket is not null)
+            {
+                rect = rect with { Y = pocket.Bounds.Y + pocket.Bounds.Height - rect.Height };
+                if (i == 2)
+                {
+                    int titleIndex = controls.FindIndex(c => c.Name == "NueLegTitle");
+                    if (titleIndex >= 0)
+                    {
+                        var title = controls[titleIndex];
+                        controls[titleIndex] = title with { Bounds = title.Bounds with {
+                            Y = title.Bounds.Y + rect.Y - native.Bounds.Y } };
+                    }
+                }
+            }
             var slot=WithCells(native with {Bounds=rect},2,rows);
             controls[at]=slot with {Properties=new Dictionary<string,string>(slot.Properties) {
                 ["State"]=((owner.LimbBits >> (2*i)) & 3)==0 ? "disabled":"normal" }};
@@ -328,6 +346,9 @@ public sealed partial class AvatarMod : IMod
             controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
                 new Dictionary<string,string>{{"ImageTexture",TextureName},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
         ArrangeEquipment(controls,root,owner,player);
+#if NUE_UNIFIED
+        PlaceMarkers(controls, player, markedCells);
+#endif
         void Menu(string anchor, string action, string[] options, int selected, bool open)
         {
             var bounds = controls.First(c => c.Name == anchor).Bounds;

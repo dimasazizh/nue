@@ -5,16 +5,26 @@ namespace Nue.Unified;
 
 public sealed class UnifiedMod : IMod
 {
-    public sealed class Options : StatsMod.Options
+    public sealed class Options
     {
         private const string Restart = "Takes effect after restarting MeitouClient.";
-        [Setting("Tooltips follow the cursor", Hint = Restart)] public bool CursorTooltips { get; set; } = true;
-        [Setting("HUD compass", Hint = Restart)] public bool Compass { get; set; } = true;
-        [Setting("Health and Stats tabs and building panel", Hint = Restart)] public bool Tabs { get; set; } = true;
-        [Setting("Hover stats, Examine and racial XP", Hint = Restart)] public bool Hover { get; set; } = true;
-        [Setting("Inventory inspection and avatar", Hint = Restart)] public bool Avatar { get; set; } = true;
-        [Setting("Inventory, crafting and research search and gear comparison", Hint = Restart)] public bool Search { get; set; } = true;
-        [Setting("Skills window portrait", Hint = Restart)] public bool Portrait { get; set; } = true;
+        private const string Core = "Core Features";
+        [Setting("Tooltips follow the cursor", Hint = Restart, SubGroup = Core)] public bool CursorTooltips { get; set; } = true;
+        [Setting("HUD compass", Hint = Restart, SubGroup = Core)] public bool Compass { get; set; } = true;
+        [Setting("Health and Stats tabs and building panel", Hint = Restart, SubGroup = Core)] public bool Tabs { get; set; } = true;
+        [Setting("Hover stats", Hint = Restart, SubGroup = Core)] public bool Hover { get; set; } = true;
+        [Setting("↳ Show character hover outline", Hint = "Requires Hover stats and the game's hover outline.",
+            SubGroup = Core, VisibleWhen = nameof(Hover))]
+        public bool ShowOutline { get; set; } = true;
+        [Setting("Examine", Hint = Restart, SubGroup = Core)] public bool Examine { get; set; } = true;
+        [Setting("Racial XP", Hint = Restart, SubGroup = Core)] public bool RacialXp { get; set; } = true;
+        [Setting("Inventory inspection and avatar", Hint = Restart, SubGroup = Core)] public bool Avatar { get; set; } = true;
+        [Setting("Inventory, crafting and research search", Hint = Restart, SubGroup = Core)] public bool Search { get; set; } = true;
+        [Setting("Gear comparison", Hint = Restart, SubGroup = Core)] public bool GearComparison { get; set; } = true;
+        [Setting("Skills window portrait", Hint = Restart, SubGroup = Core)] public bool Portrait { get; set; } = true;
+        [Setting("Item Markers compatibility", Hint = "Fit Item Markers to NUE equipment slots. Requires Item Markers. " + Restart,
+            SubGroup = "Mod Compatibility")]
+        public bool ItemMarkersCompatibility { get; set; } = true;
     }
 
     private static void FollowPointer(ref Meitou.Game.Ui.TooltipKind kind, ref Meitou.Data.Ui.UiRect? given,
@@ -32,11 +42,15 @@ public sealed class UnifiedMod : IMod
         context.AddSettings(options);
         if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),
             prefix:new HarmonyLib.HarmonyMethod(typeof(UnifiedMod),nameof(FollowPointer)));
-        if (options.Hover) new StatsMod().Install(context, options);
+        new StatsMod().Install(context, () => options.Hover && options.ShowOutline,
+            options.Hover, options.Examine, options.RacialXp);
         if (options.Tabs) new HudTabs.HudTabsMod().Initialize(context);
         if (options.Compass) new Compass.CompassMod().Initialize(context);
         new InventoryAvatar.AvatarMod().Install(context, options.Avatar);
-        if (options.Search) new SearchCompare.SearchMod().Initialize(context);
+        if (options.Avatar && options.ItemMarkersCompatibility)
+            InventoryAvatar.AvatarMod.EnableItemMarkersCompatibility(context);
+        if (options.Search || options.GearComparison)
+            new SearchCompare.SearchMod().Install(context, options.Search, options.GearComparison);
         if (options.Portrait) new SkillPortrait.PortraitMod().Initialize(context);
     }
 }

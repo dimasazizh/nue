@@ -1,15 +1,19 @@
 # NUE | 鵺
 NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes. Less interface. More Kenshi.
 
-Base UI version: **0.1.0** · Unified package: **0.1.3** for **MeitouClient 0.23.1**
+Base UI version: **0.1.0** · Unified package: **1.1.4** for **MeitouClient 0.23.1**
 
-[Download NUE Unified for MeitouClient](NUE-Unified-0.1.3.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
+[Download NUE Unified for MeitouClient](NUE-Unified-1.1.4.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
 
 In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
 
 In the unified inventory, personal storage uses the vanilla 8×10 grid. Two 2×4 arm slots and two 2×5 leg slots appear beside it. An equipped bag opens by default, with its toggle below the bag. The shared search field above the equipment matches item names and types across equipment, pockets, prosthetics, and the open bag. Use × to clear it. The avatar viewport is 80% of its previous width and height. Equipped weapon icons point up and right. Hover tooltips follow your cursor and have their own mod setting.
 
-Squad trade uses two side-by-side inspection panels for human characters. The second panel mirrors the first. Each participant has an equipped avatar, pose and background controls, personal search, pockets, prosthetic slots, and a docked bag. Vendor trade uses the partner panel for shop stock. Animal trade uses it for the animal inventory and bag. Each avatar appears once its character texture is ready.
+Squad trade uses two side-by-side inspection panels for human characters. The companion panel swaps the avatar and bag columns and keeps the equipment and pockets in the usual order. Vendor trade centers both panels together at the same height and sizes the vendor panel's width to its stock grid. The vendor search field sits below the money display. Animal trade uses the partner panel for the animal inventory and bag.
+
+Item comparison shows the hovered item on the left and the equipped item on the right. Arrows indicate higher and lower values for matching, uncolored numeric stats. Higher values are green and lower values are red. Weight uses green for the lighter item and red for the heavier item.
+
+NUE includes **Item Markers compatibility** under **Settings → Mods → NUE → Mod Compatibility**. With Item Markers enabled, it fits grade frames and badges to NUE's equipment slots. Disable the old standalone compatibility add-on when using a build with the integrated option.
 
 ## Character tabs and building information for MeitouClient
 

@@ -53,6 +53,7 @@ public sealed class StatsMod : IMod
     }
 
     static Options Settings = new();
+    static Func<bool> ShowOutline = () => true;
     sealed record Examination(World World, CharacterId Id, MyGuiScreenHost Screens);
     static volatile Examination? examination;
     [ThreadStatic] static IReadOnlyList<CharacterSnapshot>? statsSelection;
@@ -62,7 +63,7 @@ public sealed class StatsMod : IMod
 
     static void Outline(ref (CharacterId Id, Vector4 Colour)? __result)
     {
-        if (!Settings.ShowOutline) __result = null;
+        if (!ShowOutline()) __result = null;
     }
 
     static void AddExamine(object __instance, CharacterSnapshot target, List<(string Caption,Action Give)> __result)
@@ -119,33 +120,39 @@ public sealed class StatsMod : IMod
     public void Initialize(ModContext context)
     {
         context.AddSettings(Settings);
-        Install(context, Settings);
+        Install(context, () => Settings.ShowOutline, hover: true, examine: true, racialXp: true);
     }
 
-    internal void Install(ModContext context, Options options)
+    internal void Install(ModContext context, Func<bool> showOutline, bool hover, bool examine, bool racialXp)
     {
-        Settings = options;
+        ShowOutline = hover ? showOutline : () => false;
         HarmonyMethod Hook(string name) => new(typeof(StatsMod),name);
-        context.Harmony.Patch(AccessTools.PropertyGetter(Game("Ui.PointerView"),"HoverTarget"),postfix:Hook(nameof(Outline)));
-        context.Harmony.Patch(AccessTools.Method(Menu,"Verbs"),postfix:Hook(nameof(AddExamine)));
-        context.Harmony.Patch(AccessTools.Method(typeof(MyGuiScreenHost),"Close"),postfix:Hook(nameof(Closed)));
-        context.Harmony.Patch(AccessTools.Method(Game("Ui.ScreenRouter"),"BindCharacterWindow"),prefix:Hook(nameof(StatsTitle)));
-        context.Harmony.Patch(Selected,prefix:Hook(nameof(StatsSubject)));
-        context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),prefix:Hook(nameof(BeginStats)),finalizer:Hook(nameof(EndStats)));
-        context.Harmony.Patch(AccessTools.Method(Player,"ArrangeBase"),prefix:Hook(nameof(BeginFrame)),finalizer:Hook(nameof(EndFrame)));
-        foreach (var (type,method) in new[]{(Player,"BindBuildingFocus"),(Player,"ArrangeHud"),
-            (Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
-            context.Harmony.Patch(AccessTools.Method(type,method),
-                prefix:new HarmonyMethod(typeof(StatsMod),nameof(BeginPanel)) { priority=Priority.First },
-                finalizer:Hook(nameof(EndPanel)));
-        context.Harmony.Patch(AccessTools.Method(Game("Building.BuildingSelection"),"BuildingFocus"),prefix:Hook(nameof(UseSelectedBuilding)));
         void Rewrite(Type type,string method,string patch) => context.Harmony.Patch(AccessTools.Method(type,method),
-            transpiler:new HarmonyMethod(typeof(StatsMod),patch));
-        Rewrite(Game("Ui.PointerView"),"Point",nameof(ObservePointer));
-        Rewrite(typeof(World),"Viewed",nameof(PublishHoveredDetails));
-        foreach (var (type,method) in new[]{(Player,"BindUi"),(Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
-            Rewrite(type,method,nameof(ReadDisplayLead));
-        context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),postfix:new HarmonyMethod(typeof(StatsMod),nameof(ShowXp)));
+            transpiler:Hook(patch));
+        context.Harmony.Patch(AccessTools.PropertyGetter(Game("Ui.PointerView"),"HoverTarget"),postfix:Hook(nameof(Outline)));
+        if (examine)
+        {
+            context.Harmony.Patch(AccessTools.Method(Menu,"Verbs"),postfix:Hook(nameof(AddExamine)));
+            context.Harmony.Patch(AccessTools.Method(typeof(MyGuiScreenHost),"Close"),postfix:Hook(nameof(Closed)));
+            context.Harmony.Patch(AccessTools.Method(Game("Ui.ScreenRouter"),"BindCharacterWindow"),prefix:Hook(nameof(StatsTitle)));
+            context.Harmony.Patch(Selected,prefix:Hook(nameof(StatsSubject)));
+            context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),prefix:Hook(nameof(BeginStats)),finalizer:Hook(nameof(EndStats)));
+        }
+        if (hover)
+        {
+            context.Harmony.Patch(AccessTools.Method(Player,"ArrangeBase"),prefix:Hook(nameof(BeginFrame)),finalizer:Hook(nameof(EndFrame)));
+            foreach (var (type,method) in new[]{(Player,"BindBuildingFocus"),(Player,"ArrangeHud"),
+                (Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
+                context.Harmony.Patch(AccessTools.Method(type,method),
+                    prefix:new HarmonyMethod(typeof(StatsMod),nameof(BeginPanel)) { priority=Priority.First },
+                    finalizer:Hook(nameof(EndPanel)));
+            context.Harmony.Patch(AccessTools.Method(Game("Building.BuildingSelection"),"BuildingFocus"),prefix:Hook(nameof(UseSelectedBuilding)));
+            Rewrite(Game("Ui.PointerView"),"Point",nameof(ObservePointer));
+            foreach (var (type,method) in new[]{(Player,"BindUi"),(Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
+                Rewrite(type,method,nameof(ReadDisplayLead));
+        }
+        if (hover || examine) Rewrite(typeof(World),"Viewed",nameof(PublishHoveredDetails));
+        if (racialXp) context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),postfix:Hook(nameof(ShowXp)));
     }
 
     // Point also returns an empty target over menus, while dragging and over open terrain.

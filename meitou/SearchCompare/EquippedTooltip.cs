@@ -14,8 +14,10 @@ public sealed partial class SearchMod
 {
     const string EquippedPrefix = "nue-equipped-tooltip";
     const string Yellow = "0.909804 0.741176 0.447059";
-    const string Higher = "0.42 0.76 0.32";
-    const string Lower = "0.90 0.30 0.24";
+    const string Green = "0.42 0.76 0.32";
+    const string Red = "0.90 0.30 0.24";
+    const string UpArrow = "▲ ";
+    const string DownArrow = "▼ ";
     static readonly ConditionalWeakTable<IReadOnlyList<TooltipLine>,InventoryItemView> EquippedByLines = new();
 
     const string Number = @"[+-]?\d+(?:\.\d+)?";
@@ -31,7 +33,7 @@ public sealed partial class SearchMod
             EquippedByLines.AddOrUpdate(__result, equipped);
     }
 
-    static void CompareTooltipValues(object __instance, List<UiControl> controls, IReadOnlyList<TooltipLine> lines,
+    static void CompareTooltipValues(object __instance, List<UiControl> controls, ref IReadOnlyList<TooltipLine> lines,
         string prefix, ref IReadOnlyList<string?>? valueColours, out TooltipPair? __state)
     {
         __state = null;
@@ -53,6 +55,8 @@ public sealed partial class SearchMod
             for (int i = 0; i < Math.Min(valueColours.Count, hoveredColours.Length); i++)
                 hoveredColours[i] = valueColours[i];
         var equippedColours = new string?[equippedLines.Count];
+        var hoveredRows = lines.ToArray();
+        var equippedRows = equippedLines.ToArray();
         for (int i = 0; i < lines.Count; i++)
         {
             if (hoveredColours[i] is not null || !UncolouredStat(lines[i])) continue;
@@ -62,14 +66,20 @@ public sealed partial class SearchMod
                 int order = CompareStat(lines[i].Value, equippedLines[j].Value);
                 if (order != 0)
                 {
-                    hoveredColours[i] = order > 0 ? Higher : Lower;
-                    equippedColours[j] = order > 0 ? Lower : Higher;
+                    bool higher = order > 0;
+                    // The arrows show numeric direction. Weight rewards the lower value.
+                    bool hoveredBetter = lines[i].Key == "-Weight" ? !higher : higher;
+                    hoveredColours[i] = hoveredBetter ? Green : Red;
+                    equippedColours[j] = hoveredBetter ? Red : Green;
+                    hoveredRows[i] = lines[i] with { Value = (higher ? UpArrow : DownArrow) + lines[i].Value };
+                    equippedRows[j] = equippedLines[j] with { Value = (higher ? DownArrow : UpArrow) + equippedLines[j].Value };
                 }
                 break;
             }
         }
         valueColours = hoveredColours;
-        __state = new(controls.Count, equippedLines, equippedColours);
+        lines = hoveredRows;
+        __state = new(controls.Count, equippedRows, equippedColours);
     }
 
     static bool UncolouredStat(TooltipLine line) =>

@@ -21,7 +21,7 @@ public sealed partial class SearchMod : IMod
 {
     const string Prefix = "NueSearch.";
     const string StockView = "scrollview_backpack_content";
-    internal const float VendorSearchSpace = 36;
+    const float VendorSearchSpace = 36;
     const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
     static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
@@ -37,18 +37,29 @@ public sealed partial class SearchMod : IMod
     static readonly MethodInfo SectionOf = AccessTools.Method(typeof(ItemFactory),"SectionOf");
 
     internal static bool Installed { get; private set; }
-    public void Initialize(ModContext context)
+    static bool GearComparison;
+
+    public void Initialize(ModContext context) => Install(context, search: true, gearComparison: true);
+
+    internal void Install(ModContext context, bool search, bool gearComparison)
     {
-        Installed = true;
+        Installed = search;
+        GearComparison = gearComparison;
         HarmonyMethod Hook(string name) => new(typeof(SearchMod),name);
-        foreach (var method in new[]{"AddCraftContent","AddResearchContent"})
-            context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
-        context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
+        if (search)
+        {
+            foreach (var method in new[]{"AddCraftContent","AddResearchContent"})
+                context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
+            context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
+            context.Harmony.Patch(AccessTools.Method(Router,"BindFaithfulScreen"), postfix:Hook(nameof(ReserveVendorSearch)));
+        }
         context.Harmony.Patch(AccessTools.Method(Router,"AddFaithfulContent"), postfix:Hook(nameof(Inventory)));
-        context.Harmony.Patch(AccessTools.Method(Router,"BindFaithfulScreen"), postfix:Hook(nameof(ReserveVendorSearch)));
-        context.Harmony.Patch(ItemLines, postfix:Hook(nameof(RememberComparison)));
-        context.Harmony.Patch(PlaceTooltip, prefix:Hook(nameof(CompareTooltipValues)),
-            postfix:Hook(nameof(PlaceEquippedTooltip)));
+        if (gearComparison)
+        {
+            context.Harmony.Patch(ItemLines, postfix:Hook(nameof(RememberComparison)));
+            context.Harmony.Patch(PlaceTooltip, prefix:Hook(nameof(CompareTooltipValues)),
+                postfix:Hook(nameof(PlaceEquippedTooltip)));
+        }
     }
 
     static bool Input(MyGuiEvent e,object __instance)
@@ -182,17 +193,14 @@ public sealed partial class SearchMod : IMod
         var runtime = Property(player,"TooltipRuntime");
         var tips = (IDictionary)AccessTools.Field(Tips,"ItemTips").GetValue(runtime)!;
         var lookup = (Func<string,GameRecord?>?)Property(runtime,"ItemRecordOf");
-        var windows = Property(player,"InventoryWindows");
-        var owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
-        var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
-        string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
-        bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
-        if(kind=="trader") VendorSearch(controls,screens,id);
-        else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
-        if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
-            controls.Find(c=>c.Name==Prefix+source) is {} field)
-            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,field.Properties,default,Pickable:false));
-        var q = Query(shared ? source : id);
+        string q = Installed ? AddInventorySearch(player, id, kind, controls, r) : "";
+        CharacterSnapshot? owner = null;
+        if (GearComparison)
+        {
+            var windows = Property(player,"InventoryWindows");
+            owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
+        }
+        if (q.Length == 0 && owner?.ItemGrid is null) return;
         foreach (var cell in controls.ToArray())
         {
             if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-")) || tips[cell.Name] is not {} tip) continue;
@@ -214,5 +222,18 @@ public sealed partial class SearchMod : IMod
                 .OrderBy(i => i.Section!=slot).FirstOrDefault();
             if (equipped != null) Comparisons.AddOrUpdate(tip,equipped);
         }
+    }
+
+    static string AddInventorySearch(object player, string id, string kind, List<UiControl> controls, UiRect r)
+    {
+        var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
+        string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
+        bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
+        if(kind=="trader") VendorSearch(controls,screens,id);
+        else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
+        if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
+            controls.Find(c=>c.Name==Prefix+source) is {} field)
+            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,field.Properties,default,Pickable:false));
+        return Query(shared ? source : id);
     }
 }

@@ -1,69 +1,62 @@
+#if NUE_UNIFIED
 using System.Reflection;
 using HarmonyLib;
 using Meitou.Data.Ui;
 using Meitou.Modding;
 
-namespace Nue.ItemMarkersCompat;
+namespace Nue.InventoryAvatar;
 
-public sealed class CompatibilityMod : IMod
+public sealed partial class AvatarMod
 {
     private const string MarkerPrefix = "ItemMarkers:item-markers:";
     private const string ItemPrefix = "inventory-item-";
     private const string Background = "-background";
     private const string Icon = "-icon";
 
-    private static MethodInfo drawMarkers = null!;
+    private static MethodInfo? drawMarkers;
     private static MethodInfo getItemCells = null!;
-    private static FieldInfo routerPlayer = null!;
 
-    public void Initialize(ModContext context)
+    internal static void EnableItemMarkersCompatibility(ModContext context)
     {
-        var avatar = AccessTools.Method(AccessTools.TypeByName("Nue.InventoryAvatar.AvatarMod"), "Controls",
-            [typeof(string), typeof(List<UiControl>), typeof(object)]);
-        var hook = AccessTools.Method(AccessTools.TypeByName("ItemMarkers.ItemCellHook"), "AfterAddItemCell",
+        var itemMarkers = AccessTools.TypeByName("ItemMarkers.ItemCellHook");
+        if (itemMarkers is null) return;
+        var hook = AccessTools.Method(itemMarkers, "AfterAddItemCell",
             [typeof(object), typeof(List<UiControl>), typeof(string), typeof(UiRect), typeof(UiRect?)]);
-        var router = AccessTools.TypeByName("Meitou.Game.Ui.ScreenRouter");
-        var player = AccessTools.TypeByName("Meitou.Game.PlayerInterface");
-        var cells = AccessTools.PropertyGetter(player, "ItemCells");
-        var field = router is null ? null : AccessTools.GetDeclaredFields(router).SingleOrDefault(f => f.FieldType == player);
-        if (avatar is null || hook is null || cells is null || field is null)
+        var cells = AccessTools.PropertyGetter(Player, "ItemCells");
+        if (hook is null || cells is null)
         {
-            context.Log("NUE Item Markers compatibility needs the NUE inventory avatar and the modern Item Markers cell hook.");
+            context.Log("NUE Item Markers compatibility needs the modern Item Markers cell hook.");
             return;
         }
 
         drawMarkers = hook;
         getItemCells = cells;
-        routerPlayer = field;
-        context.Harmony.Patch(avatar,
-            prefix: new HarmonyMethod(typeof(CompatibilityMod), nameof(CaptureCells)),
-            postfix: new HarmonyMethod(typeof(CompatibilityMod), nameof(PlaceMarkers)));
     }
 
-    private static void CaptureCells(List<UiControl> controls, out Dictionary<string, UiControl>? __state)
+    private static Dictionary<string, UiControl>? CaptureMarkedCells(List<UiControl> controls)
     {
-        __state = null;
+        if (drawMarkers is null) return null;
         var marked = new HashSet<string>(StringComparer.Ordinal);
         foreach (var control in controls)
             if (MarkedCell(control.Name) is { } name) marked.Add(name);
-        if (marked.Count == 0) return;
+        if (marked.Count == 0) return null;
 
-        __state = new(StringComparer.Ordinal);
+        var originalCells = new Dictionary<string, UiControl>(StringComparer.Ordinal);
         foreach (var control in controls)
             if (BackgroundCell(control.Name) is { } name && marked.Contains(name))
-                __state[name] = control;
+                originalCells[name] = control;
+        return originalCells;
     }
 
-    private static void PlaceMarkers(List<UiControl> controls, object __2, Dictionary<string, UiControl>? __state)
+    private static void PlaceMarkers(List<UiControl> controls, object player, Dictionary<string, UiControl>? originalCells)
     {
-        if (__state is null || __state.Count == 0) return;
+        if (originalCells is null || originalCells.Count == 0 || drawMarkers is not {} draw) return;
         var remaining = new HashSet<UiControl>(controls, ReferenceEqualityComparer.Instance);
-        var moved = __state.Where(pair => !remaining.Contains(pair.Value))
+        var moved = originalCells.Where(pair => !remaining.Contains(pair.Value))
             .Select(pair => pair.Key).ToHashSet(StringComparer.Ordinal);
         if (moved.Count == 0) return;
 
-        var player = routerPlayer.GetValue(__2);
-        if (player is null || getItemCells.Invoke(player, null) is not { } cells) return;
+        if (getItemCells.Invoke(player, null) is not { } cells) return;
         var result = new List<UiControl>(controls.Count);
         for (int i = 0; i < controls.Count; i++)
         {
@@ -77,7 +70,7 @@ public sealed class CompatibilityMod : IMod
             if (i + 1 < controls.Count && controls[i + 1].Name == cell + Icon)
                 result.Add(controls[++i]);
             var markers = new List<UiControl>();
-            drawMarkers.Invoke(null, [cells, markers, cell, control.Bounds, control.Clip]);
+            draw.Invoke(null, [cells, markers, cell, control.Bounds, control.Clip]);
             result.AddRange(markers);
         }
 
@@ -96,3 +89,4 @@ public sealed class CompatibilityMod : IMod
         name.StartsWith(ItemPrefix, StringComparison.Ordinal) && name.EndsWith(Background, StringComparison.Ordinal)
             ? name[..^Background.Length] : null;
 }
+#endif
