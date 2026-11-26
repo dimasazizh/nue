@@ -51,9 +51,14 @@ public sealed partial class AvatarMod
         if (mirrored != null) return mirrored;
         var root = inspection.Roots[0];
         var panel = root.Children.Single(c => c.Children.Any(w => w.Name == "NuePreviewArea"));
+        var preview = panel.Children.Single(w => w.Name == "NuePreviewArea").Position;
+        float centerEnd = panel.Children.Single(w => w.Name == "NueBagArea").Position.X;
         var items = panel.Children.Select(w => w with {
             Name = w.Name == "NueSearch.inventory" ? "NueSearch.loot" : w.Name,
-            Position = w.Position with { X = 1 - w.Position.X - w.Position.Width }
+            // Swap the side columns while keeping the equipment and pockets in their original order.
+            Position = w.Position.X >= preview.X + preview.Width && w.Position.X < centerEnd
+                ? w.Position
+                : w.Position with { X = 1 - w.Position.X - w.Position.Width }
         }).ToArray();
         return mirrored = inspection with {Roots = [root with { Children = root.Children.Select(c =>
             ReferenceEquals(c,panel) ? panel with {Children = items} : c).ToArray() }]};

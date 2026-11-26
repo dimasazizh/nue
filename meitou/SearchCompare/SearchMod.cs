@@ -1,5 +1,6 @@
 using Meitou.Simulation.Trading;
 using System.Collections;
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -19,10 +20,13 @@ namespace Nue.SearchCompare;
 public sealed class SearchMod : IMod
 {
     const string Prefix = "NueSearch.";
+    const string StockView = "scrollview_backpack_content";
+    const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
     static readonly ConditionalWeakTable<object,List<InventoryItemView>> Comparisons = new();
     static Type Ui(string name) => typeof(MyGuiScreenHost).Assembly.GetType("Meitou.Game.Ui." + name, true)!;
     static readonly Type Router = Ui("ScreenRouter"), Production = Ui("ProductionWindows"), Tips = Ui("TooltipRuntime");
+    static readonly FieldInfo RouterPlayer = AccessTools.Field(Router,"<player>P");
     static readonly MethodInfo ToTip = AccessTools.Method(Tips.GetNestedType("ItemTip", BindingFlags.NonPublic)!, "Of",
         [typeof(InventoryItemView), typeof(TradeItemView), typeof(string)]);
     static readonly MethodInfo ItemLines = AccessTools.Method(Tips,"ItemLines");
@@ -37,14 +41,15 @@ public sealed class SearchMod : IMod
             context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
         context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
         context.Harmony.Patch(AccessTools.Method(Router,"AddFaithfulContent"), postfix:Hook(nameof(Inventory)));
+        context.Harmony.Patch(AccessTools.Method(Router,"BindFaithfulScreen"), postfix:Hook(nameof(ReserveVendorSearch)));
         context.Harmony.Patch(ItemLines, postfix:Hook(nameof(Compare)));
     }
 
     static bool Input(MyGuiEvent e,object __instance)
     {
-        if(e.Screen is ("inventory" or "loot") && e.Widget=="NueClear")
+        if(e.Screen is ("inventory" or "loot" or "trader") && e.Widget=="NueClear" && e.Action==ClearAction)
         {
-            var player=AccessTools.Field(Router,"<player>P").GetValue(__instance)!;
+            var player=RouterPlayer.GetValue(__instance)!;
             var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
             screens.SetText(e.Screen,Prefix+e.Screen,"");
             Queries.Remove(Prefix+e.Screen);
@@ -111,6 +116,55 @@ public sealed class SearchMod : IMod
     }
 
     static object Property(object obj,string name) => AccessTools.Property(obj.GetType(),name).GetValue(obj)!;
+
+    static void ReserveVendorSearch(string id, UiBindings __result, object __instance)
+    {
+        var b = __result;
+        if (id != "trader" || !b.Positions.TryGetValue("Root", out var root)) return;
+        var player = RouterPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
+        var layout = screens.Layout(id);
+        if (layout.Find("Content") is not {} content || layout.Find(StockView) is not {} view ||
+            !b.RelativePositions.TryGetValue(view, out var bounds)) return;
+
+        float contentHeight = root.Height * content.Position.Height;
+        if (contentHeight <= 0) return;
+        float inset = Math.Min(36 * b.TemplateScale / contentHeight, bounds.Height / 2);
+        b.RelativePositions[view] = bounds with { Y = bounds.Y + inset, Height = bounds.Height - inset };
+    }
+
+    static void VendorSearch(List<UiControl> controls, MyGuiScreenHost screens, string id)
+    {
+        if (controls.Find(c => c.Name == "datapanel-label-0") is not {} money ||
+            controls.Find(c => c.Name == StockView) is not {} view) return;
+        var stock = view.Bounds;
+        float moneyBottom = money.Bounds.Y + money.Bounds.Height;
+        float top = Math.Max(moneyBottom, money.Clip is {} clip ? clip.Y + clip.Height : moneyBottom) + 3;
+        float height = Math.Min(money.Bounds.Height * 1.4f, stock.Y - top - 4);
+        if (height <= 0 || stock.Width <= 8) return;
+        float clearWidth = Math.Min(height * 1.35f, stock.Width / 4);
+        var field = new UiRect(stock.X, top, stock.Width - clearWidth - 4, height);
+        string name = Prefix + id;
+        string query = screens.GetText(id, name);
+        var style = new Dictionary<string,string> { ["TextPadding"] = "8 2", ["TextAlign"] = "Left VCenter" };
+        var focus = screens.Focus;
+        bool focused = focus?.Screen == id && focus?.Widget == name;
+        // The host applies caret properties automatically to layout widgets, before decoration adds this field.
+        if (focus is {} edit && focused)
+        {
+            style["Focused"] = "true";
+            style["CaretIndex"] = edit.Caret.ToString(CultureInfo.InvariantCulture);
+            style["SelectionStart"] = edit.SelectionStart.ToString(CultureInfo.InvariantCulture);
+            style["SelectionLength"] = edit.SelectionLength.ToString(CultureInfo.InvariantCulture);
+        }
+        controls.Add(new(name,"EditBox",field,query,"","Kenshi_EditBox",true,style,default,Pickable:true));
+        if (!focused && query.Length == 0)
+            controls.Add(new("NueSearchHint","TextBox",field,"Search items","","",true,style,default,Pickable:false));
+        var clear = new UiRect(stock.X + stock.Width - clearWidth, top, clearWidth, height);
+        controls.Add(new("NueClear","Button",clear,"×",ClearAction,"Kenshi_Button1",true,
+            new Dictionary<string,string> { ["TextAlign"] = "Center" },default,Pickable:true));
+    }
+
     static void Inventory(object __instance,string id,List<UiControl> controls)
     {
         string kind = (string)AccessTools.Method(Ui("InventoryWindows"),"ScreenKind").Invoke(null,[id])!;
@@ -118,7 +172,7 @@ public sealed class SearchMod : IMod
         if (controls.FirstOrDefault(c=>c.Type=="Window") is not {} window) return;
         var r = window.Bounds;
 
-        var player = AccessTools.Field(Router,"<player>P").GetValue(__instance)!;
+        var player = RouterPlayer.GetValue(__instance)!;
         var runtime = Property(player,"TooltipRuntime");
         var tips = (IDictionary)AccessTools.Field(Tips,"ItemTips").GetValue(runtime)!;
         var lookup = (Func<string,GameRecord?>?)Property(runtime,"ItemRecordOf");
@@ -127,7 +181,8 @@ public sealed class SearchMod : IMod
         var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
         string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
         bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
-        if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
+        if(kind=="trader") VendorSearch(controls,screens,id);
+        else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
         if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
             controls.Find(c=>c.Name==Prefix+source) is {} field)
             controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,field.Properties,default,Pickable:false));
