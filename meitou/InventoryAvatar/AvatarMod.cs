@@ -8,6 +8,7 @@ using Meitou.Game.Rendering.Characters;
 using Meitou.Game.Rendering.Frame;
 using Meitou.Game.Rendering.Gpu;
 using Meitou.Game.Ui;
+using Meitou.Game.Rendering.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
 using System.Diagnostics;
@@ -20,19 +21,30 @@ public sealed partial class AvatarMod : IMod
 {
     private const string Texture = "nue:inventory-avatar";
     private static readonly string[] Labels = ["Idle", "Attack stance", "Sitting on mat", "Sleeping / lying"];
-    private static readonly Stopwatch Clock = Stopwatch.StartNew();
-    private static int choice;
-    private static float yaw = .12f, zoom = 1f, lastDragX;
+    private sealed class PreviewState
+    {
+        public readonly Stopwatch Clock = Stopwatch.StartNew();
+        public int choice, background, width = 280, height = 540, framedPose = -1;
+        public float yaw = .12f, zoom = 1f, framePadding, eyeHeight;
+        public bool expanded, backgroundsOpen;
+        public CharacterId subject = CharacterId.None;
+        public UiPainter? publishedPainter;
+        public CharacterId publishedSubject = CharacterId.None;
+        public EditorStageRequest? request;
+        public Vector3[]? framePoints;
+        public object? framedAsset;
+        public long framedKey;
+        public string? openRack;
+        public UiRect bagArea;
+    }
+    private static readonly PreviewState own = new(), other = new();
+    private static PreviewState active = own, dragged = own;
+    private static float lastDragX;
     private static MyGuiScreenHost? dragHost;
-    private static bool expanded, backgroundsOpen;
     private static readonly string[] Backgrounds = ["Desert", "Swamp", "Black"];
-    private static int background;
     private static string folder = "";
     private static MyGuiLayout inspection = null!;
     private static object? ui, renderer;
-    private static EditorStageRequest? request;
-    private static CharacterId subject = CharacterId.None;
-    private static int width = 280, height = 540;
 
     private static Type GameType(string name) => typeof(IMod).Assembly.GetType("Meitou.Game." + name, true)!;
     private static readonly Type Player = GameType("PlayerInterface"), Host = GameType("GameHost"),
@@ -45,7 +57,9 @@ public sealed partial class AvatarMod : IMod
     private static readonly PropertyInfo Stage = AccessTools.Property(Render, "StageRequest");
     private static readonly MethodInfo Draw = AccessTools.Method(Render, "DrawStage"), Resolve = AccessTools.Method(Render, "ResolveStage");
     private static readonly PropertyInfo Picture = AccessTools.Property(Render, "StageTexture");
-    private static readonly MethodInfo Publish = AccessTools.Method(Player, "SetUiTexture");
+    private static readonly FieldInfo Painter = AccessTools.Field(Player, "UiPainter");
+    private static readonly PropertyInfo StageView = AccessTools.Property(Render, "StageView");
+    private static string TextureName => active == other ? Texture+"-partner" : Texture;
     private static readonly FieldInfo Library = AccessTools.Field(Host, "AnimationLibrary");
 
     private static readonly FieldInfo Editor = AccessTools.Field(Host, "CharacterEditor");
@@ -86,13 +100,15 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.ScreenRouter"), "FaithfulAction", nameof(Click));
         After(Host, "FillDrawList", nameof(Prepare));
         After(typeof(MyGuiScreenHost),"Raise",nameof(KeepBagAbove));
+        After(Render,"GatherPortraitKeys",nameof(IncludePartnerPose));
+        context.Harmony.Patch(AccessTools.Method(Render,"Dispose"), prefix:new HarmonyMethod(typeof(AvatarMod),nameof(ReleasePartnerTargets)));
         After(Render, "DrawPortraits", nameof(Paint));
-        void Before(string target, string method) => context.Harmony.Patch(
-            AccessTools.Method(typeof(MyGuiScreenHost), target, target == "PointerDown" ? [typeof(Vector2), typeof(Func<string,UiControl,Vector2,bool>)] : null), prefix: new HarmonyMethod(typeof(AvatarMod), method));
-        Before("PointerDown", nameof(StartDrag));
-        Before("PointerMove", nameof(Rotate));
-        Before("PointerUp", nameof(EndDrag));
-        Before("Wheel", nameof(Zoom));
+        void Observe(string target, string method) => context.Harmony.Patch(
+            AccessTools.Method(typeof(MyGuiScreenHost), target, target == "PointerDown" ? [typeof(Vector2), typeof(Func<string,UiControl,Vector2,bool>)] : null), postfix: new HarmonyMethod(typeof(AvatarMod), method));
+        Observe("PointerDown", nameof(StartDrag));
+        Observe("PointerMove", nameof(Rotate));
+        Observe("PointerUp", nameof(EndDrag));
+        Observe("Wheel", nameof(Zoom));
     }
 
     private static readonly (string Section, string Label, int Fcs, int X)[] Accessories =
@@ -138,42 +154,61 @@ public sealed partial class AvatarMod : IMod
     private static CharacterSnapshot? Subject(object player)
     {
         var screens=(MyGuiScreenHost)Screens.GetValue(player)!;
-        if(!screens.IsOpen("inventory") || screens.IsOpen("trader") || (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
-        return Owner.Invoke(GetInventory.Invoke(player,null),["inventory"]) is CharacterSnapshot { Animal:false, Appearance:not null } c ? c : null;
+        if (!screens.IsOpen("inventory")) return null;
+        var inventories = GetInventory.Invoke(player,null);
+        var owner = Owner.Invoke(inventories,["inventory"]) as CharacterSnapshot;
+        var partner = screens.IsOpen("loot") ? Owner.Invoke(inventories,["loot"]) as CharacterSnapshot : null;
+        if (active == other)
+            return TradePartner(screens.IsOpen("trader"),owner,partner);
+        if (partner?.IsPlayer != true && (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
+        return owner is {Animal:false, Appearance:not null} ? owner : null;
     }
 
-    private static UiRect bagArea;
+    private static CharacterSnapshot? TradePartner(bool merchant, CharacterSnapshot? owner, CharacterSnapshot? partner) =>
+        !merchant && owner != null && partner is { IsPlayer:true, Animal:false, Appearance:not null } && partner.Id != owner.Id
+            ? partner : null;
+
     private static bool NormalPlacement(object __instance) => Subject(LayoutPlayer.GetValue(__instance)!)==null;
 
     private static void SelectLayout(string id, object __instance)
     {
-        if (id != "inventory") return;
+        if (id is not ("inventory" or "loot")) return;
+        active = id == "loot" ? other : own;
         var player = RouterPlayer.GetValue(__instance)!;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
         bool inspecting = Subject(player) != null;
         if ((screens.Layout(id).Find("NuePreviewArea") != null) == inspecting) return;
-        if (inspecting) screens.Replace(id, inspection);
+        if (inspecting) screens.Replace(id, id == "loot" ? MirroredInspection() : inspection);
         else
         {
             var trade = AccessTools.PropertyGetter(Player, "TradeWindows").Invoke(player, null)!;
-            var original = (MyGuiLayout)AccessTools.Field(trade.GetType(), "CharacterInventoryLayout").GetValue(trade)!;
+            var animal = Owner.Invoke(GetInventory.Invoke(player,null),[id]) is CharacterSnapshot {Animal:true};
+            var original = (MyGuiLayout)AccessTools.Field(trade.GetType(), animal ? "AnimalInventoryLayout" : "CharacterInventoryLayout").GetValue(trade)!;
             screens.Replace(id, original);
-            bagArea = default;
+            active.bagArea = default;
         }
     }
 
     private static void DockInventory(string id, UiBindings b, object __instance)
     {
-        if (id is not ("inventory" or "bag") || !b.Positions.TryGetValue("Root", out var root)) return;
+        if (!b.Positions.TryGetValue("Root", out var root)) return;
+        active = id is "loot" or "loot-bag" ? other : own;
+        bool paired = DockTrade(id, b, __instance, root);
+        if (id is not ("inventory" or "bag" or "loot" or "loot-bag")) return;
+        if (paired && id == "loot")
+        {
+            b.Disabled.Remove("ArrangeButton");
+            b.Actions["ArrangeButton"] = "ArrangeButton";
+        }
         var player = LayoutPlayer.GetValue(__instance)!;
         if (Subject(player) == null) return;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
-        if (id == "bag")
+        if (id is "bag" or "loot-bag")
         {
-            if (bagArea.Width <= 0 || bagArea.Height <= 0) return;
-            float scale = Math.Min(1, Math.Min(bagArea.Width / root.Width, bagArea.Height / root.Height));
+            if (active.bagArea.Width <= 0 || active.bagArea.Height <= 0) return;
+            float scale = Math.Min(1, Math.Min(active.bagArea.Width / root.Width, active.bagArea.Height / root.Height));
             b.Positions["Root"] = root with { Width = root.Width * scale, Height = root.Height * scale };
-            b.WindowPosition = new Vector2(bagArea.X, bagArea.Y) - screens.GetOffset(id);
+            b.WindowPosition = new Vector2(active.bagArea.X, active.bagArea.Y) - screens.GetOffset(id);
             return;
         }
 
@@ -187,10 +222,10 @@ public sealed partial class AvatarMod : IMod
 #endif
         {
             b.Hidden.Add("NueClear");
-            b.Hidden.Add("NueSearch.inventory");
+            b.Hidden.Add("NueSearch."+id);
         }
         var origin = inspection.Roots[0].Position.RelativeTo(new(0, 0, (int)Width.GetValue(player)!, (int)Height.GetValue(player)!), true);
-        b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
+        if (!paired) b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
         // The native character fitter bottom-anchors the heading for its own template.
         var title = screens.Layout(id).Find("InventoryMainTitle")!;
         b.RelativePositions[title] = title.Position;
@@ -199,12 +234,12 @@ public sealed partial class AvatarMod : IMod
     private static readonly string[] LimbSections = ["left_arm_replace","right_arm_replace","left_leg_replace","right_leg_replace"];
     private static void IncludeLimbTargets(string screen, ref (string,string)[] __result)
     {
-        if (screen == "inventory") __result = [..__result, ..LimbSections.Select(n => (n,n))];
+        if (screen is "inventory" or "loot") __result = [..__result, ..LimbSections.Select(n => (n,n))];
     }
 
     private static void DefaultBag(CharacterId id, HashSet<CharacterId> ____bagClosed, ref bool __result, object __instance)
     {
-        if (!__result && !____bagClosed.Contains(id) && Subject(InventoryPlayer.GetValue(__instance)!)?.Id == id) __result = true;
+        if (!__result && !____bagClosed.Contains(id) && Owner.Invoke(__instance,["inventory"]) is CharacterSnapshot {Animal:false} owner && owner.Id == id && ((MyGuiScreenHost)Screens.GetValue(InventoryPlayer.GetValue(__instance)!)!).IsOpen("inventory")) __result = true;
     }
 
     private static void FitPocketGrid(List<UiControl> controls, InventoryView grid)
@@ -237,7 +272,13 @@ public sealed partial class AvatarMod : IMod
 
     private static void FitBagCells(string id, List<UiControl> controls, object __instance)
     {
-        if (id != "bag" || Subject(LayoutPlayer.GetValue(__instance)!)?.ItemGrid is not {BagWidth: >0, BagHeight: >0} grid) return;
+        if (id is not ("bag" or "loot-bag")) return;
+        var player = LayoutPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        var owner = Owner.Invoke(GetInventory.Invoke(player,null), [id]) as CharacterSnapshot;
+        if (owner == null && (screens.IsOpen("trader") || screens.IsOpen("loot")))
+            owner = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
+        if (owner?.ItemGrid is not {BagWidth: >0, BagHeight: >0} grid) return;
         int i = controls.FindIndex(c => c.Name == "backpack_content");
         if (i >= 0) controls[i] = WithCells(controls[i], grid.BagWidth, grid.BagHeight);
     }
@@ -247,22 +288,24 @@ public sealed partial class AvatarMod : IMod
 
     private static void Controls(string id, List<UiControl> controls,object __instance)
     {
-        if (id != "inventory" || controls.Find(c => c.Name == "NuePreviewArea") is not {} preview ||
+        active = id == "loot" ? other : own;
+        if (id is not ("inventory" or "loot") || controls.Find(c => c.Name == "NuePreviewArea") is not {} preview ||
             controls.Find(c=>c.Type=="Window") is not {} window) return;
         var player = RouterPlayer.GetValue(__instance)!;
         if (Subject(player) is not {} owner) return;
         var image = preview.Bounds;
         var root = window.Bounds;
-        bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
+        active.bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
         for (int i=0; i<LimbSections.Length; i++)
         {
             string section=LimbSections[i];
             int at=controls.FindIndex(c=>c.Name==section);
             if(at<0) continue;
             var native=controls[at];
-            float unit=Math.Min(native.Bounds.Width/2,native.Bounds.Height/5);
-            var rect=native.Bounds with {Width=2*unit,Height=5*unit};
-            var slot=WithCells(native with {Bounds=rect},2,5);
+            int rows = i < 2 ? 4 : 5;
+            float unit=Math.Min(native.Bounds.Width/2,native.Bounds.Height/rows);
+            var rect=native.Bounds with {Width=2*unit,Height=rows*unit};
+            var slot=WithCells(native with {Bounds=rect},2,rows);
             controls[at]=slot with {Properties=new Dictionary<string,string>(slot.Properties) {
                 ["State"]=((owner.LimbBits >> (2*i)) & 3)==0 ? "disabled":"normal" }};
             foreach(var item in owner.ItemGrid!.Items.Where(v=>v.Section==section))
@@ -273,15 +316,17 @@ public sealed partial class AvatarMod : IMod
                 PlaceItem(controls,parts,name,rect,item);
             }
         }
-        width = Math.Max(1,(int)image.Width);
-        height = Math.Max(1,(int)image.Height);
+        active.width = Math.Max(1,(int)image.Width);
+        active.height = Math.Max(1,(int)image.Height);
         var backdrop = new Dictionary<string,string>();
-        if (background < 2) backdrop["ImageTexture"] = Meitou.Game.Rendering.Ui.UiPainter.IconTexture(
-            Path.Combine(folder, Backgrounds[background] + ".png"));
+        if (active.background < 2) backdrop["ImageTexture"] = Meitou.Game.Rendering.Ui.UiPainter.IconTexture(
+            Path.Combine(folder, Backgrounds[active.background] + ".png"));
         controls.Add(new("NueBackdrop", backdrop.Count == 0 ? "Widget" : "ImageBox", image,"","","",true,
             backdrop, backdrop.Count == 0 ? new Vector4(0,0,0,1) : default, Pickable:false, Clip:root));
-        controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
-            new Dictionary<string,string>{{"ImageTexture",Texture},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
+        if (active.publishedSubject == owner.Id && Painter.GetValue(player) is UiPainter painter &&
+            ReferenceEquals(active.publishedPainter,painter) && painter.HasTexture(TextureName))
+            controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
+                new Dictionary<string,string>{{"ImageTexture",TextureName},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
         ArrangeEquipment(controls,root,owner,player);
         void Menu(string anchor, string action, string[] options, int selected, bool open)
         {
@@ -292,94 +337,117 @@ public sealed partial class AvatarMod : IMod
             Button(-1,options[selected]+"  ▾",bounds.Y);
             if (open) for(int i=0;i<options.Length;i++) Button(i,options[i],bounds.Y+(i+1)*bounds.Height);
         }
-        Menu("NuePoseMenu","nue-avatar:",Labels,choice,expanded);
-        Menu("NueBackdropMenu","nue-background:",Backgrounds,background,backgroundsOpen);
+        Menu("NuePoseMenu","nue-avatar:",Labels,active.choice,active.expanded);
+        Menu("NueBackdropMenu","nue-background:",Backgrounds,active.background,active.backgroundsOpen);
     }
 
     private static readonly MethodInfo Raise=AccessTools.Method(typeof(MyGuiScreenHost),"Raise");
     private static void KeepBagAbove(MyGuiScreenHost __instance,string id)
     {
-        if(id=="inventory" && __instance.IsOpen("bag") && ui!=null && Subject(ui)!=null)
-            Raise.Invoke(__instance,["bag"]);
+        var bag = id == "loot" ? "loot-bag" : "bag";
+        if(id is ("inventory" or "loot") && __instance.IsOpen(bag) && __instance.Layout(id).Find("NuePreviewArea") != null) Raise.Invoke(__instance,[bag]);
     }
 
-    private static bool OverAvatar(MyGuiScreenHost host, Vector2 p) =>
-        host.IsOpen("inventory") && host.HitTest(p) is { Screen: "inventory", Control.Name: "NueAvatar" };
-
-    private static bool StartDrag(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    private static bool OverAvatar(MyGuiScreenHost host, Vector2 p)
+    {
+        if (host.HitTest(p) is not { Control.Name: "NueAvatar" } hit) return false;
+        active = hit.Screen == "loot" ? other : own;
+        return true;
+    }
+    private static void StartDrag(MyGuiScreenHost __instance, Vector2 p)
     {
         dragHost = null;
-        if (!OverAvatar(__instance, p)) return true;
+        if (!OverAvatar(__instance, p)) return;
+        dragged = active;
         dragHost = __instance;
         lastDragX = p.X;
-        __result = true;
-        return false;
     }
 
-    private static bool Rotate(MyGuiScreenHost __instance, Vector2 p, ref bool __result)
+    private static void Rotate(MyGuiScreenHost __instance, Vector2 p)
     {
-        if (dragHost != __instance) return true;
-        yaw = MathF.IEEERemainder(yaw - (p.X - lastDragX) * MathF.Tau / width, MathF.Tau);
+        if (dragHost != __instance) return;
+        active = dragged;
+        active.yaw = MathF.IEEERemainder(active.yaw - (p.X - lastDragX) * MathF.Tau / active.width, MathF.Tau);
         lastDragX = p.X;
-        __result = true;
-        return false;
     }
 
     private static void EndDrag() => dragHost = null;
 
-    private static bool Zoom(MyGuiScreenHost __instance, Vector2 p, float steps, ref bool __result)
+    private static void Zoom(MyGuiScreenHost __instance, Vector2 p, float steps)
     {
-        if (!OverAvatar(__instance, p)) return true;
-        zoom = Math.Clamp(zoom * MathF.Pow(.87f, steps), .4f, 2f);
-        __result = true;
-        return false;
+        if (!OverAvatar(__instance, p)) return;
+        active.zoom = Math.Clamp(active.zoom * MathF.Pow(.87f, steps), .4f, 2f);
     }
 
     private static void Click(MyGuiEvent e)
     {
-        if(e.Screen=="inventory" && e.Action is "nue-rack:back" or "nue-rack:hip")
+        active = e.Screen == "loot" ? other : own;
+        if (e.Screen is ("loot" or "loot-bag") && e.Widget == "ArrangeButton" && ui != null &&
+            Owner.Invoke(GetInventory.Invoke(ui,null), ["loot"]) is CharacterSnapshot { IsPlayer:true } member)
+        {
+            var session = (Meitou.Game.Host.WorldSession)AccessTools.Field(Player,"Session").GetValue(ui)!;
+            AccessTools.Method(Player,"Say").Invoke(ui,[new ArrangeInventory(member.Id,e.Screen=="loot-bag") {Tick=session.World.Tick}]);
+            return;
+        }
+        if(e.Screen is ("inventory" or "loot") && e.Action is "nue-rack:back" or "nue-rack:hip")
         {
             var section=e.Action[9..];
-            openRack=openRack==section ? null : section;
+            active.openRack=active.openRack==section ? null : section;
             return;
         }
-        if(e.Screen == "inventory" && e.Action.StartsWith("nue-background:") && int.TryParse(e.Action[15..],out int bg))
+        if(e.Screen is ("inventory" or "loot") && e.Action.StartsWith("nue-background:") && int.TryParse(e.Action[15..],out int bg))
         {
-            expanded = false;
-            if(bg == -1) backgroundsOpen = !backgroundsOpen;
-            else if ((uint)bg < Backgrounds.Length) { background = bg; backgroundsOpen = false; }
+            active.expanded = false;
+            if(bg == -1) active.backgroundsOpen = !active.backgroundsOpen;
+            else if ((uint)bg < Backgrounds.Length) { active.background = bg; active.backgroundsOpen = false; }
             return;
         }
-        if(e.Screen!="inventory" || !e.Action.StartsWith("nue-avatar:") || !int.TryParse(e.Action[11..],out int index)) return;
-        backgroundsOpen = false;
-        if(index==-1) expanded=!expanded;
-        else if((uint)index<Labels.Length) { choice=index; expanded=false; Clock.Restart(); }
+        if(e.Screen is not ("inventory" or "loot") || !e.Action.StartsWith("nue-avatar:") || !int.TryParse(e.Action[11..],out int index)) return;
+        active.backgroundsOpen = false;
+        if(index==-1) active.expanded=!active.expanded;
+        else if((uint)index<Labels.Length) { active.choice=index; active.expanded=false; active.Clock.Restart(); }
     }
 
     private static void Prepare(object __instance, CharacterDrawList list)
     {
         ui=PlayerField.GetValue(__instance);
-        renderer=GetRenderer.Invoke(__instance,null);
+        var nextRenderer = GetRenderer.Invoke(__instance,null);
+        if (!ReferenceEquals(renderer,nextRenderer))
+        {
+            own.publishedPainter = other.publishedPainter = null;
+            own.request = other.request = null;
+        }
+        renderer = nextRenderer;
         if(renderer==null || ui==null) return;
-        if(Stage.GetValue(renderer) is EditorStageRequest prior && prior==request) Stage.SetValue(renderer,null);
-        request=null;
+        active = other;
+        PrepareSubject(__instance,list);
+        if (Equals(Stage.GetValue(renderer),other.request)) Stage.SetValue(renderer,null);
+        active = own;
+        PrepareSubject(__instance,list);
+    }
+
+    private static void PrepareSubject(object __instance, CharacterDrawList list)
+    {
+        if(Stage.GetValue(renderer) is EditorStageRequest prior && prior==active.request) Stage.SetValue(renderer,null);
+        active.request=null;
         var screens=(MyGuiScreenHost)Screens.GetValue(ui)!;
         if(!screens.IsOpen("inventory") || screens.IsOpen("editor") || Stage.GetValue(renderer)!=null ||
-           Subject(ui) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
+           Subject(ui!) is not CharacterSnapshot { Animal: false, Appearance: {} look } c)
         {
-            dragHost=null; subject=CharacterId.None; openRack=null; expanded=backgroundsOpen=false; choice=0; return;
+            active.publishedPainter=null;
+            if (dragged == active) dragHost=null; active.subject=CharacterId.None; active.openRack=null; active.expanded=active.backgroundsOpen=false; active.choice=0; return;
         }
-        if(subject!=c.Id) { framePoints=null; subject=c.Id; openRack=null; yaw=.12f; zoom=1f; dragHost=null; choice=0; expanded=backgroundsOpen=false; Clock.Restart(); }
-        float t=(float)Clock.Elapsed.TotalSeconds;
+        if(active.subject!=c.Id) { active.publishedPainter=null; active.framePoints=null; active.subject=c.Id; active.openRack=null; active.yaw=.12f; active.zoom=1f; dragHost=null; active.choice=0; active.expanded=active.backgroundsOpen=false; active.Clock.Restart(); }
+        float t=(float)active.Clock.Elapsed.TotalSeconds;
         var bar = Bar.Invoke(Editor.GetValue(__instance), null);
         CharacterPose StandingPose(string name) =>
             new(name, (float)ClipTime.Invoke(bar, [name, t])!, 1);
-        IReadOnlyList<CharacterPose> poses = choice switch {
+        IReadOnlyList<CharacterPose> poses = active.choice switch {
             2 => [new("sitting idle",t*.55f,1)],
             3 => [new("sleeponfloor",t*.1f,1)],
             _ => [StandingPose(look.Body?.IdleStance ?? "idle_stand_relax")] };
         bool drawn = false, backDrawn = false;
-        if (choice == 1 && Library.GetValue(__instance) is AnimationLibrary lib)
+        if (active.choice == 1 && Library.GetValue(__instance) is AnimationLibrary lib)
         {
             var preferred = c.BackDrawn ? WeaponShown.BackDrawn : WeaponShown.Drawn;
             var weapon = look.Parts.FirstOrDefault(p => p.Shown == preferred)
@@ -405,10 +473,10 @@ public sealed partial class AvatarMod : IMod
         }
         long key=long.MinValue+((long)(uint)c.Id.Slot<<32)+(uint)c.Id.Generation;
         list.Items.Add(new CharacterInstance(key,look,c.Position,0,poses) { Hidden=true, FullRateAnimation=true,
-            Scale=c.Scale,Build=c.Build,WeaponDrawn=drawn,BackDrawn=backDrawn,UnitMovement=choice==3 });
-        float distance=choice==3 ? 78 : 54*Math.Max(1,c.Scale);
-        request=new(key,width,height,yaw,choice==3?.87f:.09f,distance*zoom,false,.66f,0);
-        Stage.SetValue(renderer,request);
+            Scale=c.Scale,Build=c.Build,WeaponDrawn=drawn,BackDrawn=backDrawn,UnitMovement=active.choice==3 });
+        float distance=active.choice==3 ? 78 : 54*Math.Max(1,c.Scale);
+        active.request=new(key,active.width,active.height,active.yaw,active.choice==3?.87f:.09f,distance*active.zoom,false,.66f,0);
+        Stage.SetValue(renderer,active.request);
     }
 
     private static readonly FieldInfo Lengths = AccessTools.Field(Host, "AnimationLengths");
@@ -430,14 +498,31 @@ public sealed partial class AvatarMod : IMod
 
     private static void Paint(object __instance)
     {
-        if(request==null || !ReferenceEquals(renderer,__instance) || !Equals(Stage.GetValue(renderer),request)) return;
+        active = own;
+        PaintSubject(__instance);
+        if (other.request == null || !ReferenceEquals(renderer,__instance) || Stage.GetValue(renderer)!=null) return;
+        active = other;
+        SwapTargets(__instance);
+        try { Stage.SetValue(renderer,other.request); PaintSubject(__instance); }
+        finally { SwapTargets(__instance); active = own; }
+    }
+
+    private static void PaintSubject(object __instance)
+    {
+        if(active.request==null || !ReferenceEquals(renderer,__instance) || !Equals(Stage.GetValue(renderer),active.request)) return;
         float clearColour = PreviewStudio.Background;
         try {
             PreviewStudio.Background = -1;
             Draw.Invoke(renderer,null);
             Resolve.Invoke(renderer,null);
-            if(Picture.GetValue(renderer) is ValueTuple<GpuTexture,SampledTexture> image)
-                Publish.Invoke(ui,[Texture,image.Item1,image.Item2]);
-        } finally { PreviewStudio.Background = clearColour; Stage.SetValue(renderer,null); request=null; }
+            active.publishedPainter = null;
+            if (StageView.GetValue(renderer) != null && Picture.GetValue(renderer) is ValueTuple<GpuTexture,SampledTexture> image &&
+                Painter.GetValue(ui) is UiPainter painter)
+            {
+                painter.SetTexture(TextureName,image.Item1,image.Item2);
+                active.publishedSubject = active.subject;
+                active.publishedPainter = painter;
+            }
+        } finally { PreviewStudio.Background = clearColour; Stage.SetValue(renderer,null); active.request=null; }
     }
 }

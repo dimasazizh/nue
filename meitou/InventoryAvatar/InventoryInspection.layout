@@ -128,11 +128,28 @@
       <Widget type="Widget" skin="PanelEmpty" position_real="0.189 0.013 0.158 0.049" name="NueBackdropMenu">
         <Property key="NeedMouse" value="false" />
       </Widget>
-      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.56211 0.602 0.04931 0.185" name="left_arm_replace" />
-      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.61371 0.602 0.04931 0.185" name="right_arm_replace" />
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real=".56211 .552 .10091 .04" name="NueLimbTitle">
+        <Property key="Caption" value="LIMBS" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real=".56211 .592 .10091 .031" name="NueArmTitle">
+        <Property key="Caption" value="ARMS" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real=".56211 .768 .10091 .031" name="NueLegTitle">
+        <Property key="Caption" value="LEGS" />
+        <Property key="TextAlign" value="Center" />
+        <Property key="NeedMouse" value="false" />
+      </Widget>
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.56211 0.625 0.04931 0.14" name="left_arm_replace" />
+      <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.61371 0.625 0.04931 0.14" name="right_arm_replace" />
       <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.56211 0.801 0.04931 0.185" name="left_leg_replace" />
       <Widget type="Widget" skin="Kenshi_InventorySlotSkin" position_real="0.61371 0.801 0.04931 0.185" name="right_leg_replace" />
-      <Widget type="EditBox" skin="Kenshi_EditBox" position_real="0.358 0.013 0.258 0.045" name="NueSearch.inventory" />
+      <Widget type="EditBox" skin="Kenshi_EditBox" position_real="0.358 0.013 0.258 0.045" name="NueSearch.inventory">
+        <Property key="TextPadding" value="8 2" />
+      </Widget>
       <Widget type="Button" skin="Kenshi_Button1" position_real="0.61829 0.013 0.04357 0.045" name="NueClear">
         <Property key="Caption" value="×" />
       </Widget>

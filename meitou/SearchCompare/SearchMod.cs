@@ -42,12 +42,12 @@ public sealed class SearchMod : IMod
 
     static bool Input(MyGuiEvent e,object __instance)
     {
-        if(e.Screen=="inventory" && e.Widget=="NueClear")
+        if(e.Screen is ("inventory" or "loot") && e.Widget=="NueClear")
         {
             var player=AccessTools.Field(Router,"<player>P").GetValue(__instance)!;
             var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
-            screens.SetText("inventory",Prefix+"inventory","");
-            Queries.Remove(Prefix+"inventory");
+            screens.SetText(e.Screen,Prefix+e.Screen,"");
+            Queries.Remove(Prefix+e.Screen);
             return false;
         }
         if (!e.Widget.StartsWith(Prefix) || e.Action != "text") return true;
@@ -125,12 +125,13 @@ public sealed class SearchMod : IMod
         var windows = Property(player,"InventoryWindows");
         var owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
         var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
-        bool shared=(id is "inventory" or "bag") && screens.IsOpen("inventory") && screens.Layout("inventory").Find("NuePreviewArea")!=null;
+        string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
+        bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
         if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
-        if(shared && id=="inventory" && screens.Focus?.Widget!=Prefix+"inventory" && Query("inventory").Length==0 &&
-            controls.Find(c=>c.Name==Prefix+"inventory") is {} field)
-            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,new Dictionary<string,string>(),default,Pickable:false));
-        var q = Query(shared ? "inventory" : id);
+        if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
+            controls.Find(c=>c.Name==Prefix+source) is {} field)
+            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,field.Properties,default,Pickable:false));
+        var q = Query(shared ? source : id);
         foreach (var cell in controls.ToArray())
         {
             if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-")) || tips[cell.Name] is not {} tip) continue;

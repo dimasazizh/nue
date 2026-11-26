@@ -1,4 +1,7 @@
 using System.Numerics;
+using Meitou.Data.Textures;
+using Meitou.Game.Rendering.Ui;
+using Meitou.Game.Rendering.Characters;
 using HarmonyLib;
 using Meitou.Data.Ui;
 using Meitou.Simulation;
@@ -14,7 +17,7 @@ public sealed partial class AvatarMod
         ("belt","lbBelt"),("legs","lbPants"),("boots","lbBoots")
     ];
     private static readonly System.Reflection.MethodInfo CellSize=AccessTools.PropertyGetter(Player,"InventoryCellSize");
-    private static string? openRack;
+
 
     private static void ArrangeEquipment(List<UiControl> controls,UiRect root,CharacterSnapshot owner,object player)
     {
@@ -35,7 +38,7 @@ public sealed partial class AvatarMod
             bool weapon=section is "back" or "hip";
             var capacity=InventoryCommands.SectionSize(section);
             var rack=new UiRect(tile.X-capacity.Width*cell.X-6,tile.Y,capacity.Width*cell.X,capacity.Height*cell.Y);
-            bool opened=weapon && openRack==section;
+            bool opened=weapon && active.openRack==section;
             if(opened) controls.Add(native with {Bounds=rack,Clip=root});
             bool first=true;
             foreach(var item in items)
@@ -44,7 +47,7 @@ public sealed partial class AvatarMod
                 var parts=controls.Where(c=>c.Name==name || c.Name.StartsWith(name+"-",StringComparison.Ordinal)).ToList();
                 if(parts.Count==0) continue; // Already lifted.
                 foreach(var part in parts) controls.Remove(part);
-                if(first) PlaceItem(controls,parts,name,tile,item,weapon);
+                if(first) PlaceItem(controls,parts,name,tile,item,weapon,section == "head");
                 if(opened) PlaceItem(controls,parts,name,new(rack.X+item.X*cell.X,rack.Y+item.Y*cell.Y,item.Width*cell.X,item.Height*cell.Y),item);
                 first=false;
             }
@@ -55,7 +58,7 @@ public sealed partial class AvatarMod
         }
     }
 
-    private static void PlaceItem(List<UiControl> output,List<UiControl> parts,string name,UiRect target,InventoryItemView item,bool diagonal=false)
+    private static void PlaceItem(List<UiControl> output,List<UiControl> parts,string name,UiRect target,InventoryItemView item,bool diagonal=false, bool centreHelmet=false)
     {
         float scale=Math.Min(target.Width/item.Width,target.Height/item.Height);
         if (diagonal)
@@ -65,7 +68,12 @@ public sealed partial class AvatarMod
         foreach(var part in parts)
         {
             var bounds=target;
-            if(part.Name==name+"-icon") bounds=icon;
+            if(part.Name==name+"-icon")
+            {
+                bounds = icon;
+                if (centreHelmet && part.Properties.TryGetValue("ImageTexture", out var texture))
+                    bounds = icon with { Y = icon.Y + icon.Height * HelmetOffset(texture) };
+            }
             else if(part.Name.StartsWith(name+"-charge",StringComparison.Ordinal))
             {
                 var original=parts.First(c=>c.Name==name).Bounds;
@@ -78,28 +86,66 @@ public sealed partial class AvatarMod
         }
     }
 
-    // The expanded rack uses native cells. A drop on the compact tile tries a free
+    // Inventory art includes transparent padding. Centre the visible rows inside the equipment tile.
+    private static readonly Dictionary<string,(float Offset,long Retry)> HelmetOffsets = new();
+    private static float HelmetOffset(string texture)
+    {
+        long now = Environment.TickCount64;
+        if (HelmetOffsets.TryGetValue(texture, out var cached) && now < cached.Retry)
+            return cached.Offset;
+        string? path = null;
+        if (texture.StartsWith("file:", StringComparison.Ordinal))
+            path = texture[5..];
+        else if (renderer != null && UiPainter.TryParseRenderedIcon(texture, out var record, out var material, out var colour) &&
+            AccessTools.Property(Render, "IconSaveDirectory").GetValue(renderer) is string directory &&
+            AccessTools.Field(Render, "_icons").GetValue(renderer) is System.Collections.IDictionary entries &&
+            entries[new IconKey(record, material, colour)] is {} entry &&
+            AccessTools.Field(entry.GetType(), "MaterialId").GetValue(entry) is string materialId && materialId.Length > 0)
+            path = Path.Combine(directory, record + "." + materialId + (colour.Length > 0 ? "." + colour : "") + ".png");
+
+        // A freshly rendered icon can reach the UI before the client's active.background PNG write completes.
+        if (path != null && File.Exists(path))
+        {
+            try
+            {
+                var image = TextureLoader.LoadFile(path, false).Levels[0];
+                int first = image.Height, last = -1;
+                for (int y = 0; y < image.Height; y++)
+                    for (int x = 0; x < image.Width; x++)
+                        if (image.Pixels[(y * image.Width + x) * 4 + 3] >= 16)
+                        {
+                            first = Math.Min(first, y);
+                            last = y;
+                            break;
+                        }
+                float offset = last < 0 ? 0 : .5f - (first + last + 1f) / (2 * image.Height);
+                HelmetOffsets[texture] = (offset, long.MaxValue);
+                return offset;
+            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+        HelmetOffsets[texture] = (0, now + 2000);
+        return 0;
+    }
+
+    // The active.expanded rack uses native cells. A drop on the compact tile tries a free
     // rectangle first, then offers the displayed weapon's position for a native swap.
-    private static void WeaponDrop(string section,ref UiControl slot,ref Vector2 topLeft,HeldItemView h,object __instance)
+    private static void WeaponDrop(ItemOwner window,string section,ref UiControl slot,ref Vector2 topLeft,HeldItemView h,object __instance)
     {
         if (section is ("main" or "backpack_content") && slot.Properties.ContainsKey("NueFittedGrid"))
         {
-            var playerForGrid = InventoryPlayer.GetValue(__instance)!;
-            if (Subject(playerForGrid)?.ItemGrid is {} gridView)
-            {
-                var size = section == "main" ? (gridView.Width,gridView.Height) : (gridView.BagWidth,gridView.BagHeight);
-                if (size.Item1 > 0 && size.Item2 > 0)
-                {
-                    var nativeCell = (Vector2)CellSize.Invoke(playerForGrid,null)!;
-                    var fittedCell = new Vector2(slot.Bounds.Width/size.Item1,slot.Bounds.Height/size.Item2);
-                    topLeft += (Vector2)HeldGrab.GetValue(__instance)! * (nativeCell-fittedCell);
-                }
-            }
+            var cells = slot.Properties["TileSize"].Split(' ');
+            var fitted = new Vector2(float.Parse(cells[0], System.Globalization.CultureInfo.InvariantCulture),
+                float.Parse(cells[1], System.Globalization.CultureInfo.InvariantCulture));
+            var native = (Vector2)CellSize.Invoke(InventoryPlayer.GetValue(__instance), null)!;
+            topLeft += (Vector2)HeldGrab.GetValue(__instance)! * (native - fitted);
             return;
         }
         if(section is not ("back" or "hip") || !slot.Properties.ContainsKey("NueEquipmentTile")) return;
         var player=InventoryPlayer.GetValue(__instance)!;
-        if(Subject(player)?.ItemGrid is not {} grid) return;
+        var session = (Meitou.Game.Host.WorldSession)AccessTools.Field(Player,"Session").GetValue(player)!;
+        if (session.CurrentSnapshot.Characters.FirstOrDefault(c=>c.Id==window.Character)?.ItemGrid is not {} grid) return;
         var items=grid.Items.Where(i=>i.Section==section).ToArray();
         var (cols,rows)=InventoryCommands.SectionSize(section);
         if(h.Rotated) h=h.Turned();

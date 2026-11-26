@@ -24,7 +24,7 @@ Core unique features:
 17. [ ] Add a bestiary panel that shows complete stats and skills for NPCs and beasts.
 18. [ ] Rework the trade/barter panel window with vendors.
 19. [ ] Rework the trade/barter panel window with squad members and **ANIMALS** (their biggiest backpack, the garru backpack is 20x200 (400 grid), see if we can implement a scroll bar.
-20. [x] Show four 2×5 limb slots beside the vanilla 8×10 personal inventory.
+20. [x] Show two 2×4 arm and two 2×5 leg slots beside the vanilla 8×10 personal inventory.
 21. [x] Resize the avatar viewport to 80% to make room for planned armor coverage stats.
 22. [ ] Comment the lines of code of not yet implemented neck, eye, and hand socket.
 23. [ ] Make the mod options more varied. Each element must be toggleable.

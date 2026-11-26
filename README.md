@@ -7,7 +7,9 @@ Base UI version: **0.1.0** · Unified package: **0.1.3** for **MeitouClient 0.23
 
 In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
 
-In the unified inventory, personal storage uses the vanilla 8×10 grid. Four 2×5 prosthetic slots appear beside it. An equipped bag opens by default, with its toggle below the bag. The shared search field above the equipment matches item names and types across equipment, pockets, prosthetics, and the open bag. Use × to clear it. The avatar viewport is 80% of its previous width and height. Equipped weapon icons point up and right. Hover tooltips follow your cursor and have their own mod setting.
+In the unified inventory, personal storage uses the vanilla 8×10 grid. Two 2×4 arm slots and two 2×5 leg slots appear beside it. An equipped bag opens by default, with its toggle below the bag. The shared search field above the equipment matches item names and types across equipment, pockets, prosthetics, and the open bag. Use × to clear it. The avatar viewport is 80% of its previous width and height. Equipped weapon icons point up and right. Hover tooltips follow your cursor and have their own mod setting.
+
+Squad trade uses two side-by-side inspection panels for human characters. The second panel mirrors the first. Each participant has an equipped avatar, pose and background controls, personal search, pockets, prosthetic slots, and a docked bag. Vendor trade uses the partner panel for shop stock. Animal trade uses it for the animal inventory and bag. Each avatar appears once its character texture is ready.
 
 ## Character tabs and building information for MeitouClient
 
