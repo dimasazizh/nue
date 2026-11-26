@@ -1,9 +1,9 @@
 # NUE | 鵺
 NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes. Less interface. More Kenshi.
 
-Base UI version: **0.1.0** · Unified package: **1.1.4** for **MeitouClient 0.23.1**
+Base UI version: **0.1.0** · Unified package: **0.1.5** for **MeitouClient 0.23.1**
 
-[Download NUE Unified for MeitouClient](NUE-Unified-1.1.4.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
+[Download NUE Unified for MeitouClient](NUE-Unified-0.1.5.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE and disable the six standalone NUE code mods before launching. The individual packages documented below are legacy alternatives.
 
 In **Settings → Mods → NUE**, switch each former submod on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
 
