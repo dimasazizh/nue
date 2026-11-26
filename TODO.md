@@ -8,7 +8,7 @@ Core unique features:
 5. [x] Add a search bar to inventory and trade windows.
 6. [x] Switch between health and stats with vertical HUD tabs in MeitouClient.
 7. [x] Rework the equipment slots in the inventory to move away from the rigid grid.
-8. [x] Add equipment slots for eyes, hands, and neck.
+8. [ ] ~~Add equipment slots for eyes, hands, and neck~~. (Scrap for now. Need to test with other mods).
 9. [x] Show racial XP multipliers. Reference the Racial XP Multipliers - RaceMetrics mod.
 10. [x] Update the stats panels when hovering over a character.
 11. [x] Add an on/off toggle in the mod options for each improvement.
@@ -22,11 +22,12 @@ Core unique features:
 16. [x] Restore the separate inventory avatar preview with compact equipment, personal storage below the slots, and details above the backpack. Preserve the gameplay camera.
     - Trade-window design is deferred.
 17. [ ] Add a bestiary panel that shows complete stats and skills for NPCs and beasts.
-18. [ ] Rework the trade/barter panel window with vendors.
-19. [ ] Rework the trade/barter panel window with squad members and **ANIMALS** (their biggiest backpack, the garru backpack is 20x200 (400 grid), see if we can implement a scroll bar.
+18. [x] Rework the trade/barter panel window with vendors.
+19. [x] Rework the trade/barter panel window with squad members and....
+    - [ ] ....**ANIMALS** (their biggiest backpack, the garru backpack is 20x200 (400 grid), see if we can implement a scroll bar.
 20. [x] Show two 2×4 arm and two 2×5 leg slots beside the vanilla 8×10 personal inventory.
 21. [x] Resize the avatar viewport to 80% to make room for planned armor coverage stats.
-22. [ ] Comment the lines of code of not yet implemented neck, eye, and hand socket.
+22. [x] Comment the lines of code of not yet implemented neck, eye, and hand socket.
 23. [ ] Make the mod options more varied. Each element must be toggleable.
    
 Features from other mods to implement:

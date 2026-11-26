@@ -17,19 +17,22 @@ using Meitou.Simulation.Production;
 
 namespace Nue.SearchCompare;
 
-public sealed class SearchMod : IMod
+public sealed partial class SearchMod : IMod
 {
     const string Prefix = "NueSearch.";
     const string StockView = "scrollview_backpack_content";
     const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
-    static readonly ConditionalWeakTable<object,List<InventoryItemView>> Comparisons = new();
+    static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
     static Type Ui(string name) => typeof(MyGuiScreenHost).Assembly.GetType("Meitou.Game.Ui." + name, true)!;
     static readonly Type Router = Ui("ScreenRouter"), Production = Ui("ProductionWindows"), Tips = Ui("TooltipRuntime");
     static readonly FieldInfo RouterPlayer = AccessTools.Field(Router,"<player>P");
     static readonly MethodInfo ToTip = AccessTools.Method(Tips.GetNestedType("ItemTip", BindingFlags.NonPublic)!, "Of",
         [typeof(InventoryItemView), typeof(TradeItemView), typeof(string)]);
     static readonly MethodInfo ItemLines = AccessTools.Method(Tips,"ItemLines");
+    static readonly MethodInfo PlaceTooltip = AccessTools.Method(Tips,"PlaceTooltip");
+    static readonly FieldInfo TooltipPlayer = AccessTools.Field(Tips,"<player>P");
+    static readonly FieldInfo LastModTooltip = AccessTools.Field(Tips,"_modRowsShownFor");
     static readonly MethodInfo SectionOf = AccessTools.Method(typeof(ItemFactory),"SectionOf");
 
     internal static bool Installed { get; private set; }
@@ -42,7 +45,9 @@ public sealed class SearchMod : IMod
         context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
         context.Harmony.Patch(AccessTools.Method(Router,"AddFaithfulContent"), postfix:Hook(nameof(Inventory)));
         context.Harmony.Patch(AccessTools.Method(Router,"BindFaithfulScreen"), postfix:Hook(nameof(ReserveVendorSearch)));
-        context.Harmony.Patch(ItemLines, postfix:Hook(nameof(Compare)));
+        context.Harmony.Patch(ItemLines, postfix:Hook(nameof(RememberComparison)));
+        context.Harmony.Patch(PlaceTooltip, prefix:Hook(nameof(CompareTooltipValues)),
+            postfix:Hook(nameof(PlaceEquippedTooltip)));
     }
 
     static bool Input(MyGuiEvent e,object __instance)
@@ -202,31 +207,11 @@ public sealed class SearchMod : IMod
                 FcsRecordType.Armour or FcsRecordType.Item => (string)SectionOf.Invoke(null,[record])!,
                 _ => "" };
             if (!InventoryCommands.IsEquipmentSection(slot)) continue;
-            var equipped = grid.Items.Where(i => i.Section==slot || slot=="back" && i.Section=="hip").ToList();
-            if (kind!="trader" && cell.Properties.TryGetValue("InventoryItem",out var index))
-                equipped.RemoveAll(i=>i.Index.ToString()==index);
-            if (equipped.Count>0) Comparisons.AddOrUpdate(tip,equipped);
+            string? index = kind!="trader" ? cell.Properties.GetValueOrDefault("InventoryItem") : null;
+            var equipped = grid.Items.Where(i => i.Index.ToString()!=index &&
+                (i.Section==slot || slot=="back" && i.Section=="hip"))
+                .OrderBy(i => i.Section!=slot).FirstOrDefault();
+            if (equipped != null) Comparisons.AddOrUpdate(tip,equipped);
         }
-    }
-
-    static void Compare(object __instance,object t,ref IReadOnlyList<TooltipLine> __result)
-    {
-        if (!Comparisons.TryGetValue(t,out var equipped)) return;
-        var candidate = __result;
-        var rows = candidate.ToList();
-        foreach (var item in equipped)
-        {
-            var other = ToTip.Invoke(null,[item,null,null]);
-            var lines = (IReadOnlyList<TooltipLine>)ItemLines.Invoke(__instance,[other])!;
-            rows.Add(new("Equipped ("+item.Section+")",item.Name));
-            foreach (var line in lines)
-            {
-                if (string.IsNullOrEmpty(line.Value)) continue;
-                var hovered = candidate.FirstOrDefault(c => c.Key == line.Key);
-                if (string.IsNullOrEmpty(hovered.Value) || hovered.Value == line.Value) continue;
-                rows.Add(new(line.Key, $"{hovered.Value} vs {line.Value}"));
-            }
-        }
-        __result = rows;
     }
 }
