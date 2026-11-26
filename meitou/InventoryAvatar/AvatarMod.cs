@@ -92,6 +92,8 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
+        After(Layout, "BindContainerGeometry", nameof(BindStorageTradeGeometry));
+        After(Layout, "ArrangeContainerGrid", nameof(ArrangeStorageTradeGrid));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
             prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
@@ -167,33 +169,56 @@ public sealed partial class AvatarMod : IMod
         var partner = screens.IsOpen("loot") ? Owner.Invoke(inventories,["loot"]) as CharacterSnapshot : null;
         if (active == other)
             return TradePartner(screens.IsOpen("trader"),owner,partner);
-        if (partner?.IsPlayer != true && (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
+        if (partner == null && LinkedStorage(player) == null && (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
         return owner is {Animal:false, Appearance:not null} ? owner : null;
     }
 
     private static CharacterSnapshot? TradePartner(bool merchant, CharacterSnapshot? owner, CharacterSnapshot? partner) =>
-        !merchant && owner != null && partner is { IsPlayer:true, Animal:false, Appearance:not null } && partner.Id != owner.Id
+        !merchant && owner != null && partner is { Animal:false, Appearance:not null } && partner.Id != owner.Id
             ? partner : null;
 
     private static bool NormalPlacement(object __instance) => Subject(LayoutPlayer.GetValue(__instance)!)==null;
 
     private static void SelectLayout(string id, object __instance)
     {
-        if (id is not ("inventory" or "loot")) return;
-        active = id == "loot" ? other : own;
+        if (id is not ("inventory" or "loot") && !IsStorageScreen(id)) return;
         var player = RouterPlayer.GetValue(__instance)!;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
-        bool inspecting = Subject(player) != null;
-        if ((screens.Layout(id).Find("NuePreviewArea") != null) == inspecting) return;
-        if (inspecting) screens.Replace(id, id == "loot" ? MirroredInspection() : inspection);
-        else
+        if (IsStorageScreen(id))
         {
-            var trade = AccessTools.PropertyGetter(Player, "TradeWindows").Invoke(player, null)!;
-            var animal = Owner.Invoke(GetInventory.Invoke(player,null),[id]) is CharacterSnapshot {Animal:true};
-            var original = (MyGuiLayout)AccessTools.Field(trade.GetType(), animal ? "AnimalInventoryLayout" : "CharacterInventoryLayout").GetValue(trade)!;
-            screens.Replace(id, original);
-            active.bagArea = default;
+            SelectStorageLayout(screens, id);
+            return;
         }
+        active = id == "loot" ? other : own;
+        var character = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
+        var current = screens.Layout(id);
+        if (character is { Animal: true })
+        {
+            var animal = NativeInventoryLayout(player, animal: true);
+            if (current.Find("MainSectionName") == null ||
+                current.Roots[0].Position != animal.Roots[0].Position)
+                screens.Replace(id, animal);
+            active.bagArea = default;
+            return;
+        }
+
+        bool inspecting = Subject(player) != null;
+        if (inspecting)
+        {
+            if (current.Find("NuePreviewArea") == null)
+                screens.Replace(id, id == "loot" ? MirroredInspection() : inspection);
+            return;
+        }
+        if (current.Find("NuePreviewArea") != null || current.Find("MainSectionName") != null)
+            screens.Replace(id, NativeInventoryLayout(player, animal: false));
+        active.bagArea = default;
+    }
+
+    private static MyGuiLayout NativeInventoryLayout(object player, bool animal)
+    {
+        var trade = AccessTools.PropertyGetter(Player, "TradeWindows").Invoke(player, null)!;
+        string field = animal ? "AnimalInventoryLayout" : "CharacterInventoryLayout";
+        return (MyGuiLayout)AccessTools.Field(trade.GetType(), field).GetValue(trade)!;
     }
 
     private static void DockInventory(string id, UiBindings b, object __instance)
@@ -202,12 +227,13 @@ public sealed partial class AvatarMod : IMod
         active = id is "loot" or "loot-bag" ? other : own;
         bool paired = DockTrade(id, b, __instance, root);
         if (id is not ("inventory" or "bag" or "loot" or "loot-bag")) return;
-        if (paired && id == "loot")
+        var player = LayoutPlayer.GetValue(__instance)!;
+        if (paired && id == "loot" &&
+            Owner.Invoke(GetInventory.Invoke(player, null), ["loot"]) is CharacterSnapshot { IsPlayer: true })
         {
             b.Disabled.Remove("ArrangeButton");
             b.Actions["ArrangeButton"] = "ArrangeButton";
         }
-        var player = LayoutPlayer.GetValue(__instance)!;
         if (Subject(player) is not {} subject) return;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
         if (id is "bag" or "loot-bag")
