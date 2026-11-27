@@ -33,7 +33,6 @@ internal static partial class CharacterInspector
     {
         data = context.Data;
         silhouette = UiPainter.IconTexture(Path.Combine(context.Folder, "gui", "gfx", "nue_body.png"));
-        serviceRecord = ServiceRecordRadar.Connect();
     }
 
     internal sealed class View
@@ -43,8 +42,6 @@ internal static partial class CharacterInspector
         internal string? Part;
         internal int Page;
         internal bool ShowRadar;
-        internal RadarData? Radar;
-        internal long RefreshRadarAt;
 
         internal void Use(CharacterId id)
         {
@@ -54,8 +51,6 @@ internal static partial class CharacterInspector
             Part = null;
             Page = 0;
             ShowRadar = false;
-            Radar = null;
-            RefreshRadarAt = 0;
         }
 
         internal void Act(string action)
@@ -119,10 +114,10 @@ internal static partial class CharacterInspector
         float switchHeight = Math.Min(figureSpace * .13f, width * .075f);
         string switchFont = Math.Max(1, (int)(switchHeight * .68f)).ToString(CultureInfo.InvariantCulture);
         var switchBounds = new UiRect(x + width * .27f, area.Y + pad, width * .46f, switchHeight);
-        AddButton(controls, switchBounds, view.ShowRadar ? "BODY FIGURE" : "SERVICE RECORD", "figure-mode", switchFont);
+        AddButton(controls, switchBounds, view.ShowRadar ? "BODY FIGURE" : "ARMOUR CHART", "figure-mode", switchFont);
         var visual = new UiRect(x, switchBounds.Y + switchHeight + pad, width, figureSpace - switchHeight - pad);
         if (view.ShowRadar)
-            DrawRadar(controls, character, visual, view);
+            DrawRadar(controls, parts, estimates, visual);
         else
         {
             float unit = Math.Min(visual.Height / 128, width / 96);
