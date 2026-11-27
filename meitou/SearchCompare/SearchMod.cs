@@ -62,7 +62,7 @@ public sealed partial class SearchMod : IMod
 
     static bool Input(MyGuiEvent e,object __instance)
     {
-        if(e.Screen is ("inventory" or "loot" or "trader" or "storage" or "storage-own") &&
+        if(e.Screen is ("inventory" or "loot" or "trader") &&
             e.Widget=="NueClear" && e.Action==ClearAction)
         {
             var player=RouterPlayer.GetValue(__instance)!;
@@ -174,19 +174,6 @@ public sealed partial class SearchMod : IMod
         }
     }
 
-    static void StorageSearch(List<UiControl> controls, MyGuiScreenHost screens, string id, UiRect window, UiRect stock)
-    {
-        var details = controls.Find(c => c.Name is "TypeText" or "CapacityText");
-        float top = details?.Bounds.Y ?? window.Y + 4;
-        float left = details is null ? stock.X : stock.X + stock.Width * .44f;
-        float height = Math.Min(24, stock.Y - top - 4);
-        if (height <= 0) return;
-        float clearWidth = Math.Min(height * 1.25f, stock.Width * .18f);
-        float clearX = stock.X + stock.Width - clearWidth;
-        if (clearX - left <= 8) return;
-        AddStockSearch(controls, screens, id, window, new(left + 4, top, clearX - left - 8, height), clearX, clearWidth);
-    }
-
     static void AddStockSearch(List<UiControl> controls, MyGuiScreenHost screens, string id, UiRect window,
         UiRect field, float clearX, float clearWidth)
     {
@@ -216,7 +203,7 @@ public sealed partial class SearchMod : IMod
     static void Inventory(object __instance,string id,List<UiControl> controls)
     {
         string kind = (string)AccessTools.Method(Ui("InventoryWindows"),"ScreenKind").Invoke(null,[id])!;
-        if (kind is not ("trader" or "inventory" or "bag" or "loot" or "loot-bag" or "storage")) return;
+        if (kind is not ("trader" or "inventory" or "bag" or "loot" or "loot-bag")) return;
         if (controls.FirstOrDefault(c=>c.Type=="Window") is not {} window) return;
         var r = window.Bounds;
 
@@ -226,7 +213,7 @@ public sealed partial class SearchMod : IMod
         var lookup = (Func<string,GameRecord?>?)Property(runtime,"ItemRecordOf");
         string q = Installed ? AddInventorySearch(player, id, kind, controls, r) : "";
         CharacterSnapshot? owner = null;
-        if (GearComparison && kind != "storage")
+        if (GearComparison)
         {
             var windows = Property(player,"InventoryWindows");
             owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
@@ -234,8 +221,7 @@ public sealed partial class SearchMod : IMod
         if (q.Length == 0 && owner?.ItemGrid is null) return;
         foreach (var cell in controls.ToArray())
         {
-            if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-") ||
-                kind == "storage" && cell.Name.StartsWith("machine-item-")) || tips[cell.Name] is not {} tip) continue;
+            if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-")) || tips[cell.Name] is not {} tip) continue;
             var record=lookup?.Invoke((string)Property(tip,"Record"));
             if (q.Length>0 && !Match((string)Property(tip,"Name"),q) && !Match(record?.Type.ToString() ?? "",q)
                 && !(record?.Type==FcsRecordType.Armour && Match((string)SectionOf.Invoke(null,[record])!,q)))
@@ -262,8 +248,6 @@ public sealed partial class SearchMod : IMod
         string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
         bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
         if(kind=="trader") VendorSearch(controls,screens,id,r);
-        else if (kind == "storage" && controls.Find(c => c.Name == StockView) is {} view)
-            StorageSearch(controls, screens, id, r, view.Bounds);
         else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
         if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
             controls.Find(c=>c.Name==Prefix+source) is {} field)

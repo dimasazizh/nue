@@ -1,7 +1,6 @@
 using Meitou.Game.Ui;
 using HarmonyLib;
 using System.Numerics;
-using System.Globalization;
 using Meitou.Data.Ui;
 using Meitou.Simulation;
 using Meitou.Simulation.Items;
@@ -13,18 +12,10 @@ public sealed partial class AvatarMod
     private static readonly System.Reflection.MethodInfo BindVendorGeometry =
         AccessTools.Method(GameType("Ui.TradeWindows"), "BindTraderGeometry");
     private static readonly System.Reflection.MethodInfo GetProduction = AccessTools.PropertyGetter(Player, "Production"),
-        GetRouter = AccessTools.PropertyGetter(Player, "ScreenRouter"),
-        GetLinkedMachine = AccessTools.Method(GameType("Ui.ProductionWindows"), "LinkedScreen"),
-        BindScreen = AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen"),
-        InventoryCell = AccessTools.PropertyGetter(Player, "InventoryCell"),
-        InventoryCellHeight = AccessTools.PropertyGetter(Player, "InventoryCellHeight");
+        GetLinkedMachine = AccessTools.Method(GameType("Ui.ProductionWindows"), "LinkedScreen");
     private const string StockScroll = "scrollview_backpack_content";
-    private const string StorageGridSize = "NueStorageGridSize";
-
-    private static bool IsStorageScreen(string id) => id is "storage" or "storage-own";
-
-    private static string? LinkedStorage(object player) =>
-        GetLinkedMachine.Invoke(GetProduction.Invoke(player, null), null) as string == "storage" ? "storage" : null;
+    private static bool StorageLinked(object player) =>
+        GetLinkedMachine.Invoke(GetProduction.Invoke(player, null), null) as string == "storage";
 
     private static bool DockTrade(string id, UiBindings bindings, object layout, UiRect root)
     {
@@ -36,23 +27,11 @@ public sealed partial class AvatarMod
         var target = screens.IsOpen("loot")
             ? Owner.Invoke(GetInventory.Invoke(player, null), ["loot"]) as CharacterSnapshot
             : null;
-        string? storage = merchant || target != null ? null : LinkedStorage(player);
-        if (!merchant && target == null && storage == null) return false;
+        if (!merchant && target == null) return false;
 
         var (width, height, gap, half, panelHeight) = TradeDimensions(player);
         if (merchant)
             return DockVendorTrade(id, bindings, player, screens, width, height, gap, half, panelHeight);
-        if (storage != null)
-        {
-            if (id == "bag") return true;
-            if (id != "inventory") return false;
-            var storageBindings = (UiBindings)BindScreen.Invoke(GetRouter.Invoke(player, null), [storage])!;
-            if (!storageBindings.Positions.TryGetValue("Root", out var storageRoot)) return false;
-            float start = TradeStart(width, half, gap, storageRoot.Width);
-            bindings.Positions["Root"] = root with { Width = half, Height = panelHeight };
-            bindings.WindowPosition = new Vector2(start, (height - panelHeight) / 2) - screens.GetOffset(id);
-            return true;
-        }
 
         bool partner = id is "loot" or "loot-bag";
         bool bag = id is "bag" or "loot-bag";
@@ -69,7 +48,7 @@ public sealed partial class AvatarMod
                 bindings.Positions["Root"] = root with { Width = root.Width * scale, Height = root.Height * scale };
                 bindings.WindowPosition += new Vector2(animalWidth + gap, 0);
             }
-            else bindings.Positions["Root"] = root with { Width = animalWidth, Height = Math.Min(root.Height, panelHeight) };
+            else bindings.Positions["Root"] = root with { Width = animalWidth, Height = panelHeight };
             return true;
         }
         if (bag) bindings.Positions["Root"] = root; // DockInventory fits the native bag into its owner's bag area.
@@ -134,85 +113,6 @@ public sealed partial class AvatarMod
         var template = inspection.Roots[0].Position;
         float panelHeight = Math.Min(height * .84f, half * template.Height * height / (template.Width * width));
         return (width, height, gap, half, panelHeight);
-    }
-
-    private static void SelectStorageLayout(MyGuiScreenHost screens, string id)
-    {
-        var storage = screens.Layout(id);
-        if (storage.Find(StockScroll) != null) return;
-        var trader = screens.Layout("trader");
-        var root = trader.Roots[0];
-        var content = trader.Find("Content")!;
-        var view = trader.Find(StockScroll)!;
-        var grid = trader.Find("backpack_content")! with { Position = new(0, 0, 1, 1) };
-        var header = content.Children.Single(w => w.Children.Any(c => c.Name == "datapanel"));
-        var children = content.Children.Where(w => w != header && w.Name != grid.Name)
-            .Select(w => w == view ? view with { Children = [..view.Children, grid] } : w)
-            .Concat(new[] { "TypeText", "CapacityText" }.Select(name =>
-            {
-                var label = storage.Find(name)!;
-                return label with
-                {
-                    Position = header.Position with { Height = header.Position.Height / 2,
-                        Y = header.Position.Y + (name == "CapacityText" ? header.Position.Height / 2 : 0) }
-                };
-            })).ToArray();
-        screens.Replace(id, trader with { Roots = [root with
-        {
-            Position = storage.Roots[0].Position with { Width = root.Position.Width, Height = root.Position.Height },
-            Children = root.Children.Select(w => w == content ? content with { Children = children } : w).ToArray()
-        }] });
-    }
-
-    private static void BindStorageTradeGeometry(string id, UiBindings bindings, int columns, int rows, object __instance)
-    {
-        if (!IsStorageScreen(id) || columns <= 0 || rows <= 0) return;
-        var player = LayoutPlayer.GetValue(__instance)!;
-        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
-        var layout = screens.Layout(id);
-        if (layout.Find(StockScroll) is not {} view || layout.Find("Content") is not {} content ||
-            layout.Find("backpack_content") is not {} grid ||
-            !bindings.Positions.TryGetValue("Root", out var root)) return;
-
-        var (width, height, gap, half, panelHeight) = TradeDimensions(player);
-        float gridWidth = columns * (float)InventoryCell.Invoke(player, null)!;
-        float gridHeight = rows * (float)InventoryCellHeight.Invoke(player, null)!;
-        bool linked = LinkedStorage(player) == id && screens.IsOpen("inventory");
-        var area = content.Position;
-        float desiredWidth = (gridWidth + 2 * gap) / (area.Width * view.Position.Width);
-        float panelWidth = Math.Min(linked ? half : width - 2 * gap, Math.Max(half * .45f, desiredWidth));
-        bindings.Positions["Root"] = root with { Width = panelWidth, Height = panelHeight };
-        // Keep the standalone building anchor and clamp its final position after the host adds the window offset.
-        bindings.FitWindowToViewport = !linked;
-        bindings.RelativePositions[content] = area;
-        bindings.RelativePositions[view] = view.Position;
-        bindings.RelativePositions[grid] = grid.Position;
-        foreach (var widget in content.Children.Where(w => w.Name is "TypeText" or "CapacityText" or "ArrangeButton"))
-            bindings.RelativePositions[widget] = widget.Position;
-        bindings.Canvas[StockScroll] = (gridWidth, gridHeight);
-        bindings.NativeScroll.Add(StockScroll);
-        bindings.Properties[StockScroll] = new Dictionary<string, string> { ["VisibleHScroll"] = "true" };
-        bindings.Properties[grid.Name] = new Dictionary<string, string>
-            { [StorageGridSize] = FormattableString.Invariant($"{gridWidth} {gridHeight}") };
-        if (linked)
-        {
-            float start = TradeStart(width, half, gap, panelWidth);
-            bindings.WindowPosition = new Vector2(start + half + gap, (height - panelHeight) / 2) - screens.GetOffset(id);
-        }
-    }
-
-    private static void ArrangeStorageTradeGrid(string id, List<UiControl> controls)
-    {
-        if (!IsStorageScreen(id)) return;
-        int index = controls.FindIndex(c => c.Name == "backpack_content");
-        if (index < 0) return;
-        var grid = controls[index];
-        // The scroll canvas can exceed the actual grid when storage has only a few rows.
-        var size = grid.Properties.GetValueOrDefault(StorageGridSize)?.Split(' ');
-        if (size is not { Length: 2 } ||
-            !float.TryParse(size[0], CultureInfo.InvariantCulture, out float width) ||
-            !float.TryParse(size[1], CultureInfo.InvariantCulture, out float height)) return;
-        controls[index] = grid with { Bounds = grid.Bounds with { Width = width, Height = height } };
     }
 
     private static MyGuiLayout? mirrored;

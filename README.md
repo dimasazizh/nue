@@ -56,7 +56,6 @@ See the [UI improvements checklist](TODO.md) for progress on changes to search, 
 ## Etymology & Philosophy
 In Japanese folklore, the Nue is traditionally depicted as a creature with the head of a monkey, the body of a tanuki, the limbs of a tiger, and a snake for a tail. The chimeric nature of the creature is also a fitting metaphor for a GUI combining native Kenshi MyGUI and MeitouClient's own GUI codes.
 
-
 ## Contributors & Special Mentions
-Dimsky - Author, main contributor
+Dimsky - Author, main contributor\
 Shutori - Character Inspector

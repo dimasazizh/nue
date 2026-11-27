@@ -92,8 +92,6 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
-        After(Layout, "BindContainerGeometry", nameof(BindStorageTradeGeometry));
-        After(Layout, "ArrangeContainerGrid", nameof(ArrangeStorageTradeGrid));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
             prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
@@ -169,7 +167,7 @@ public sealed partial class AvatarMod : IMod
         var partner = screens.IsOpen("loot") ? Owner.Invoke(inventories,["loot"]) as CharacterSnapshot : null;
         if (active == other)
             return TradePartner(screens.IsOpen("trader"),owner,partner);
-        if (partner == null && LinkedStorage(player) == null && (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
+        if (partner == null && !StorageLinked(player) && (bool)Linked.Invoke(GetLayout.Invoke(player,null),null)!) return null;
         return owner is {Animal:false, Appearance:not null} ? owner : null;
     }
 
@@ -177,18 +175,17 @@ public sealed partial class AvatarMod : IMod
         !merchant && owner != null && partner is { Animal:false, Appearance:not null } && partner.Id != owner.Id
             ? partner : null;
 
-    private static bool NormalPlacement(object __instance) => Subject(LayoutPlayer.GetValue(__instance)!)==null;
+    private static bool NormalPlacement(object __instance)
+    {
+        var player = LayoutPlayer.GetValue(__instance)!;
+        return StorageLinked(player) || Subject(player) == null;
+    }
 
     private static void SelectLayout(string id, object __instance)
     {
-        if (id is not ("inventory" or "loot") && !IsStorageScreen(id)) return;
+        if (id is not ("inventory" or "loot")) return;
         var player = RouterPlayer.GetValue(__instance)!;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
-        if (IsStorageScreen(id))
-        {
-            SelectStorageLayout(screens, id);
-            return;
-        }
         active = id == "loot" ? other : own;
         var character = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
         var current = screens.Layout(id);
@@ -268,7 +265,8 @@ public sealed partial class AvatarMod : IMod
             b.Hidden.Add("NueSearch."+id);
         }
         var origin = inspection.Roots[0].Position.RelativeTo(new(0, 0, (int)Width.GetValue(player)!, (int)Height.GetValue(player)!), true);
-        if (!paired) b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
+        if (!paired && !StorageLinked(player))
+            b.WindowPosition = new Vector2(origin.X, origin.Y) - screens.GetOffset(id);
         // The native character fitter bottom-anchors the heading for its own template.
         var title = screens.Layout(id).Find("InventoryMainTitle")!;
         b.RelativePositions[title] = title.Position;
