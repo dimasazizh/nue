@@ -15,7 +15,7 @@ using Meitou.Simulation.Items;
 
 namespace Nue.Unified;
 
-internal static class CharacterInspector
+internal static partial class CharacterInspector
 {
     internal const string ActionPrefix = "nue-inspector:";
     private const string Gold = "0.909804 0.741176 0.447059";
@@ -33,6 +33,7 @@ internal static class CharacterInspector
     {
         data = context.Data;
         silhouette = UiPainter.IconTexture(Path.Combine(context.Folder, "gui", "gfx", "nue_body.png"));
+        serviceRecord = ServiceRecordRadar.Connect();
     }
 
     internal sealed class View
@@ -41,6 +42,9 @@ internal static class CharacterInspector
         internal bool Hidden;
         internal string? Part;
         internal int Page;
+        internal bool ShowRadar;
+        internal RadarData? Radar;
+        internal long RefreshRadarAt;
 
         internal void Use(CharacterId id)
         {
@@ -49,6 +53,9 @@ internal static class CharacterInspector
             Hidden = false;
             Part = null;
             Page = 0;
+            ShowRadar = false;
+            Radar = null;
+            RefreshRadarAt = 0;
         }
 
         internal void Act(string action)
@@ -56,6 +63,7 @@ internal static class CharacterInspector
             switch (action)
             {
                 case "toggle": Hidden = !Hidden; break;
+                case "figure-mode": ShowRadar = !ShowRadar; break;
                 case "back": Part = null; Page = 0; break;
                 case "previous": Page = Math.Max(0, Page - 1); break;
                 case "next": Page++; break;
@@ -108,10 +116,20 @@ internal static class CharacterInspector
         float x = area.X + pad, width = area.Width - 2 * pad;
         if (width <= 0 || area.Height <= 2 * pad) return;
         float figureSpace = (area.Height - 2 * pad) * .43f;
-        float unit = Math.Min(figureSpace / 128, width / 96);
-        var figure = new UiRect(x + (width - 96 * unit) / 2, area.Y + pad + (figureSpace - 128 * unit) / 2,
-            96 * unit, 128 * unit);
-        DrawFigure(controls, character, parts, estimates, selected, hoveredAction, figure, area, unit);
+        float switchHeight = Math.Min(figureSpace * .13f, width * .075f);
+        string switchFont = Math.Max(1, (int)(switchHeight * .68f)).ToString(CultureInfo.InvariantCulture);
+        var switchBounds = new UiRect(x + width * .27f, area.Y + pad, width * .46f, switchHeight);
+        AddButton(controls, switchBounds, view.ShowRadar ? "BODY FIGURE" : "SERVICE RECORD", "figure-mode", switchFont);
+        var visual = new UiRect(x, switchBounds.Y + switchHeight + pad, width, figureSpace - switchHeight - pad);
+        if (view.ShowRadar)
+            DrawRadar(controls, character, visual, view);
+        else
+        {
+            float unit = Math.Min(visual.Height / 128, width / 96);
+            var figure = new UiRect(x + (width - 96 * unit) / 2, visual.Y + (visual.Height - 128 * unit) / 2,
+                96 * unit, 128 * unit);
+            DrawFigure(controls, character, parts, estimates, selected, hoveredAction, figure, visual, unit);
+        }
 
         float y = area.Y + pad + figureSpace + pad;
         float rowHeight = Math.Min(width * .074f, (area.Y + area.Height - y - pad) / 11);
