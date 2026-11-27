@@ -1,0 +1,115 @@
+name: Build NUE mod
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Mod version for this ZIP (blank uses meitou/Unified/meitou.json)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      MEITOU_VERSION: '0.23.1'
+      MEITOU_SHA256: '37070ea8981ac9ecda2f29ca5d16a4499e77684c4efaa4a0c507bd61c4278c13'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '11.0.100'
+
+      - name: Fetch Meitou build references
+        id: meitou
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $manifest = Get-Content -LiteralPath 'meitou/Unified/meitou.json' -Raw | ConvertFrom-Json
+          if ($manifest.gameVersion -ne $env:MEITOU_VERSION) {
+            throw "Update MEITOU_VERSION and MEITOU_SHA256 to match the manifest gameVersion."
+          }
+          $asset = "Meitou-${env:MEITOU_VERSION}-win-x64.zip"
+          $archive = Join-Path $env:RUNNER_TEMP $asset
+          $url = "https://github.com/VlcekM/MeitouClient/releases/download/v$env:MEITOU_VERSION/$asset"
+          curl.exe --fail --location --silent --show-error --retry 3 --output $archive $url
+          if ($LASTEXITCODE -ne 0) { throw "Could not download $asset." }
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $env:MEITOU_SHA256) {
+            throw "SHA-256 mismatch for $asset."
+          }
+          $expanded = Join-Path $env:RUNNER_TEMP 'meitou-references'
+          Expand-Archive -LiteralPath $archive -DestinationPath $expanded
+          $clients = @(Get-ChildItem -LiteralPath $expanded -Filter MeitouClient.dll -File -Recurse)
+          if ($clients.Count -ne 1) { throw "Expected exactly one MeitouClient.dll in $asset." }
+          $references = $clients[0].Directory.FullName
+          foreach ($dll in 'MeitouClient.dll','Meitou.Core.dll','Meitou.Simulation.dll','Meitou.Data.dll','0Harmony.dll') {
+            if (!(Test-Path -LiteralPath (Join-Path $references $dll) -PathType Leaf)) { throw "Missing $dll." }
+          }
+          "directory=$references" >> $env:GITHUB_OUTPUT
+
+      - name: Build and verify the mod ZIP
+        id: package
+        shell: pwsh
+        env:
+          MEITOU_DIR: ${{ steps.meitou.outputs.directory }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $manifestPath = 'meitou/Unified/meitou.json'
+          $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+          $version = ([string]$env:REQUESTED_VERSION).Trim()
+          if ($version.Length -eq 0) { $version = $manifest.version }
+          if ($version -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') {
+            throw 'Enter a three-part mod version such as 0.1.8.'
+          }
+
+          $compiled = Join-Path $env:RUNNER_TEMP 'nue-compiled'
+          dotnet build 'meitou/Unified/Unified.csproj' --configuration Release --output $compiled --nologo "-p:MeitouDir=$env:MEITOU_DIR" "-p:Version=$version"
+          if ($LASTEXITCODE -ne 0) { throw 'NUE compilation failed.' }
+          $dll = Join-Path $compiled 'Nue.Unified.dll'
+          if ([Reflection.AssemblyName]::GetAssemblyName($dll).Version.ToString() -ne "$version.0") {
+            throw 'The assembly version does not match the requested mod version.'
+          }
+
+          $mod = 'NUE (Native UI Enhancement)'
+          $stage = Join-Path $env:RUNNER_TEMP "nue-package/$mod"
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          Copy-Item -LiteralPath @("$mod/$mod.mod", "$mod/_$mod.img", "$mod/_$mod.info", "$mod/gui", "$mod/locale") -Destination $stage -Recurse
+          Copy-Item -LiteralPath @($dll, 'meitou/InventoryAvatar/InventoryInspection.layout', 'meitou/InventoryAvatar/Desert.png', 'meitou/InventoryAvatar/Swamp.png') -Destination $stage
+          $manifest.version = $version
+          $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $stage 'meitou.json') -Encoding utf8
+
+          $beta = '# beta dlls build'
+          New-Item -ItemType Directory -Force -Path $beta | Out-Null
+          $relativeZip = "$beta/NUE-Unified-$version.zip"
+          $zipPath = Join-Path $env:GITHUB_WORKSPACE $relativeZip
+          # The checkout can already contain a historical ZIP with this version.
+          Compress-Archive -LiteralPath $stage -DestinationPath $zipPath -CompressionLevel Optimal -Force
+          $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+          try {
+            foreach ($file in "$mod.mod",'meitou.json','Nue.Unified.dll','InventoryInspection.layout','Desert.png','Swamp.png','gui/gfx/nue_skill_xp.png') {
+              if (!$zip.GetEntry("$mod/$file")) { throw "The package is missing $file." }
+            }
+            $assemblies = @($zip.Entries | Where-Object Name -Like '*.dll')
+            if ($assemblies.Count -ne 1) { throw 'The ZIP should contain only the NUE assembly.' }
+          } finally {
+            $zip.Dispose()
+          }
+          "path=$($zipPath.Replace('\','/'))" >> $env:GITHUB_OUTPUT
+          $digest = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+          "Built NUE $version for MeitouClient $env:MEITOU_VERSION" >> $env:GITHUB_STEP_SUMMARY
+          "SHA-256: $digest" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload the installable ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ steps.package.outputs.path }}
+          archive: false
+          if-no-files-found: error
