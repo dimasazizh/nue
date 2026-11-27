@@ -1,9 +1,8 @@
 # NUE | 鵺
 NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve quality of life but still maintaining the vanilla UI vibes. Less interface. More Kenshi.
 
-Base UI version: **0.1.0** · Unified package: **0.1.5** for **MeitouClient 0.23.1**
+Unified package: **0.1.7** for **MeitouClient 0.23.1**
 
-[Download NUE Unified for MeitouClient](NUE-Unified-0.1.5.zip). Extract the single `NUE (Native UI Enhancement)` folder into your mods directory. Enable NUE before launching.
 
 In **Settings → Mods → NUE**, switch each features on or off, then restart MeitouClient. All six start enabled, with the options to toggle them individually on/off. The base GUI skin stays active. The inventory toggle controls the inspection UI; pocket geometry and accessory registrations stay active for save compatibility.
 
@@ -37,8 +36,6 @@ Drag the preview to rotate it and scroll over it to zoom. Use the pose menu to s
 
 The top-center compass follows the camera and shows eight directions. Nearby discovered locations and player outposts appear as map icons. When icons overlap, the closest location takes priority.
 
-Extract the enclosed `NueCompass` folder into your mods directory and enable it in MeitouClient nightly `0.22.2-nightly.20261122.2`. [Download Compass 0.1.0](meitou/Compass/NueCompass-0.1.0.zip)
-
 ## Search and gear comparison for MeitouClient
 
 Type in the crafting or research list to filter recipes or topics in the current category. Inventory and trade searches dim items whose names do not match, keeping their grid positions visible. Hover over gear to see its differing shared stats alongside the equipped item's values, with the hovered value first.
@@ -58,4 +55,4 @@ In Japanese folklore, the Nue is traditionally depicted as a creature with the h
 
 ## Contributors & Special Mentions
 Dimsky - Author, main contributor\
-Shutori - Character Inspector
+Shutori - Character Inspector (https://github.com/shutori/Shutori_Re_Kenshi_Source)
