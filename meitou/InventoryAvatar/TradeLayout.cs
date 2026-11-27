@@ -13,9 +13,28 @@ public sealed partial class AvatarMod
         AccessTools.Method(GameType("Ui.TradeWindows"), "BindTraderGeometry");
     private static readonly System.Reflection.MethodInfo GetProduction = AccessTools.PropertyGetter(Player, "Production"),
         GetLinkedMachine = AccessTools.Method(GameType("Ui.ProductionWindows"), "LinkedScreen");
+    private static readonly System.Reflection.FieldInfo TradePlayer =
+        AccessTools.Field(GameType("Ui.TradeWindows"), "<player>P");
+    private static readonly System.Reflection.MethodInfo SelectedForLoot =
+        AccessTools.Method(GameType("PlayerInterface"), "Selected");
     private const string StockScroll = "scrollview_backpack_content";
     private static bool StorageLinked(object player) =>
         GetLinkedMachine.Invoke(GetProduction.Invoke(player, null), null) as string == "storage";
+
+    private static void EndTradeOnPartnerSelection(object __instance, ref bool ____lootLinked)
+    {
+        var player = TradePlayer.GetValue(__instance)!;
+        if (Screens.GetValue(player) is not MyGuiScreenHost screens || !screens.IsOpen("loot")) return;
+        if (Owner.Invoke(GetInventory.Invoke(player, null), ["loot"]) is not CharacterSnapshot { IsPlayer: true } partner ||
+            SelectedForLoot.Invoke(player, null) is not IReadOnlyList<CharacterSnapshot> selected ||
+            selected.FirstOrDefault()?.Id != partner.Id) return;
+
+        // Let native loot synchronization close the simulated container without closing the active inventory.
+        ____lootLinked = false;
+        if (screens.IsOpen("loot-bag")) screens.Close("loot-bag");
+        screens.Close("loot");
+        screens.SetOffset("inventory", Vector2.Zero);
+    }
 
     private static bool DockTrade(string id, UiBindings bindings, object layout, UiRect root)
     {
@@ -33,7 +52,7 @@ public sealed partial class AvatarMod
         if (merchant)
             return DockVendorTrade(id, bindings, player, screens, width, height, gap, half, panelHeight);
         if (target is { Animal: true })
-            return DockAnimalTrade(id, bindings, layout, root, player, screens, target, width, height, gap, half, panelHeight);
+            return DockAnimalTrade(id, bindings, root, player, screens, target, width, height, gap, half, panelHeight);
 
         bool partner = id is "loot" or "loot-bag";
         bool bag = id is "bag" or "loot-bag";

@@ -95,6 +95,8 @@ public sealed partial class AvatarMod : IMod
         context.Harmony.Patch(AccessTools.Method(Layout, "TrimAnimalWindow"),
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(KeepAnimalLootHeight)));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
+        context.Harmony.Patch(AccessTools.Method(GameType("Ui.TradeWindows"), "SyncLootScreen"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(EndTradeOnPartnerSelection)));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
             prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
         void After(Type type, string target, string method) => context.Harmony.Patch(AccessTools.Method(type,target),
@@ -323,6 +325,7 @@ public sealed partial class AvatarMod : IMod
         if (owner == null && (screens.IsOpen("trader") || screens.IsOpen("loot")))
             owner = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
         if (owner?.ItemGrid is not {BagWidth: >0, BagHeight: >0} grid) return;
+        if (FitEmbeddedAnimalBag(id, controls, grid)) return;
         int i = controls.FindIndex(c => c.Name == "backpack_content");
         if (i >= 0) controls[i] = WithCells(controls[i], grid.BagWidth, grid.BagHeight);
     }
@@ -422,7 +425,10 @@ public sealed partial class AvatarMod : IMod
     private static void KeepBagAbove(MyGuiScreenHost __instance,string id)
     {
         var bag = id == "loot" ? "loot-bag" : "bag";
-        if(id is ("inventory" or "loot") && __instance.IsOpen(bag) && __instance.Layout(id).Find("NuePreviewArea") != null) Raise.Invoke(__instance,[bag]);
+        if (id is not ("inventory" or "loot") || !__instance.IsOpen(bag)) return;
+        var layout = __instance.Layout(id);
+        if (layout.Find("NuePreviewArea") != null || id == "loot" && layout.Find("MainSectionName") != null)
+            Raise.Invoke(__instance,[bag]);
     }
 
     private static bool OverAvatar(MyGuiScreenHost host, Vector2 p)

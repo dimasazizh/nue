@@ -245,6 +245,17 @@ public sealed partial class SearchMod : IMod
     static string AddInventorySearch(object player, string id, string kind, List<UiControl> controls, UiRect r)
     {
         var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
+        if (id == "loot-bag" && controls.Any(c => c.Type == "Window" && c.Properties.ContainsKey("NueEmbeddedAnimalBag")))
+            return Query("loot");
+        if (id == "loot" && controls.Find(c => c.Name == "NueAnimalSearchArea") is {} animal)
+        {
+            var area = animal.Bounds;
+            float clear = Math.Min(area.Height * 1.25f, area.Width / 4), gap = Math.Max(2, area.Height * .15f);
+            if (area.Width > clear + gap)
+                AddStockSearch(controls, screens, id, r, area with { Width = area.Width - clear - gap },
+                    area.X + area.Width - clear, clear);
+            return Query(id);
+        }
         string source = id is "loot" or "loot-bag" ? "loot" : "inventory";
         bool shared=(id is "inventory" or "bag" or "loot" or "loot-bag") && screens.IsOpen(source) && screens.Layout(source).Find("NuePreviewArea")!=null;
         if(kind=="trader") VendorSearch(controls,screens,id,r);
