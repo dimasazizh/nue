@@ -26,6 +26,9 @@ public sealed class UnifiedMod : IMod
         [Setting("Item Markers compatibility", Hint = "Fit Item Markers to NUE equipment slots. Requires Item Markers. " + Restart,
             SubGroup = "Mod Compatibility")]
         public bool ItemMarkersCompatibility { get; set; } = true;
+        [Setting("Timelight world map", Hint = "Show Timelight's live view in the interactive map when its embedding API is available. " + Restart,
+            SubGroup = "Mod Compatibility")]
+        public bool TimelightWorldMap { get; set; } = true;
     }
 
     private static void FollowPointer(ref Meitou.Game.Ui.TooltipKind kind, ref Meitou.Data.Ui.UiRect? given,
@@ -55,5 +58,6 @@ public sealed class UnifiedMod : IMod
         if (options.Portrait) new SkillPortrait.PortraitMod().Initialize(context);
         SkillsLayout.Install(context);
         if (options.CharacterInspector) CharacterInspector.Enable(context);
+        if (options.TimelightWorldMap) TimelightWorldMap.Install(context);
     }
 }
