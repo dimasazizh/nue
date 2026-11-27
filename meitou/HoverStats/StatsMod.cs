@@ -87,8 +87,10 @@ public sealed class StatsMod : IMod
         if (id=="stats" && examination?.Screens==__instance) examination=null;
     }
 
+    static bool inventoryReadouts;
     static bool NeedsDetails(bool shown, World world, CharacterId id) =>
-        shown || examination is {} e && ReferenceEquals(e.World,world) && e.Id==id;
+        shown || inventoryReadouts && world.Player.OpenLoot == id ||
+        examination is {} e && ReferenceEquals(e.World,world) && e.Id==id;
 
     static CharacterSnapshot? Examined(object player)
     {
@@ -123,9 +125,11 @@ public sealed class StatsMod : IMod
         Install(context, () => Settings.ShowOutline, hover: true, examine: true, racialXp: true);
     }
 
-    internal void Install(ModContext context, Func<bool> showOutline, bool hover, bool examine, bool racialXp)
+    internal void Install(ModContext context, Func<bool> showOutline, bool hover, bool examine, bool racialXp,
+        bool publishInventoryReadouts = false)
     {
         ShowOutline = hover ? showOutline : () => false;
+        inventoryReadouts = publishInventoryReadouts;
         HarmonyMethod Hook(string name) => new(typeof(StatsMod),name);
         void Rewrite(Type type,string method,string patch) => context.Harmony.Patch(AccessTools.Method(type,method),
             transpiler:Hook(patch));
@@ -151,7 +155,7 @@ public sealed class StatsMod : IMod
             foreach (var (type,method) in new[]{(Player,"BindUi"),(Game("Ui.HudPanels"),"AddHudText"),(Game("Ui.TooltipRuntime"),"BindTooltips")})
                 Rewrite(type,method,nameof(ReadDisplayLead));
         }
-        if (hover || examine) Rewrite(typeof(World),"Viewed",nameof(PublishHoveredDetails));
+        if (hover || examine || inventoryReadouts) Rewrite(typeof(World),"Viewed",nameof(PublishCharacterDetails));
         if (racialXp) context.Harmony.Patch(AccessTools.Method(Stats,"AddStatsContent"),postfix:Hook(nameof(ShowXp)));
     }
 
@@ -173,9 +177,8 @@ public sealed class StatsMod : IMod
         return result;
     }
 
-    // Viewed already marks the pointed character Shown, including during paused publishes.
-    // Request the same detail payload used for inspection without changing selection or inspection.
-    static IEnumerable<CodeInstruction> PublishHoveredDetails(IEnumerable<CodeInstruction> instructions,MethodBase __originalMethod,ILGenerator generator)
+    // Request the inspection detail payload for hover and open loot without changing selection.
+    static IEnumerable<CodeInstruction> PublishCharacterDetails(IEnumerable<CodeInstruction> instructions,MethodBase __originalMethod,ILGenerator generator)
     {
         var type = ((MethodInfo)__originalMethod).ReturnType;
         var local = generator.DeclareLocal(type);
@@ -185,6 +188,8 @@ public sealed class StatsMod : IMod
             {
                 yield return new CodeInstruction(OpCodes.Stloc,local).MoveLabelsFrom(op);
                 yield return new CodeInstruction(OpCodes.Ldloca,local);
+                yield return new CodeInstruction(OpCodes.Ldloca,local);
+                yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertyGetter(type,"Detailed"));
                 yield return new CodeInstruction(OpCodes.Ldloca,local);
                 yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertyGetter(type,"Shown"));
                 yield return new CodeInstruction(OpCodes.Ldarg_0);
@@ -196,6 +201,7 @@ public sealed class StatsMod : IMod
                 yield return new CodeInstruction(OpCodes.Ldnull);
                 yield return new CodeInstruction(OpCodes.Cgt_Un);
                 yield return new CodeInstruction(OpCodes.And);
+                yield return new CodeInstruction(OpCodes.Or);
                 yield return new CodeInstruction(OpCodes.Call,AccessTools.PropertySetter(type,"Detailed"));
                 yield return new CodeInstruction(OpCodes.Ldloc,local);
             }

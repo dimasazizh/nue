@@ -38,6 +38,8 @@ public sealed partial class AvatarMod : IMod
         public string? openRack;
         public UiRect bagArea;
         public float inventoryCell;
+        public bool? showHealthOverride;
+        public bool mainHudShowsStats;
 #if NUE_UNIFIED
         public readonly Nue.Unified.CharacterInspector.View Inspector = new();
 #endif
@@ -89,7 +91,9 @@ public sealed partial class AvatarMod : IMod
         if (!preview) return;
         After(Render, "StageCamera", nameof(FrameAvatar));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen"),
-            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)));
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)),
+            postfix: new HarmonyMethod(typeof(AvatarMod), nameof(BindTradeChrome)));
+        After(GameType("Ui.ScreenRouter"), "AddFaithfulContent", nameof(FitTradeArrangeButton));
         After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
@@ -522,6 +526,11 @@ public sealed partial class AvatarMod : IMod
     private static void Click(MyGuiEvent e)
     {
         active = e.Screen == "loot" ? other : own;
+        if (e.Screen is ("inventory" or "loot") && e.Action == ToggleVitals)
+        {
+            active.showHealthOverride = !AvatarShowsHealth(active);
+            return;
+        }
         if (e.Screen is ("loot" or "loot-bag") && e.Widget == "ArrangeButton" && ui != null &&
             Owner.Invoke(GetInventory.Invoke(ui,null), ["loot"]) is CharacterSnapshot { IsPlayer:true } member)
         {

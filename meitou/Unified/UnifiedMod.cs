@@ -47,7 +47,7 @@ public sealed class UnifiedMod : IMod
         if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),
             prefix:new HarmonyLib.HarmonyMethod(typeof(UnifiedMod),nameof(FollowPointer)));
         new StatsMod().Install(context, () => options.Hover && options.ShowOutline,
-            options.Hover, options.Examine, options.RacialXp);
+            options.Hover, options.Examine, options.RacialXp, publishInventoryReadouts: options.Avatar);
         if (options.Tabs) new HudTabs.HudTabsMod().Initialize(context);
         if (options.Compass) new Compass.CompassMod().Initialize(context);
         new InventoryAvatar.AvatarMod().Install(context, options.Avatar);

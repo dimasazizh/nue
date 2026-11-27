@@ -18,6 +18,97 @@ public sealed partial class AvatarMod
     private static readonly System.Reflection.MethodInfo SelectedForLoot =
         AccessTools.Method(GameType("PlayerInterface"), "Selected");
     private const string StockScroll = "scrollview_backpack_content";
+    private const string TradeArrangeSize = "NueTradeArrangeSize";
+    private static readonly System.Reflection.MethodInfo BindFaithfulScreen =
+        AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen");
+
+    private static bool IsStockWindow(string id) => id is "trader" or "storage" or "storage-own";
+
+    private static void BindTradeChrome(string id, object __instance, UiBindings __result)
+    {
+        if (!IsStockWindow(id) || !__result.Positions.TryGetValue("Root", out var stock) ||
+            stock.Width <= 0 || stock.Height <= 0) return;
+        var player = RouterPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (!screens.IsRegistered("inventory")) return;
+        var layout = screens.Layout(id);
+        var header = layout.Roots[0].Children.FirstOrDefault(w => w.Skin == "Kenshi_GenericWindowHeaderSkin");
+        if (header is null) return;
+
+        var reference = (UiBindings)BindFaithfulScreen.Invoke(__instance, ["inventory"])!;
+        var inventory = screens.Layout("inventory");
+        var inventoryHeader = inventory.Roots[0].Children.FirstOrDefault(w => w.Skin == header.Skin);
+        if (inventoryHeader is null || !reference.Positions.TryGetValue("Root", out var inventoryRoot) ||
+            inventoryRoot.Width <= 0 || inventoryRoot.Height <= 0) return;
+
+        var referenceHeader = BoundWithin(reference, inventoryHeader, inventoryRoot);
+        if (referenceHeader.Height <= 0 || referenceHeader.Width <= 0) return;
+        float titleHeight = referenceHeader.Height / stock.Height;
+        var stockHeader = new UiRect(0, 0, stock.Width, referenceHeader.Height);
+        __result.RelativePositions[header] = new(0, 0, 1, titleHeight);
+        var body = layout.Roots[0].Children.FirstOrDefault(w => w.Skin == "Kenshi_GenericWindowSkin");
+        if (body is not null)
+            __result.RelativePositions[body] = new(0, titleHeight, 1, Math.Max(0, 1 - titleHeight));
+
+        float captionRight = 1;
+        var close = header.Children.FirstOrDefault(w => w.Skin == "Kenshi_CloseButtonSkin");
+        var inventoryClose = inventoryHeader.Children.FirstOrDefault(w => w.Skin == "Kenshi_CloseButtonSkin");
+        if (close is not null && inventoryClose is not null)
+        {
+            var rect = BoundWithin(reference, inventoryClose, referenceHeader);
+            float right = referenceHeader.X + referenceHeader.Width - rect.X;
+            captionRight = Math.Max(0, 1 - (right + 2) / stockHeader.Width);
+            __result.RelativePositions[close] = new(1 - right / stockHeader.Width,
+                (rect.Y - referenceHeader.Y) / stockHeader.Height, rect.Width / stockHeader.Width, rect.Height / stockHeader.Height);
+        }
+        var caption = header.Children.FirstOrDefault(w => w.Name == "Caption");
+        var inventoryCaption = inventoryHeader.Children.FirstOrDefault(w => w.Name == "Caption");
+        if (caption is not null && inventoryCaption is not null)
+        {
+            var rect = BoundWithin(reference, inventoryCaption, referenceHeader);
+            float x = (rect.X - referenceHeader.X) / stockHeader.Width;
+            __result.RelativePositions[caption] = new(x, (rect.Y - referenceHeader.Y) / stockHeader.Height,
+                Math.Max(0, captionRight - x), rect.Height / stockHeader.Height);
+        }
+
+        if (layout.Find("ArrangeButton") is not null && inventory.Find("ArrangeButton") is {} inventoryArrange)
+        {
+            var rect = BoundWithin(reference, inventoryArrange, inventoryRoot);
+            var properties = __result.Properties.GetValueOrDefault("ArrangeButton") ?? new Dictionary<string, string>();
+            __result.Properties["ArrangeButton"] = new Dictionary<string, string>(properties)
+                { [TradeArrangeSize] = FormattableString.Invariant($"{rect.Width} {rect.Height}") };
+        }
+    }
+
+    private static UiRect BoundWithin(UiBindings bindings, MyGuiWidget widget, UiRect parent)
+    {
+        if (bindings.RelativePositions.TryGetValue(widget, out var relative))
+            return relative.RelativeTo(parent, true);
+        if (widget.RealPosition)
+            return widget.Position.RelativeTo(parent, true);
+        float scale = bindings.TemplateScale;
+        var rect = widget.Position;
+        return new(parent.X + rect.X * scale, parent.Y + rect.Y * scale, rect.Width * scale, rect.Height * scale);
+    }
+
+    private static void FitTradeArrangeButton(string id, List<UiControl> controls)
+    {
+        if (!IsStockWindow(id) || controls.Find(c => c.Type == "Window") is not {} window) return;
+        int index = controls.FindIndex(c => c.Name == "ArrangeButton");
+        if (index < 0) return;
+        var button = controls[index];
+        if (!button.Properties.TryGetValue(TradeArrangeSize, out string? size) ||
+            ReadDimensions(size, 2) is not {} dimensions) return;
+        float width = Math.Min(dimensions[0], window.Bounds.Width);
+        var bounds = button.Bounds with
+        {
+            X = Math.Clamp(button.Bounds.X + (button.Bounds.Width - width) / 2,
+                window.Bounds.X, window.Bounds.X + window.Bounds.Width - width),
+            Y = button.Bounds.Y + button.Bounds.Height - dimensions[1],
+            Width = width, Height = dimensions[1]
+        };
+        controls[index] = button with { Bounds = bounds, Clip = bounds.Intersect(window.Bounds) };
+    }
     private static bool StorageLinked(object player) =>
         GetLinkedMachine.Invoke(GetProduction.Invoke(player, null), null) as string == "storage";
 
