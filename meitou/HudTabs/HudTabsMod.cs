@@ -13,6 +13,7 @@ public sealed class HudTabsMod : IMod, IUiExtension
 {
     public string Id => "nue.hud-tabs";
     static bool showStats;
+    internal static bool ShowingStats => showStats;
     const string StatsTab = "NueHudStatsTab";
     const string HealthTab = "NueHudHealthTab";
 

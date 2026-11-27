@@ -7,6 +7,7 @@ using Meitou.Data.Ui;
 using Meitou.Game.Rendering.Characters;
 using Meitou.Game.Rendering.Frame;
 using Meitou.Game.Rendering.Gpu;
+using Meitou.Game.Host.Input;
 using Meitou.Game.Ui;
 using Meitou.Game.Rendering.Ui;
 using Meitou.Modding;
@@ -36,6 +37,7 @@ public sealed partial class AvatarMod : IMod
         public long framedKey;
         public string? openRack;
         public UiRect bagArea;
+        public float inventoryCell;
 #if NUE_UNIFIED
         public readonly Nue.Unified.CharacterInspector.View Inspector = new();
 #endif
@@ -115,12 +117,10 @@ public sealed partial class AvatarMod : IMod
         After(Render,"GatherPortraitKeys",nameof(IncludePartnerPose));
         context.Harmony.Patch(AccessTools.Method(Render,"Dispose"), prefix:new HarmonyMethod(typeof(AvatarMod),nameof(ReleasePartnerTargets)));
         After(Render, "DrawPortraits", nameof(Paint));
-        void Observe(string target, string method) => context.Harmony.Patch(
-            AccessTools.Method(typeof(MyGuiScreenHost), target, target == "PointerDown" ? [typeof(Vector2), typeof(Func<string,UiControl,Vector2,bool>)] : null), postfix: new HarmonyMethod(typeof(AvatarMod), method));
-        Observe("PointerDown", nameof(StartDrag));
-        Observe("PointerMove", nameof(Rotate));
-        Observe("PointerUp", nameof(EndDrag));
-        Observe("Wheel", nameof(Zoom));
+        After(Player, "MouseDown", nameof(StartDrag));
+        After(Player, "MouseMove", nameof(Rotate));
+        After(Player, "MouseUp", nameof(EndDrag));
+        After(typeof(MyGuiScreenHost), "Wheel", nameof(Zoom));
     }
 
     private static readonly (string Section, string Label, int Fcs, int X)[] Accessories =
@@ -248,8 +248,7 @@ public sealed partial class AvatarMod : IMod
         if (id is "bag" or "loot-bag")
         {
             if (active.bagArea.Width <= 0 || active.bagArea.Height <= 0) return;
-            float scale = Math.Min(1, Math.Min(active.bagArea.Width / root.Width, active.bagArea.Height / root.Height));
-            b.Positions["Root"] = root with { Width = root.Width * scale, Height = root.Height * scale };
+            b.Positions["Root"] = root with { Width = active.bagArea.Width, Height = active.bagArea.Height };
             b.WindowPosition = new Vector2(active.bagArea.X, active.bagArea.Y) - screens.GetOffset(id);
             return;
         }
@@ -282,6 +281,7 @@ public sealed partial class AvatarMod : IMod
         // The native character fitter bottom-anchors the heading for its own template.
         var title = screens.Layout(id).Find("InventoryMainTitle")!;
         b.RelativePositions[title] = title.Position;
+        b.Properties["NuePocketArea"] = new Dictionary<string, string> { ["NueBagScreen"] = id == "loot" ? "loot-bag" : "bag" };
     }
 
     private static readonly string[] LimbSections = ["left_arm_replace","right_arm_replace","left_leg_replace","right_leg_replace"];
@@ -295,7 +295,7 @@ public sealed partial class AvatarMod : IMod
         if (!__result && !____bagClosed.Contains(id) && Owner.Invoke(__instance,["inventory"]) is CharacterSnapshot {Animal:false} owner && owner.Id == id && ((MyGuiScreenHost)Screens.GetValue(InventoryPlayer.GetValue(__instance)!)!).IsOpen("inventory")) __result = true;
     }
 
-    private static void FitPocketGrid(List<UiControl> controls, InventoryView grid)
+    private static void FitPocketGrid(List<UiControl> controls, InventoryView grid, object __instance)
     {
         if (controls.Find(c => c.Name == "NuePocketArea") is not {} anchor) return;
         int index = controls.FindIndex(c => c.Name == "main");
@@ -303,6 +303,17 @@ public sealed partial class AvatarMod : IMod
         var slot = controls[index];
         float side = Math.Min(slot.Bounds.Width / grid.Width,
             Math.Min(anchor.Bounds.Width / grid.Width, anchor.Bounds.Height / grid.Height));
+        var player = LayoutPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        string bag = anchor.Properties.GetValueOrDefault("NueBagScreen", "bag");
+        if (grid.BagWidth > 0 && grid.BagHeight > 0 && screens.IsOpen(bag) &&
+            controls.Find(c => c.Name == "NueBagArea") is {} area)
+        {
+            // Reserve room for the bag frame, title, and Arrange button.
+            side = Math.Min(side, Math.Min(area.Bounds.Width * .9f / grid.BagWidth,
+                area.Bounds.Height * .8f / grid.BagHeight));
+        }
+        (bag == "loot-bag" ? other : own).inventoryCell = side;
         controls[index] = WithCells(slot with { Bounds = anchor.Bounds with {
             Width = side * grid.Width, Height = side * grid.Height }, Clip = anchor.Bounds }, grid.Width, grid.Height);
         int arrangeIndex = controls.FindIndex(c => c.Name == "ArrangeButton");
@@ -328,17 +339,83 @@ public sealed partial class AvatarMod : IMod
         if (id is not ("bag" or "loot-bag")) return;
         var player = LayoutPlayer.GetValue(__instance)!;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
-        var owner = Owner.Invoke(GetInventory.Invoke(player,null), [id]) as CharacterSnapshot;
-        if (owner == null && (screens.IsOpen("trader") || screens.IsOpen("loot")))
-            owner = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
+        var owner = Owner.Invoke(GetInventory.Invoke(player, null), [id]) as CharacterSnapshot;
         if (owner?.ItemGrid is not {BagWidth: >0, BagHeight: >0} grid) return;
         if (FitEmbeddedAnimalBag(id, controls, grid)) return;
         int i = controls.FindIndex(c => c.Name == "backpack_content");
-        if (i >= 0) controls[i] = WithCells(controls[i], grid.BagWidth, grid.BagHeight);
+        if (i < 0) return;
+        var slot = controls[i];
+        string parent = id == "loot-bag" ? "loot" : "inventory";
+        var view = id == "loot-bag" ? other : own;
+        if (screens.IsOpen(parent) && screens.Layout(parent).Find("NuePocketArea") != null &&
+            view.inventoryCell > 0 && controls.Find(c => c.Type == "Window") is {} window)
+        {
+            var frame = window.Bounds;
+            float width = view.inventoryCell * grid.BagWidth;
+            float height = view.inventoryCell * grid.BagHeight;
+            var bounds = new UiRect(frame.X + (frame.Width - width) / 2,
+                frame.Y + frame.Height * .1f, width, height);
+            slot = slot with { Bounds = bounds, Clip = bounds.Intersect(frame) };
+            int arrangeIndex = controls.FindIndex(c => c.Name == "ArrangeButton");
+            if (arrangeIndex >= 0)
+            {
+                var button = controls[arrangeIndex];
+                float buttonHeight = Math.Min(button.Bounds.Height, frame.Height * .08f);
+                var buttonBounds = button.Bounds with { X = frame.X + (frame.Width - button.Bounds.Width) / 2,
+                    Y = Math.Min(bounds.Y + height + 4, frame.Y + frame.Height - buttonHeight), Height = buttonHeight };
+                controls[arrangeIndex] = button with { Bounds = buttonBounds, Clip = buttonBounds.Intersect(frame) };
+            }
+        }
+        controls[i] = WithCells(slot, grid.BagWidth, grid.BagHeight);
     }
 
     private static readonly FieldInfo RouterPlayer = GameType("Ui.ScreenRouter").GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
 
+
+    private static void ArrangeLimbGrids(List<UiControl> controls, UiRect root, CharacterSnapshot owner)
+    {
+        if (controls.Find(c => c.Name == "main") is not {} pocket ||
+            owner.ItemGrid is not { Width: > 0, Height: > 0 } grid) return;
+        float cellWidth = pocket.Bounds.Width / grid.Width;
+        float cellHeight = pocket.Bounds.Height / grid.Height;
+        for (int i = 0; i < LimbSections.Length; i++)
+        {
+            string section=LimbSections[i];
+            int at=controls.FindIndex(c=>c.Name==section);
+            if(at<0) continue;
+            var native=controls[at];
+            const int columns = 2;
+            int rows = i < 2 ? 4 : 5;
+            var rect = native.Bounds with { Y = pocket.Bounds.Y, Width = columns * cellWidth, Height = rows * cellHeight };
+            if (i >= 2)
+            {
+                rect = rect with { Y = pocket.Bounds.Y + pocket.Bounds.Height - rect.Height };
+                if (i == 2)
+                {
+                    int titleIndex = controls.FindIndex(c => c.Name == "NueLegTitle");
+                    if (titleIndex >= 0)
+                    {
+                        var title = controls[titleIndex];
+                        controls[titleIndex] = title with { Bounds = title.Bounds with {
+                            Y = title.Bounds.Y + rect.Y - native.Bounds.Y } };
+                    }
+                }
+            }
+            var slot=WithCells(native with {Bounds=rect, Clip=rect.Intersect(root)},columns,rows);
+            controls[at]=slot with {Properties=new Dictionary<string,string>(slot.Properties) {
+                ["State"]=((owner.LimbBits >> (2*i)) & 3)==0 ? "disabled":"normal" }};
+            foreach(var item in grid.Items.Where(v=>v.Section==section))
+            {
+                string name=$"inventory-item-{owner.Id}-{item.Index}";
+                var parts=controls.Where(c=>c.Name==name || c.Name.StartsWith(name+"-",StringComparison.Ordinal)).ToList();
+                if (parts.Count == 0) continue;
+                foreach(var part in parts) controls.Remove(part);
+                var footprint = new UiRect(rect.X + item.X * cellWidth, rect.Y + item.Y * cellHeight,
+                    item.Width * cellWidth, item.Height * cellHeight);
+                PlaceItem(controls,parts,name,footprint,item);
+            }
+        }
+    }
 
     private static void Controls(string id, List<UiControl> controls,object __instance)
     {
@@ -353,53 +430,23 @@ public sealed partial class AvatarMod : IMod
         var image = preview.Bounds;
         var root = window.Bounds;
         active.bagArea = controls.First(c => c.Name == "NueBagArea").Bounds;
-        var pocket = controls.Find(c => c.Name == "main");
-        for (int i=0; i<LimbSections.Length; i++)
-        {
-            string section=LimbSections[i];
-            int at=controls.FindIndex(c=>c.Name==section);
-            if(at<0) continue;
-            var native=controls[at];
-            int rows = i < 2 ? 4 : 5;
-            float unit=Math.Min(native.Bounds.Width/2,native.Bounds.Height/rows);
-            var rect=native.Bounds with {Width=2*unit,Height=rows*unit};
-            if (i >= 2 && pocket is not null)
-            {
-                rect = rect with { Y = pocket.Bounds.Y + pocket.Bounds.Height - rect.Height };
-                if (i == 2)
-                {
-                    int titleIndex = controls.FindIndex(c => c.Name == "NueLegTitle");
-                    if (titleIndex >= 0)
-                    {
-                        var title = controls[titleIndex];
-                        controls[titleIndex] = title with { Bounds = title.Bounds with {
-                            Y = title.Bounds.Y + rect.Y - native.Bounds.Y } };
-                    }
-                }
-            }
-            var slot=WithCells(native with {Bounds=rect},2,rows);
-            controls[at]=slot with {Properties=new Dictionary<string,string>(slot.Properties) {
-                ["State"]=((owner.LimbBits >> (2*i)) & 3)==0 ? "disabled":"normal" }};
-            foreach(var item in owner.ItemGrid!.Items.Where(v=>v.Section==section))
-            {
-                string name=$"inventory-item-{owner.Id}-{item.Index}";
-                var parts=controls.Where(c=>c.Name==name || c.Name.StartsWith(name+"-",StringComparison.Ordinal)).ToList();
-                foreach(var part in parts) controls.Remove(part);
-                PlaceItem(controls,parts,name,rect,item);
-            }
-        }
+        ArrangeLimbGrids(controls, root, owner);
         active.width = Math.Max(1,(int)image.Width);
         active.height = Math.Max(1,(int)image.Height);
         var backdrop = new Dictionary<string,string>();
         if (active.background < 2) backdrop["ImageTexture"] = Meitou.Game.Rendering.Ui.UiPainter.IconTexture(
             Path.Combine(folder, Backgrounds[active.background] + ".png"));
-        controls.Add(new("NueBackdrop", backdrop.Count == 0 ? "Widget" : "ImageBox", image,"","","",true,
-            backdrop, backdrop.Count == 0 ? new Vector4(0,0,0,1) : default, Pickable:false, Clip:root));
+        // Keep the backdrop at its original proportions behind the shorter viewport.
+        float backdropHeight = image.Height / .905f;
+        var backdropBounds = image with { Y = image.Y - backdropHeight * .035f, Height = backdropHeight };
+        controls.Add(new("NueBackdrop", backdrop.Count == 0 ? "Widget" : "ImageBox", backdropBounds,"","","",true,
+            backdrop, backdrop.Count == 0 ? new Vector4(0,0,0,1) : default, Pickable:false, Clip:image));
         if (active.publishedSubject == owner.Id && Painter.GetValue(player) is UiPainter painter &&
             ReferenceEquals(active.publishedPainter,painter) && painter.HasTexture(TextureName))
             controls.Add(new("NueAvatar","ImageBox",image,"","","",true,
                 new Dictionary<string,string>{{"ImageTexture",TextureName},{"ImageFlipV","true"}},default,Pickable:true,Clip:root));
         ArrangeEquipment(controls,root,owner,player);
+        AddAvatarReadouts(controls, player, owner);
 #if NUE_UNIFIED
         PlaceMarkers(controls, player, markedCells);
         if (Nue.Unified.CharacterInspector.Enabled)
@@ -444,24 +491,27 @@ public sealed partial class AvatarMod : IMod
         active = hit.Screen == "loot" ? other : own;
         return true;
     }
-    private static void StartDrag(MyGuiScreenHost __instance, Vector2 p)
+    private static void StartDrag(object __instance, MouseButton button, Vector2 p)
     {
+        if (button != MouseButton.Left) return;
         dragHost = null;
-        if (!OverAvatar(__instance, p)) return;
+        if (Screens.GetValue(__instance) is not MyGuiScreenHost host || !OverAvatar(host, p)) return;
         dragged = active;
-        dragHost = __instance;
+        dragHost = host;
         lastDragX = p.X;
     }
 
-    private static void Rotate(MyGuiScreenHost __instance, Vector2 p)
+    private static void Rotate(object __instance, Vector2 p)
     {
-        if (dragHost != __instance) return;
-        active = dragged;
-        active.yaw = MathF.IEEERemainder(active.yaw - (p.X - lastDragX) * MathF.Tau / active.width, MathF.Tau);
+        if (dragHost == null || !ReferenceEquals(dragHost, Screens.GetValue(__instance))) return;
+        dragged.yaw = MathF.IEEERemainder(dragged.yaw - (p.X - lastDragX) * MathF.Tau / dragged.width, MathF.Tau);
         lastDragX = p.X;
     }
 
-    private static void EndDrag() => dragHost = null;
+    private static void EndDrag(MouseButton button)
+    {
+        if (button == MouseButton.Left) dragHost = null;
+    }
 
     private static void Zoom(MyGuiScreenHost __instance, Vector2 p, float steps)
     {

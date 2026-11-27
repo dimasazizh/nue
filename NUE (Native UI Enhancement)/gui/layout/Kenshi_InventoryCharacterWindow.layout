@@ -12,7 +12,6 @@
         <Property key="TextAlign" value="Center"/>
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="Widget" skin="NUE_Equipment_back" position_real="0.4294553 0.256932 0.509728 0.0831793" name="back"/>
       <Widget type="Widget" skin="NUE_Equipment_shirt" position_real="0.4450195 0.486137 0.202335 0.0831793" name="shirt"/>
@@ -42,35 +41,30 @@
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.713502 0.493531 0.229572 0.0314233" name="lbHead">
         <Property key="Caption" value="HELMET"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.4294553 0.589649 0.229572 0.0314233" name="lbPants">
         <Property key="Caption" value="PANTS"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.713502 0.676525 0.229572 0.0314233" name="lbArmor">
         <Property key="Caption" value="BODY ARMOR"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.4294553 0.852126 0.229572 0.0314233" name="lbBoots">
         <Property key="Caption" value="BOOTS"/>
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="Widget" skin="NUE_Equipment_hip" position_real="0.4294553 0.391867 0.354086 0.0369686" name="hip"/>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real="0.4294553 0.360444 0.354086 0.0314233" name="lbWeapon2">
@@ -84,7 +78,6 @@
         <Property key="TextColour" value="0.909804 0.741176 0.447059"/>
         <Property key="TextAlign" value="Center"/>
         <Property key="FontName" value="Kenshi_StandardFont_Small"/>
-        <Property key="NeedMouse" value="false"/>
       </Widget>
       <Widget type="Button" skin="Kenshi_Button1" position_real="0.4294553 0.138632 0.233463 0.0554529" name="LimbsButton">
         <Property key="Caption" value="LIMBS"/>

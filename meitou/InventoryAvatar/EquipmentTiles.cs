@@ -133,7 +133,8 @@ public sealed partial class AvatarMod
     // rectangle first, then offers the displayed weapon's position for a native swap.
     private static void WeaponDrop(ItemOwner window,string section,ref UiControl slot,ref Vector2 topLeft,HeldItemView h,object __instance)
     {
-        if (section is ("main" or "backpack_content") && slot.Properties.ContainsKey("NueFittedGrid"))
+        if ((section is ("main" or "backpack_content") || LimbSections.Contains(section)) &&
+            slot.Properties.ContainsKey("NueFittedGrid"))
         {
             var cells = slot.Properties["TileSize"].Split(' ');
             var fitted = new Vector2(float.Parse(cells[0], System.Globalization.CultureInfo.InvariantCulture),
