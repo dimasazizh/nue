@@ -245,9 +245,9 @@ public sealed partial class SearchMod : IMod
     static string AddInventorySearch(object player, string id, string kind, List<UiControl> controls, UiRect r)
     {
         var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
-        if (id == "loot-bag" && controls.Any(c => c.Type == "Window" && c.Properties.ContainsKey("NueEmbeddedAnimalBag")))
-            return Query("loot");
-        if (id == "loot" && controls.Find(c => c.Name == "NueAnimalSearchArea") is {} animal)
+        if (id is ("bag" or "loot-bag") && controls.Any(c => c.Type == "Window" && c.Properties.ContainsKey("NueEmbeddedAnimalBag")))
+            return Query(id == "bag" ? "inventory" : "loot");
+        if (id is ("inventory" or "loot") && controls.Find(c => c.Name == "NueAnimalSearchArea") is {} animal)
         {
             var area = animal.Bounds;
             float clear = Math.Min(area.Height * 1.25f, area.Width / 4), gap = Math.Max(2, area.Height * .15f);

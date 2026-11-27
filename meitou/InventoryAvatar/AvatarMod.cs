@@ -91,9 +91,9 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
-        After(Layout, "ArrangeEquipmentGrid", nameof(FitAnimalLootGrid));
+        After(Layout, "ArrangeEquipmentGrid", nameof(FitAnimalGrid));
         context.Harmony.Patch(AccessTools.Method(Layout, "TrimAnimalWindow"),
-            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(KeepAnimalLootHeight)));
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(KeepAnimalPanelHeight)));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.TradeWindows"), "SyncLootScreen"),
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(EndTradeOnPartnerSelection)));
@@ -183,6 +183,7 @@ public sealed partial class AvatarMod : IMod
     private static bool NormalPlacement(object __instance)
     {
         var player = LayoutPlayer.GetValue(__instance)!;
+        if (Screens.GetValue(player) is MyGuiScreenHost screens && StandaloneAnimal(player, screens) != null) return false;
         return StorageLinked(player) || Subject(player) == null;
     }
 
@@ -230,6 +231,13 @@ public sealed partial class AvatarMod : IMod
         bool paired = DockTrade(id, b, __instance, root);
         if (id is not ("inventory" or "bag" or "loot" or "loot-bag")) return;
         var player = LayoutPlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (!paired && id is ("inventory" or "bag") && StandaloneAnimal(player, screens) is {} animal)
+        {
+            var (width, height, gap, half, panelHeight) = TradeDimensions(player);
+            BindAnimalInventory(id, b, root, player, screens, animal, width, height, gap, half, panelHeight, trading: false);
+            return;
+        }
         if (paired && id == "loot" &&
             Owner.Invoke(GetInventory.Invoke(player, null), ["loot"]) is CharacterSnapshot { IsPlayer: true })
         {
@@ -237,7 +245,6 @@ public sealed partial class AvatarMod : IMod
             b.Actions["ArrangeButton"] = "ArrangeButton";
         }
         if (Subject(player) is not {} subject) return;
-        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
         if (id is "bag" or "loot-bag")
         {
             if (active.bagArea.Width <= 0 || active.bagArea.Height <= 0) return;
@@ -427,7 +434,7 @@ public sealed partial class AvatarMod : IMod
         var bag = id == "loot" ? "loot-bag" : "bag";
         if (id is not ("inventory" or "loot") || !__instance.IsOpen(bag)) return;
         var layout = __instance.Layout(id);
-        if (layout.Find("NuePreviewArea") != null || id == "loot" && layout.Find("MainSectionName") != null)
+        if (layout.Find("NuePreviewArea") != null || layout.Find("MainSectionName") != null)
             Raise.Invoke(__instance,[bag]);
     }
 

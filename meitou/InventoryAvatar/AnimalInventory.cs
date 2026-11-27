@@ -10,7 +10,7 @@ namespace Nue.InventoryAvatar;
 
 public sealed partial class AvatarMod
 {
-    private const string AnimalLoot = "NueAnimalLoot";
+    private const string AnimalPanel = "NueAnimalPanel";
     private const string EmbeddedBag = "NueEmbeddedAnimalBag";
 
     private readonly record struct AnimalColumns(UiRect Grid, UiRect Details, float Heading, float Pad);
@@ -32,54 +32,74 @@ public sealed partial class AvatarMod
     {
         if (id == "bag") return true;
         if (id is not ("inventory" or "loot" or "loot-bag")) return false;
+        return BindAnimalInventory(id, bindings, root, player, screens, animal, width, height, gap, half, panelHeight,
+            trading: true);
+    }
+
+    private static CharacterSnapshot? StandaloneAnimal(object player, MyGuiScreenHost screens)
+    {
+        if (!screens.IsOpen("inventory") || screens.IsOpen("trader") ||
+            (bool)Linked.Invoke(GetLayout.Invoke(player, null), null)!) return null;
+        return Owner.Invoke(GetInventory.Invoke(player, null), ["inventory"]) is CharacterSnapshot { Animal: true } animal
+            ? animal : null;
+    }
+
+    private static bool BindAnimalInventory(string id, UiBindings bindings, UiRect root, object player,
+        MyGuiScreenHost screens, CharacterSnapshot animal, int width, int height, float gap, float half, float panelHeight,
+        bool trading)
+    {
+        string panelId = trading ? "loot" : "inventory";
+        string bagId = trading ? "loot-bag" : "bag";
         var grid = animal.ItemGrid;
         var cell = (Vector2)CellSize.Invoke(player, null)!;
         bool hasMain = grid is { Width: > 0, Height: > 0 } && !animal.ClosedSlots.Contains("main");
         bool hasBag = grid is { BagWidth: > 0, BagHeight: > 0 };
-        bool bagOpen = hasBag && screens.IsOpen("loot-bag");
+        bool bagOpen = hasBag && screens.IsOpen(bagId);
         float nativeWidth = NativeInventoryLayout(player, animal: true).Roots[0].Position.Width * width;
         float gridWidth = Math.Max(hasMain ? grid!.Width : 0, hasBag ? grid!.BagWidth : 0) * cell.X;
         float animalWidth = Math.Min(half, Math.Max(nativeWidth, gridWidth + (hasBag ? 10 * cell.X : 0) + 3 * gap));
-        float start = TradeStart(width, half, gap, animalWidth);
-        float top = (height - panelHeight) / 2, animalX = start + half + gap;
-        var animalPanel = new UiRect(animalX, top, animalWidth, panelHeight);
+        float top = (height - panelHeight) / 2;
+        float start = trading ? TradeStart(width, half, gap, animalWidth) : (width - animalWidth) / 2;
+        var origin = trading ? new Vector2(start + half + gap, top)
+            : new Vector2(start, top) + screens.GetOffset(panelId);
+        var animalPanel = new UiRect(origin.X, origin.Y, animalWidth, panelHeight);
         var character = inspection.Roots[0].Position.RelativeTo(new(0, 0, width, height), inspection.Roots[0].RealPosition);
         float interfaceScale = bindings.TemplateScale * 1080 / height;
         float title = 38 * bindings.TemplateScale * panelHeight / (character.Height * interfaceScale);
 
-        switch (id)
+        if (trading && id == "inventory")
         {
-            case "inventory":
-                bindings.Positions["Root"] = root with { Width = half, Height = panelHeight };
-                bindings.WindowPosition = new Vector2(start, top) - screens.GetOffset(id);
-                break;
-            case "loot":
-                bindings.Positions["Root"] = root with { Width = animalWidth, Height = panelHeight };
-                bindings.WindowPosition = new Vector2(animalX, top) - screens.GetOffset(id);
-                Mark(bindings, AnimalLoot, $"{(bagOpen ? 2 : hasBag ? 1 : 0)} {title.ToString(CultureInfo.InvariantCulture)}");
-                MatchAnimalChrome(bindings, screens.Layout(id).Roots[0], root, animalPanel,
-                    character.Width * interfaceScale, half, title);
-                break;
-            case "loot-bag" when bagOpen:
-                var columns = AnimalInterior(animalPanel, cell, hasBag, title);
-                float mainHeight = hasMain ? columns.Grid.Height * .39f : 0;
-                float bagTop = columns.Grid.Y + mainHeight;
-                float buttonHeight = 24 * bindings.TemplateScale;
-                float available = columns.Grid.Height - mainHeight - buttonHeight - 2 * columns.Pad;
-                float nativeHeight = grid!.BagHeight * cell.Y;
-                float scale = Math.Min(1, Math.Min(columns.Grid.Width / (grid.BagWidth * cell.X), available / nativeHeight));
-                if (scale <= 0) break;
-                float bagWidth = grid.BagWidth * cell.X * scale, bagHeight = nativeHeight * scale;
-                float embeddedWidth = Math.Min(columns.Grid.Width, Math.Max(bagWidth, 100 * bindings.TemplateScale));
-                bindings.Positions["Root"] = root with { Width = embeddedWidth, Height = bagHeight + buttonHeight + 2 * columns.Pad };
-                bindings.WindowPosition = new Vector2(columns.Grid.X + (columns.Grid.Width - embeddedWidth) / 2, bagTop) - screens.GetOffset(id);
-                Mark(bindings, EmbeddedBag, FormattableString.Invariant($"{bagWidth} {bagHeight} {columns.Pad} {buttonHeight} {100 * bindings.TemplateScale}"));
-                if (animal.IsPlayer)
-                {
-                    bindings.Disabled.Remove("ArrangeButton");
-                    bindings.Actions["ArrangeButton"] = "ArrangeButton";
-                }
-                break;
+            bindings.Positions["Root"] = root with { Width = half, Height = panelHeight };
+            bindings.WindowPosition = new Vector2(start, top) - screens.GetOffset(id);
+        }
+        else if (id == panelId)
+        {
+            bindings.Positions["Root"] = root with { Width = animalWidth, Height = panelHeight };
+            bindings.WindowPosition = origin - screens.GetOffset(id);
+            Mark(bindings, AnimalPanel, $"{(bagOpen ? 2 : hasBag ? 1 : 0)} {title.ToString(CultureInfo.InvariantCulture)}");
+            MatchAnimalChrome(bindings, screens.Layout(id).Roots[0], root, animalPanel,
+                character.Width * interfaceScale, half, title);
+        }
+        else if (id == bagId && bagOpen)
+        {
+            var columns = AnimalInterior(animalPanel, cell, hasBag, title);
+            float mainHeight = hasMain ? columns.Grid.Height * .39f : 0;
+            float bagTop = columns.Grid.Y + mainHeight;
+            float buttonHeight = 24 * bindings.TemplateScale;
+            float available = columns.Grid.Height - mainHeight - buttonHeight - 2 * columns.Pad;
+            float nativeHeight = grid!.BagHeight * cell.Y;
+            float scale = Math.Min(1, Math.Min(columns.Grid.Width / (grid.BagWidth * cell.X), available / nativeHeight));
+            if (scale <= 0) return false;
+            float bagWidth = grid.BagWidth * cell.X * scale, bagHeight = nativeHeight * scale;
+            float embeddedWidth = Math.Min(columns.Grid.Width, Math.Max(bagWidth, 100 * bindings.TemplateScale));
+            bindings.Positions["Root"] = root with { Width = embeddedWidth, Height = bagHeight + buttonHeight + 2 * columns.Pad };
+            bindings.WindowPosition = new Vector2(columns.Grid.X + (columns.Grid.Width - embeddedWidth) / 2, bagTop) - screens.GetOffset(id);
+            Mark(bindings, EmbeddedBag, FormattableString.Invariant($"{bagWidth} {bagHeight} {columns.Pad} {buttonHeight} {100 * bindings.TemplateScale}"));
+            if (animal.IsPlayer)
+            {
+                bindings.Disabled.Remove("ArrangeButton");
+                bindings.Actions["ArrangeButton"] = "ArrangeButton";
+            }
         }
         return true;
     }
@@ -121,10 +141,10 @@ public sealed partial class AvatarMod
         }
     }
 
-    private static void FitAnimalLootGrid(List<UiControl> controls, InventoryView grid, object __instance)
+    private static void FitAnimalGrid(List<UiControl> controls, InventoryView grid, object __instance)
     {
-        if (controls.Find(c => c.Type == "Window" && c.Properties.ContainsKey(AnimalLoot)) is not {} window ||
-            ReadDimensions(window.Properties[AnimalLoot], 2) is not {} sizing) return;
+        if (controls.Find(c => c.Type == "Window" && c.Properties.ContainsKey(AnimalPanel)) is not {} window ||
+            ReadDimensions(window.Properties[AnimalPanel], 2) is not {} sizing) return;
         var cell = (Vector2)CellSize.Invoke(LayoutPlayer.GetValue(__instance), null)!;
         bool hasBag = sizing[0] > 0, bagOpen = sizing[0] == 2;
         var (lane, details, heading, pad) = AnimalInterior(window.Bounds, cell, hasBag, sizing[1]);
@@ -180,7 +200,7 @@ public sealed partial class AvatarMod
 
     private static bool FitEmbeddedAnimalBag(string id, List<UiControl> controls, InventoryView grid)
     {
-        if (id != "loot-bag" ||
+        if (id is not ("bag" or "loot-bag") ||
             controls.Find(c => c.Type == "Window" && c.Properties.ContainsKey(EmbeddedBag)) is not {} window ||
             ReadDimensions(window.Properties[EmbeddedBag], 5) is not {} dimensions ||
             controls.Find(c => c.Name == "backpack_content") is not {} slot) return false;
@@ -211,9 +231,9 @@ public sealed partial class AvatarMod
         return result;
     }
 
-    private static bool KeepAnimalLootHeight(List<UiControl> controls)
+    private static bool KeepAnimalPanelHeight(List<UiControl> controls)
     {
-        if (!controls.Any(c => c.Type == "Window" && c.Properties.ContainsKey(AnimalLoot))) return true;
+        if (!controls.Any(c => c.Type == "Window" && c.Properties.ContainsKey(AnimalPanel))) return true;
         controls.RemoveAll(c => c.Name is "main" or "MainSectionName");
         return false;
     }
