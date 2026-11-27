@@ -32,25 +32,13 @@ public sealed partial class AvatarMod
         var (width, height, gap, half, panelHeight) = TradeDimensions(player);
         if (merchant)
             return DockVendorTrade(id, bindings, player, screens, width, height, gap, half, panelHeight);
+        if (target is { Animal: true })
+            return DockAnimalTrade(id, bindings, layout, root, player, screens, target, width, height, gap, half, panelHeight);
 
         bool partner = id is "loot" or "loot-bag";
         bool bag = id is "bag" or "loot-bag";
         bindings.Positions["Root"] = root with {Width = half, Height = panelHeight};
         bindings.WindowPosition = new Vector2(partner ? half + 2 * gap : gap, (height-panelHeight)/2) - screens.GetOffset(id);
-        if (partner && target is { Animal: true })
-        {
-            // The bag can bind before the partner window switches to the animal template.
-            float animalWidth = NativeInventoryLayout(player, animal: true).Roots[0].Position.Width * width;
-            animalWidth = Math.Min(animalWidth, half - gap);
-            if (bag)
-            {
-                float scale = Math.Min(1, Math.Min((half - animalWidth - gap) / root.Width, panelHeight / root.Height));
-                bindings.Positions["Root"] = root with { Width = root.Width * scale, Height = root.Height * scale };
-                bindings.WindowPosition += new Vector2(animalWidth + gap, 0);
-            }
-            else bindings.Positions["Root"] = root with { Width = animalWidth, Height = panelHeight };
-            return true;
-        }
         if (bag) bindings.Positions["Root"] = root; // DockInventory fits the native bag into its owner's bag area.
         return true;
     }

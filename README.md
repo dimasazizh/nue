@@ -51,8 +51,11 @@ Hold right-click on an NPC and release over **Examine** to open their Skills win
 See the [UI improvements checklist](TODO.md) for progress on changes to search, inventory and equipment, squad portraits, maps, and character stats. The checklist also tracks an on/off setting for each improvement.
 
 ## Etymology & Philosophy
-In Japanese folklore, the Nue is traditionally depicted as a creature with the head of a monkey, the body of a tanuki, the limbs of a tiger, and a snake for a tail. The chimeric nature of the creature is also a fitting metaphor for a GUI combining native Kenshi MyGUI and MeitouClient's own GUI codes.
+In Japanese folklore, the Nue is traditionally depicted as a creature with the head of a monkey, the body of a tanuki, the limbs of a tiger, and a snake for a tail. The chimeric nature of the creature is also a fitting metaphor for this GUI mod, as it combines native Kenshi MyGUI and MeitouClient's own GUI codes.
 
-## Contributors & Special Mentions
+## Contributors
 Dimsky - Author, main contributor\
+
+With special thanks to:
 Shutori - Character Inspector (https://github.com/shutori/Shutori_Re_Kenshi_Source)
+PZA -  Service Record for Meitou (https://github.com/Meitou-Modding-Ecosystem/PZAMeitouServiceRecord/) for letting me borrow his spider chart code.

@@ -91,6 +91,9 @@ public sealed partial class AvatarMod : IMod
         After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
+        After(Layout, "ArrangeEquipmentGrid", nameof(FitAnimalLootGrid));
+        context.Harmony.Patch(AccessTools.Method(Layout, "TrimAnimalWindow"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(KeepAnimalLootHeight)));
         After(Layout, "ArrangeContainerGrid", nameof(FitBagCells));
         context.Harmony.Patch(AccessTools.Method(GameType("Ui.InventoryWindows"),"Spot"),
             prefix:new HarmonyMethod(typeof(AvatarMod),nameof(WeaponDrop)));
