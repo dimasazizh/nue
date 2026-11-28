@@ -158,9 +158,9 @@ public sealed partial class AvatarMod : IMod
     private static readonly (string Section, string Label, int Fcs, int Columns, int Rows,
         int Limit, bool Secondary, int X, int Y)[] Accessories =
     [
+        ("eyes_hats", "EXTRA HAT", 3, 3, 1, 1, true, 280, 294),
         ("eyes_eyes", "EYES", 4, 3, 1, 1, false, 280, 240),
         ("eyes_belts", "EXTRA BELT", 14, 3, 1, 1, true, 280, 267),
-        ("eyes_hats", "EXTRA HAT", 3, 3, 1, 1, true, 280, 294),
         ("gloves", "HANDS", 10, 2, 2, 4, false, 362, 240),
         ("neck", "NECK", 11, 2, 2, 1, false, 424, 240)
     ];
@@ -185,28 +185,37 @@ public sealed partial class AvatarMod : IMod
             controls.RemoveAll(c => Accessories.Any(slot => slot.Section == c.Name));
             return;
         }
-        float unit = clip.Height / 10;
-        float labelHeight = unit * .60f;
+        if (controls.Find(c => c.Name == "main") is not {} inventory) return;
+        var tileSize = inventory.Properties.TryGetValue("TileSize", out var dimensions)
+            ? ReadDimensions(dimensions, 2) : null;
+        float cellWidth = tileSize?[0] ?? inventory.Bounds.Width / pocketColumns;
+        float cellHeight = tileSize?[1] ?? inventory.Bounds.Height / pocketRows;
+        if (cellWidth <= 0 || cellHeight <= 0) return;
+        float labelHeight = cellHeight * .65f;
+        float gap = Math.Max(0, Math.Min(cellWidth * .25f, clip.Width - 4 * cellWidth));
         float y = clip.Y;
         foreach (var slot in Accessories)
         {
             int index = controls.FindIndex(c => c.Name == slot.Section);
             if (index < 0) continue;
             var tile = controls[index];
-            float cell = Math.Min(unit, clip.Width / slot.Columns);
-            var bounds = new UiRect(clip.X + (clip.Width - cell * slot.Columns) / 2,
-                y + labelHeight, cell * slot.Columns, cell * slot.Rows);
+            bool paired = slot.Secondary == false && slot.Rows == 2;
+            float width = cellWidth * slot.Columns;
+            float left = paired ? clip.X + (clip.Width - 4 * cellWidth - gap) / 2
+                : clip.X + (clip.Width - width) / 2;
+            if (slot.Section == "neck") left += 2 * cellWidth + gap;
+            var bounds = new UiRect(left, y + labelHeight, width, cellHeight * slot.Rows);
             var properties = new Dictionary<string, string>(tile.Properties)
             {
-                ["TileSize"] = FormattableString.Invariant($"{cell} {cell}")
+                ["TileSize"] = FormattableString.Invariant($"{cellWidth} {cellHeight}")
             };
             controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties, Skin = "Kenshi_InventorySlotSkin" };
             controls.Add(new(slot.Section + "-label", "TextBox",
-                new(clip.X, y, clip.Width, labelHeight), InventoryText(slot.Label),
+                new(paired ? left : clip.X, y, paired ? width : clip.Width, labelHeight), InventoryText(slot.Label),
                 "", "Kenshi_TextboxPaintedText", true,
                 new Dictionary<string, string> { ["TextAlign"] = "Center VCenter" },
                 default, Pickable: false, Clip: clip));
-            y += labelHeight + bounds.Height;
+            if (!paired) y += labelHeight + bounds.Height;
         }
     }
 
