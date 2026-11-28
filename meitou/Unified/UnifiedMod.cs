@@ -16,6 +16,11 @@ public sealed class UnifiedMod : IMod
         [Setting("↳ Show character hover outline", Hint = "Requires Hover stats and the game's hover outline.",
             SubGroup = Core, VisibleWhen = nameof(Hover))]
         public bool ShowOutline { get; set; } = true;
+        [Setting("Container highlights", SubGroup = Core)]
+        public bool ContainerHighlights { get; set; } = true;
+        [Setting("↳ Additional container highlight key", Hint = "Leave blank to use the game's highlight key (Alt by default). Enter a key or chord, such as H or Ctrl+H.",
+            SubGroup = Core, VisibleWhen = nameof(ContainerHighlights))]
+        public string ContainerHighlightKey { get; set; } = "";
         [Setting("Examine", Hint = Restart, SubGroup = Core)] public bool Examine { get; set; } = true;
         [Setting("Racial XP", Hint = Restart, SubGroup = Core)] public bool RacialXp { get; set; } = true;
         [Setting("Inventory inspection and avatar", Hint = Restart, SubGroup = Core)] public bool Avatar { get; set; } = true;
@@ -44,6 +49,7 @@ public sealed class UnifiedMod : IMod
     {
         var options = new Options();
         context.AddSettings(options);
+        ContainerHighlights.Install(context, options);
         if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),
             prefix:new HarmonyLib.HarmonyMethod(typeof(UnifiedMod),nameof(FollowPointer)));
         new StatsMod().Install(context, () => options.Hover && options.ShowOutline,

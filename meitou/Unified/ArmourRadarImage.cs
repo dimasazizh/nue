@@ -8,19 +8,26 @@ namespace Nue.Unified;
 internal static class ArmourRadarImage
 {
     private const int Size = 256;
-    internal static readonly (string Label, Vector4 Colour)[] Metrics =
+    internal static readonly string[] Metrics = ["Coverage", "Cut", "Blunt"];
+    internal static readonly Vector4[] Palette =
     [
-        ("Coverage", new(.93f, .60f, .22f, 1)),
-        ("Cut", new(.42f, .78f, .92f, 1)),
-        ("Blunt", new(.60f, .87f, .53f, 1))
+        new(1, .62f, .22f, 1), new(.30f, .88f, 1, 1), new(.57f, 1, .39f, 1),
+        new(1, .45f, .81f, 1), new(1, .91f, .33f, 1)
     ];
     static readonly Dictionary<string, string> s_made = new(StringComparer.Ordinal);
     static string s_dir = "";
 
     /// <summary>The image property value for a chart ("file:<path>"), drawing it when new; "" when it cannot be made.</summary>
-    internal static string For(Vector3[] values)
+    internal static Vector2 AxisDirection(int axis, int count)
     {
-        string key = string.Join(";", values.Select(v => FormattableString.Invariant($"{v.X:0.000},{v.Y:0.000},{v.Z:0.000}")));
+        float angle = MathF.Tau * axis / count;
+        return new(MathF.Sin(angle), -MathF.Cos(angle));
+    }
+
+    internal static string For(Vector3[] values, int[] colours)
+    {
+        string key = string.Join(",", colours) + "|" +
+            string.Join(";", values.Select(v => FormattableString.Invariant($"{v.X:0.000},{v.Y:0.000},{v.Z:0.000}")));
         if (s_made.TryGetValue(key, out var path)) return "file:" + path;
         try
         {
@@ -31,7 +38,7 @@ internal static class ArmourRadarImage
             }
             string name = Fnv(key).ToString("x16", CultureInfo.InvariantCulture);
             path = Path.Combine(s_dir, "radar_" + name + ".tga");
-            File.WriteAllBytes(path, Tga(Draw(values)));
+            File.WriteAllBytes(path, Tga(Draw(values, colours)));
             s_made[key] = path;
             return "file:" + path;
         }
@@ -49,15 +56,15 @@ internal static class ArmourRadarImage
         return h;
     }
 
-    static byte[] Draw(Vector3[] values)
+    static byte[] Draw(Vector3[] values, int[] colours)
     {
         var px = new float[Size * Size * 4];   // straight RGBA, 0..1
         var web = (R: 0.62f, G: 0.56f, B: 0.46f, A: 0.55f);
         (double X, double Y) Vertex(int axis, double fraction)
         {
-            double angle = axis * Math.Tau / values.Length - Math.PI / 2;
+            var direction = AxisDirection(axis, values.Length);
             double radius = Size * .40 * fraction;
-            return (Size / 2.0 + Math.Cos(angle) * radius, Size / 2.0 + Math.Sin(angle) * radius);
+            return (Size / 2.0 + direction.X * radius, Size / 2.0 + direction.Y * radius);
         }
         for (int r = 1; r <= 3; r++)
             for (int a = 0; a < values.Length; a++)
@@ -73,7 +80,7 @@ internal static class ArmourRadarImage
         }
         for (int metric = 0; metric < Metrics.Length; metric++)
         {
-            var colour = Metrics[metric].Colour;
+            var colour = Palette[colours[metric]];
             for (int a = 0; a < values.Length; a++)
             {
                 int next = (a + 1) % values.Length;

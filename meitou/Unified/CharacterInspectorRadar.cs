@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using Meitou.Data.Ui;
+using Meitou.Game.Ui;
 
 namespace Nue.Unified;
 
@@ -10,7 +11,7 @@ internal static partial class CharacterInspector
         ["head", "chest", "right arm", "right leg", "left leg", "left arm", "stomach"];
 
     private static void DrawRadar(List<UiControl> controls, Part[] parts,
-        Dictionary<string, Protection> estimates, UiRect area)
+        Dictionary<string, Protection> estimates, UiRect area, int[] colours)
     {
         if (area.Width <= 0 || area.Height <= 0) return;
         string font = Math.Max(1, (int)(area.Height * .067f)).ToString(CultureInfo.InvariantCulture);
@@ -26,7 +27,7 @@ internal static partial class CharacterInspector
             var protection = estimates[part.Id];
             return Vector3.Clamp(new(protection.Coverage, protection.Cut, protection.Blunt), Vector3.Zero, Vector3.One);
         }).ToArray();
-        string texture = ArmourRadarImage.For(values);
+        string texture = ArmourRadarImage.For(values, colours);
         if (texture.Length == 0)
         {
             AddText(controls, "radar-empty", area, "Armour chart unavailable.", font, "Center VCenter");
@@ -43,24 +44,40 @@ internal static partial class CharacterInspector
         for (int axis = 0; axis < axes.Length; axis++)
         {
             var part = axes[axis];
-            double angle = axis * Math.Tau / axes.Length;
-            float x = centre.X + (float)Math.Sin(angle) * side * .62f;
-            float y = centre.Y - (float)Math.Cos(angle) * side * .48f;
+            var direction = ArmourRadarImage.AxisDirection(axis, axes.Length);
+            var anchor = centre + direction * (side * .49f);
             float labelWidth = area.Width * .29f;
-            float labelX = Math.Clamp(x - labelWidth / 2, area.X, area.X + area.Width - labelWidth);
-            var label = new UiRect(labelX, y - row / 2, labelWidth, row);
-            AddText(controls, "radar-axis-" + axis, label, part.Name, font, "Center VCenter", Gold);
+            float alignment = Math.Clamp(direction.X * 1.2f, -1, 1);
+            float labelX = Math.Clamp(anchor.X - labelWidth * (1 - alignment) / 2,
+                area.X, area.X + area.Width - labelWidth);
+            var label = new UiRect(labelX, Math.Max(area.Y, anchor.Y - row / 2), labelWidth, row);
+            string align = alignment >= .5f ? "Left VCenter" : alignment <= -.5f ? "Right VCenter" : "Center VCenter";
+            AddText(controls, "radar-axis-" + axis, label, part.Name, font, align, Gold);
+            var protection = estimates[part.Id];
+            var tooltip = UiTooltips.RowProperties([
+                ("#E8BD72" + part.Name.ToUpperInvariant() + " · ARMOUR PROTECTION", ""),
+                ("Armour coverage", protection.Coverage.ToString("P0")),
+                ("Cut damage resistance", protection.Cut.ToString("P0")),
+                ("Blunt damage resistance", protection.Blunt.ToString("P0")),
+                ("Harpoon resistance", $"{protection.Harpoon:0.#} pts")
+            ]);
             controls.Add(new(ActionPrefix + "radar-tip-" + axis, "Button", label, "", ActionPrefix + "part:" + part.Id,
-                "", true, Tooltip(part, estimates[part.Id]), default, Pickable: true, Clip: area));
+                "", true, tooltip, default, Pickable: true, Clip: area));
         }
 
         float legendWidth = area.Width / ArmourRadarImage.Metrics.Length;
         for (int i = 0; i < ArmourRadarImage.Metrics.Length; i++)
         {
-            var (label, colour) = ArmourRadarImage.Metrics[i];
-            var bounds = new UiRect(area.X + i * legendWidth, area.Y + area.Height - row, legendWidth, row);
-            AddText(controls, "radar-legend-" + i, bounds, label, font, "Center VCenter",
-                FormattableString.Invariant($"{colour.X} {colour.Y} {colour.Z}"));
+            string label = ArmourRadarImage.Metrics[i];
+            var colour = ArmourRadarImage.Palette[colours[i]];
+            var bounds = new UiRect(area.X + i * legendWidth, area.Y + area.Height, legendWidth, row);
+            var style = UiTooltips.RowProperties([("Click to change " + label.ToLowerInvariant() + " colour", "")]);
+            style["TextAlign"] = "Center VCenter";
+            style["FontName"] = "Kenshi_StandardFont_Small";
+            style["FontPixels"] = font;
+            controls.Add(new(ActionPrefix + "radar-legend-" + i, "Button", bounds, label,
+                ActionPrefix + "chart-colour:" + i, "", true, style, default,
+                TextColour: colour, Pickable: true, Clip: bounds));
         }
     }
 }

@@ -261,12 +261,21 @@ public sealed partial class AvatarMod : IMod
         if (Nue.Unified.CharacterInspector.Enabled)
         {
             active.Inspector.Use(subject.Id);
-            bool hasBag = subject.ItemGrid is { BagWidth: > 0, BagHeight: > 0 };
-            bool bagOpen = screens.IsOpen(id == "loot" ? "loot-bag" : "bag");
-            bool inspectorShown = !bagOpen && (hasBag || !active.Inspector.Hidden);
-            b.Text["OpenBagButton"] = inspectorShown ? "OPEN BAG | HIDE CHAR INSPECTOR" : "CLOSE BAG | SHOW CHAR INSPECTOR";
-            b.Disabled.Remove("OpenBagButton");
-            b.Actions["OpenBagButton"] = hasBag ? "OpenBagButton" : Nue.Unified.CharacterInspector.ActionPrefix + "toggle";
+            const string button = "OpenBagButton";
+            bool hasBag = subject.ItemGrid is { BagWidth: > 0, BagHeight: > 0 } grid &&
+                grid.Items.Any(item => item.Section == "backpack_attach");
+            bool bagOpen = hasBag && screens.IsOpen(id == "loot" ? "loot-bag" : "bag");
+            b.Text[button] = bagOpen ? "CHARACTER INSPECTOR" : "OPEN BAG";
+            if (hasBag)
+            {
+                b.Disabled.Remove(button);
+                b.Actions[button] = button;
+            }
+            else
+            {
+                b.Disabled.Add(button);
+                b.Actions.Remove(button);
+            }
         }
         if (Nue.SearchCompare.SearchMod.Installed)
         {
@@ -457,8 +466,7 @@ public sealed partial class AvatarMod : IMod
         {
             var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
             active.Inspector.Use(owner.Id);
-            if (!screens.IsOpen(id == "loot" ? "loot-bag" : "bag") &&
-                (owner.ItemGrid is { BagWidth: > 0, BagHeight: > 0 } || !active.Inspector.Hidden))
+            if (!screens.IsOpen(id == "loot" ? "loot-bag" : "bag"))
             {
                 var hit = screens.HitTest((Vector2)Nue.Unified.CharacterInspector.Mouse.GetValue(player)!);
                 Nue.Unified.CharacterInspector.Draw(controls, player, owner, active.bagArea, active.Inspector,

@@ -38,16 +38,15 @@ internal static partial class CharacterInspector
     internal sealed class View
     {
         private CharacterId character = CharacterId.None;
-        internal bool Hidden;
         internal string? Part;
         internal int Page;
         internal bool ShowRadar;
+        internal readonly int[] RadarColours = [0, 1, 2];
 
         internal void Use(CharacterId id)
         {
             if (character == id) return;
             character = id;
-            Hidden = false;
             Part = null;
             Page = 0;
             ShowRadar = false;
@@ -57,12 +56,18 @@ internal static partial class CharacterInspector
         {
             switch (action)
             {
-                case "toggle": Hidden = !Hidden; break;
                 case "figure-mode": ShowRadar = !ShowRadar; break;
                 case "back": Part = null; Page = 0; break;
                 case "previous": Page = Math.Max(0, Page - 1); break;
                 case "next": Page++; break;
                 default:
+                    if (action.StartsWith("chart-colour:", StringComparison.Ordinal) &&
+                        int.TryParse(action.AsSpan("chart-colour:".Length), out int metric) &&
+                        (uint)metric < RadarColours.Length)
+                    {
+                        RadarColours[metric] = (RadarColours[metric] + 1) % ArmourRadarImage.Palette.Length;
+                        break;
+                    }
                     if (!action.StartsWith("part:", StringComparison.Ordinal)) break;
                     Part = action[5..];
                     Page = 0;
@@ -114,10 +119,11 @@ internal static partial class CharacterInspector
         float switchHeight = Math.Min(figureSpace * .13f, width * .075f);
         string switchFont = Math.Max(1, (int)(switchHeight * .68f)).ToString(CultureInfo.InvariantCulture);
         var switchBounds = new UiRect(x + width * .27f, area.Y + pad, width * .46f, switchHeight);
-        AddButton(controls, switchBounds, view.ShowRadar ? "BODY FIGURE" : "ARMOUR CHART", "figure-mode", switchFont);
+        AddButton(controls, switchBounds, view.ShowRadar ? "BODY FIGURE" : "ARMOUR CHART", "figure-mode", switchFont,
+            new() { ["TextColour"] = Gold });
         var visual = new UiRect(x, switchBounds.Y + switchHeight + pad, width, figureSpace - switchHeight - pad);
         if (view.ShowRadar)
-            DrawRadar(controls, parts, estimates, visual);
+            DrawRadar(controls, parts, estimates, visual, view.RadarColours);
         else
         {
             float unit = Math.Min(visual.Height / 128, width / 96);
@@ -127,6 +133,7 @@ internal static partial class CharacterInspector
         }
 
         float y = area.Y + pad + figureSpace + pad;
+        if (view.ShowRadar) y += visual.Height * .105f + pad;
         float rowHeight = Math.Min(width * .074f, (area.Y + area.Height - y - pad) / 11);
         if (rowHeight <= 0) return;
         string font = Math.Max(1, (int)MathF.Floor(rowHeight * .76f)).ToString(CultureInfo.InvariantCulture);

@@ -20,13 +20,14 @@ public sealed partial class SearchMod
     const string ArrowSpace = "00 ";
     static readonly ConditionalWeakTable<IReadOnlyList<TooltipLine>,InventoryItemView> EquippedByLines = new();
 
-    const string Number = @"[+-]?\d+(?:\.\d+)?";
+    const string Number = @"[+−-]?\d+(?:\.\d+)?";
     static readonly Regex Stat = new(
         $@"^\s*(?<first>{Number})(?:\s*(?<separator>[-/–])\s*(?<second>{Number}))?\s*(?<unit>%|[a-z]+(?:/[a-z]+)?)?\s*$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     sealed record TooltipPair(int Start, IReadOnlyList<TooltipLine> Equipped, string?[] EquippedColours,
         int[] HoveredDirections, int[] EquippedDirections);
+    enum RowKind { None, Stat, Skill, Weather }
 
     static void RememberComparison(object t, IReadOnlyList<TooltipLine> __result)
     {
@@ -60,36 +61,66 @@ public sealed partial class SearchMod
         var equippedRows = equippedLines.ToArray();
         var hoveredDirections = new int[hoveredRows.Length];
         var equippedDirections = new int[equippedRows.Length];
-        for (int i = 0; i < lines.Count; i++)
+        for (int i = 0; i < hoveredRows.Length; i++)
         {
-            if (hoveredColours[i] is not null || !UncolouredStat(lines[i])) continue;
-            for (int j = 0; j < equippedLines.Count; j++)
+            var row = lines[i];
+            var category = ComparisonKind(row);
+            if (hoveredColours[i] is not null || category == RowKind.None) continue;
+            int j = Array.FindIndex(equippedRows, candidate =>
+                candidate.Key == row.Key && ComparisonKind(candidate) == category);
+            if (j >= 0)
             {
-                if (lines[i].Key != equippedLines[j].Key || !UncolouredStat(equippedLines[j])) continue;
-                int order = CompareStat(lines[i].Value, equippedLines[j].Value);
-                if (order != 0)
-                {
-                    bool higher = order > 0;
-                    // The arrows show numeric direction. Weight rewards the lower value.
-                    bool hoveredBetter = lines[i].Key == "-Weight" ? !higher : higher;
-                    hoveredColours[i] = hoveredBetter ? Green : Red;
-                    equippedColours[j] = hoveredBetter ? Red : Green;
-                    hoveredRows[i] = lines[i] with { Value = ArrowSpace + lines[i].Value };
-                    equippedRows[j] = equippedLines[j] with { Value = ArrowSpace + equippedLines[j].Value };
-                    hoveredDirections[i] = order;
-                    equippedDirections[j] = -order;
-                }
-                break;
+                int order = CompareStat(row.Value, equippedLines[j].Value);
+                Mark(hoveredRows, hoveredColours, hoveredDirections, i, order);
+                Mark(equippedRows, equippedColours, equippedDirections, j, -order);
             }
+            else if (category is RowKind.Skill or RowKind.Weather)
+                Mark(hoveredRows, hoveredColours, hoveredDirections, i, AgainstNeutral(row.Value));
+        }
+        for (int j = 0; j < equippedLines.Count; j++)
+        {
+            var row = equippedLines[j];
+            var category = ComparisonKind(row);
+            if (category is (RowKind.Skill or RowKind.Weather) &&
+                !lines.Any(candidate => candidate.Key == row.Key && ComparisonKind(candidate) == category))
+                Mark(equippedRows, equippedColours, equippedDirections, j, AgainstNeutral(row.Value));
         }
         valueColours = hoveredColours;
         lines = hoveredRows;
         __state = new(controls.Count, equippedRows, equippedColours, hoveredDirections, equippedDirections);
     }
 
-    static bool UncolouredStat(TooltipLine line) =>
-        line.Key.Length > 0 && line.Value.Length > 0 && line.ValueColour is null &&
-        line.ValueTone is TooltipTone.Default or TooltipTone.Main or TooltipTone.Ink;
+    static RowKind ComparisonKind(TooltipLine line)
+    {
+        if (line.Key.Length == 0 || line.Value.Length == 0 || line.ValueColour is not null) return RowKind.None;
+        // Native armour details colour the skill and weather rows before comparison.
+        if (line.Key.StartsWith('-'))
+        {
+            if (line.KeyTone == TooltipTone.Title && line.ValueTone is TooltipTone.Good or TooltipTone.Bad)
+                return RowKind.Skill;
+            if (line.KeyTone == TooltipTone.Good && line.ValueTone == TooltipTone.Good && line.Value.EndsWith('%'))
+                return RowKind.Weather;
+        }
+        return line.ValueTone is TooltipTone.Default or TooltipTone.Main or TooltipTone.Ink ? RowKind.Stat : RowKind.None;
+    }
+
+    static void Mark(TooltipLine[] rows, string?[] colours, int[] directions, int index, int order)
+    {
+        if (order == 0 || directions[index] != 0) return;
+        var row = rows[index];
+        bool better = row.Key == "-Weight" ? order < 0 : order > 0;
+        colours[index] = better ? Green : Red;
+        rows[index] = row with { Value = ArrowSpace + row.Value };
+        directions[index] = order;
+    }
+
+    static int AgainstNeutral(string value)
+    {
+        var match = Stat.Match(value);
+        if (!match.Success || match.Groups["separator"].Success) return 0;
+        string unit = match.Groups["unit"].Value;
+        return CompareStat(value, (unit.Equals("x", StringComparison.OrdinalIgnoreCase) ? "1" : "0") + unit);
+    }
 
     static int CompareStat(string left, string right)
     {
@@ -98,7 +129,7 @@ public sealed partial class SearchMod
         if (!a.Success || !b.Success ||
             !a.Groups["unit"].Value.Equals(b.Groups["unit"].Value, StringComparison.OrdinalIgnoreCase)) return 0;
 
-        static double Parse(Group g) => double.Parse(g.Value, CultureInfo.InvariantCulture);
+        static double Parse(Group g) => double.Parse(g.Value.Replace('−', '-'), CultureInfo.InvariantCulture);
         double first = Parse(a.Groups["first"]), otherFirst = Parse(b.Groups["first"]);
         int order = first.CompareTo(otherFirst);
         string separator = a.Groups["separator"].Value.Replace('–', '-');
@@ -127,24 +158,34 @@ public sealed partial class SearchMod
         float minimum = (bool)Property(player, "TitleOpen") ? 0 : (float)Property(player, "StandardPixels");
         DrawArrows(controls, pair.Start, "tooltip", pair.HoveredDirections, painter, height, minimum, scale);
         DrawArrows(equipped, 0, EquippedPrefix, pair.EquippedDirections, painter, height, minimum, scale);
-        float gap = Math.Max(6, 9 * scale), labelHeight = Math.Max(14, 22 * scale);
+        const float gap = 4;
+        float labelHeight = Math.Max(14, 22 * scale);
         float border = Math.Max(1, 2 * scale);
-        var left = controls[pair.Start].Bounds;
-        var right = equipped[0].Bounds;
-        float x = Math.Clamp(left.X, 0, Math.Max(0, width - left.Width - gap - right.Width - border));
+        var leftPlate = controls[pair.Start];
+        var rightPlate = equipped[0];
+        var left = leftPlate.Bounds;
+        var right = rightPlate.Bounds;
+        // The plate image contains a transparent margin. Space the visible frame edges.
+        float leftInset = leftPlate.Type == "ImageBox" ? 16 * scale : 0;
+        float rightInset = rightPlate.Type == "ImageBox" ? 16 * scale : 0;
+        float rightOffset = left.Width - leftInset + gap - rightInset + border;
+        float rightTop = leftInset - rightInset + border;
+        float pairWidth = rightOffset + right.Width - rightInset + border;
+        float pairHeight = Math.Max(left.Height - leftInset, rightTop + right.Height - rightInset + border);
+        float x = Math.Clamp(left.X, 0, Math.Max(0, width - pairWidth));
         float y = Math.Clamp(left.Y, labelHeight + border,
-            Math.Max(labelHeight + border, height - Math.Max(left.Height, right.Height) - border));
+            Math.Max(labelHeight + border, height - pairHeight));
         int end = controls.Count;
         for (int i = pair.Start; i < end; i++)
             controls[i] = MoveTooltipControl(controls[i], x - left.X, y - left.Y);
 
-        float rightX = x + left.Width + gap;
+        float rightX = x + rightOffset;
+        float rightY = y + rightTop;
         foreach (var control in equipped)
-            controls.Add(MoveTooltipControl(control, rightX - right.X, y - right.Y));
+            controls.Add(MoveTooltipControl(control, rightX - right.X, rightY - right.Y));
 
-        // The Meitou plate includes a transparent margin around its visible frame.
-        float margin = equipped[0].Type == "ImageBox" ? 16 * scale : 0;
-        var frame = new UiRect(rightX + margin, y + margin, right.Width - 2 * margin, right.Height - 2 * margin);
+        var frame = new UiRect(rightX + rightInset, rightY + rightInset,
+            right.Width - 2 * rightInset, right.Height - 2 * rightInset);
         var gold = new Vector4(.909804f, .741176f, .447059f, 1);
         var style = new Dictionary<string,string>();
         void Edge(string name, UiRect bounds) => controls.Add(new(EquippedPrefix + "-" + name, "Widget", bounds,
