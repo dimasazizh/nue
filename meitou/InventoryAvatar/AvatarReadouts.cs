@@ -20,6 +20,11 @@ public sealed partial class AvatarMod
     private static readonly System.Reflection.FieldInfo WorldSessionField = AccessTools.Field(Player, "Session");
     private static readonly Dictionary<string, string> ReadoutFace = new()
         { ["TextAlign"] = "Left VCenter", ["FontName"] = "Kenshi_StandardFont_Medium" };
+    private static readonly Dictionary<string, string> VitalsHeadingFace = new(ReadoutFace)
+    {
+        ["tooltip_type"] = "0",
+        ["tooltip_text"] = "Click to toggle view between stats and health bars"
+    };
     private static readonly Dictionary<string, string> ReadoutValueFace = new(ReadoutFace)
         { ["TextAlign"] = "Right VCenter" };
 
@@ -54,7 +59,7 @@ public sealed partial class AvatarMod
         var heading = area with { Height = headingHeight };
         var title = heading with { Width = heading.Width * .34f };
         controls.Add(new("NueVitalsHeading", "Button", title, health ? "HEALTH" : "STATS",
-            ToggleVitals, "", true, ReadoutFace, default, TextColour: new(1, .83f, .55f, 1),
+            ToggleVitals, "", true, VitalsHeadingFace, default, TextColour: new(1, .83f, .55f, 1),
             Pickable: true, Clip: title));
         if (owner.Hud is not {} hud) return;
         if (owner.Body.HasValue && HudHealthWord.Invoke(null, [owner]) is ValueTuple<string, string, string> statusWord)

@@ -132,8 +132,7 @@ internal static partial class CharacterInspector
             DrawFigure(controls, character, parts, estimates, selected, hoveredAction, figure, visual, unit);
         }
 
-        float y = area.Y + pad + figureSpace + pad;
-        if (view.ShowRadar) y += visual.Height * .105f + pad;
+        float y = visual.Y + visual.Height + visual.Height * .105f + 2 * pad;
         float rowHeight = Math.Min(width * .074f, (area.Y + area.Height - y - pad) / 11);
         if (rowHeight <= 0) return;
         string font = Math.Max(1, (int)MathF.Floor(rowHeight * .76f)).ToString(CultureInfo.InvariantCulture);
