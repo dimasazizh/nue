@@ -16,8 +16,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 15
     env:
-      MEITOU_VERSION: '0.24.0'
-      MEITOU_SHA256: '654a8a35d0b506f3974a4bff71a8974ba4c621edd6003c9a94d5ff3747a8f9c6'
+      MEITOU_VERSION: '0.24.1'
+      MEITOU_SHA256: '1c4dcc9da7ad6f69c8ca93097f703d623a3ab226829c2d699d6594356080ee02'
     steps:
       - uses: actions/checkout@v7
         with:
