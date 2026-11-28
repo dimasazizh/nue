@@ -111,6 +111,11 @@
       </Widget>
       <Widget type="Widget" skin="PanelEmpty" position_real="0.011 0.784 0.336 0.205" name="NueAvatarVitals">
       </Widget>
+      <Widget type="Widget" skin="PanelEmpty" position_real=".56211 .552 .10091 .390" name="NueAccessoriesArea" />
+      <Widget type="Button" skin="Kenshi_Button1" position_real=".56211 .949 .10091 .038" name="NueToggleAccessories">
+        <Property key="Caption" value="EXTRA SLOTS" />
+        <Property key="FontName" value="Kenshi_StandardFont_Small" />
+      </Widget>
       <Widget type="TextBox" skin="Kenshi_TextboxPaintedText" position_real=".56211 .552 .10091 .04" name="NueArmTitle">
         <Property key="Caption" value="ARMS" />
         <Property key="TextAlign" value="Center" />

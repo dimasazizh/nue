@@ -27,10 +27,34 @@ public sealed partial class AvatarMod
 
     // Let the native loader validate everything at its saved position first. It already
     // grows the height, but would reject items outside a newly narrowed width.
-    private static void BeforeLoad(IReadOnlyList<SaveItem> items, ItemFactory factory, out int __state)
+    private static readonly System.Reflection.MethodInfo CopySaveItem =
+        HarmonyLib.AccessTools.Method(typeof(object), "MemberwiseClone");
+    private static readonly System.Reflection.PropertyInfo SavedSection = typeof(SaveItem).GetProperty(nameof(SaveItem.Section))!;
+    private static readonly System.Reflection.PropertyInfo SavedRow = typeof(SaveItem).GetProperty(nameof(SaveItem.Y))!;
+
+    private static void BeforeLoad(ref IReadOnlyList<SaveItem> items, ItemFactory factory, out int __state)
     {
         __state = loadingColumns;
         loadingColumns = 0;
+        SaveItem[]? migrated = null;
+        for (int i = 0; i < items.Count; i++)
+        {
+            var saved = items[i];
+            string? section = saved.Section switch
+            {
+                "nue.eyes" => "eyes_eyes",
+                "nue.hands" => "gloves",
+                "nue.neck" => "neck",
+                _ => null
+            };
+            if (section is null) continue;
+            migrated ??= items.ToArray();
+            var copy = (SaveItem)CopySaveItem.Invoke(saved, null)!;
+            SavedSection.SetValue(copy, section);
+            if (section == "eyes_eyes") SavedRow.SetValue(copy, 0);
+            migrated[i] = copy;
+        }
+        if (migrated is not null) items = migrated;
         foreach (var item in items)
             if (item.Section == "main" && factory.Info(item.BaseId) is {} info)
                 loadingColumns = Math.Max(loadingColumns, item.X + (item.Rotated ? info.Height : info.Width));

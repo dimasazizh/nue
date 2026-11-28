@@ -27,7 +27,7 @@ public sealed partial class AvatarMod : IMod
         public readonly Stopwatch Clock = Stopwatch.StartNew();
         public int choice, background, width = 280, height = 540, framedPose = -1;
         public float yaw = .12f, zoom = 1f, framePadding, eyeHeight;
-        public bool expanded, backgroundsOpen;
+        public bool expanded, backgroundsOpen, showAccessories;
         public CharacterId subject = CharacterId.None;
         public UiPainter? publishedPainter;
         public CharacterId publishedSubject = CharacterId.None;
@@ -103,7 +103,12 @@ public sealed partial class AvatarMod : IMod
             postfix: new HarmonyMethod(typeof(AvatarMod), nameof(FitSavedPockets)),
             finalizer: new HarmonyMethod(typeof(AvatarMod), nameof(EndLoad)));
         foreach (var slot in Accessories)
-            context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, 2, 2, slot.X, 305));
+            context.AddEquipmentSlot(new ModSlot(slot.Section, slot.Fcs, slot.Columns, slot.Rows, slot.X, slot.Y)
+            {
+                MaxItems = slot.Limit,
+                Secondary = slot.Secondary,
+                RollFromClothing = !slot.Secondary
+            });
         After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
         if (!preview) return;
         After(Render, "StageCamera", nameof(FrameAvatar));
@@ -149,37 +154,49 @@ public sealed partial class AvatarMod : IMod
         After(typeof(MyGuiScreenHost), "Wheel", nameof(Zoom));
     }
 
-    private static readonly (string Section, string Label, int Fcs, int X)[] Accessories =
-        [("nue.eyes", "EYES", 4, 12), ("nue.hands", "HANDS", 10, 75), ("nue.neck", "NECK", 11, 138)];
+    private static readonly (string Section, string Label, int Fcs, int Columns, int Rows,
+        int Limit, bool Secondary, int X, int Y)[] Accessories =
+    [
+        ("eyes_eyes", "EYES", 4, 3, 1, 1, false, 280, 240),
+        ("eyes_belts", "EXTRA BELT", 14, 3, 1, 1, true, 280, 267),
+        ("eyes_hats", "EXTRA HAT", 3, 3, 1, 1, true, 280, 294),
+        ("gloves", "HANDS", 10, 2, 2, 4, false, 362, 240),
+        ("neck", "NECK", 11, 2, 2, 1, false, 424, 240)
+    ];
 
-    private static readonly bool ShowAccessorySockets = false;
-
-    // AddModSlots runs before item icons and hit targets are generated from the slot bounds.
+    // The native item icons and hit targets are arranged after these slot controls.
     private static void PlaceAccessories(List<UiControl> controls)
     {
-        if (!ShowAccessorySockets)
+        if (controls.Find(c => c.Name == "NueAccessoriesArea") is not {} strip) return;
+        var clip = strip.Bounds.Intersect(strip.Clip ?? strip.Bounds);
+        if (clip.Width <= 0 || clip.Height <= 0) return;
+        if (strip.Properties.GetValueOrDefault("NueShowAccessories") != "true")
         {
             controls.RemoveAll(c => Accessories.Any(slot => slot.Section == c.Name));
             return;
         }
-        if (controls.Find(c=>c.Name=="nue.eyes") is not {} first ||
-            controls.Find(c=>c.Name=="datapanel") is not {} summary) return;
-        float size=first.Bounds.Height, labelHeight=size*.34f;
-        // In the inspection window the summary follows the boots. In linked windows it precedes the grid.
-        bool belowGear=controls.Find(c=>c.Name=="boots") is {} boots && summary.Bounds.Y>boots.Bounds.Y;
-        float y=belowGear ? summary.Bounds.Y-size-labelHeight*.65f : summary.Bounds.Y+summary.Bounds.Height+labelHeight;
-        float step=Math.Max(first.Bounds.Width+3,summary.Bounds.Width/3);
-        for (int i=0;i<Accessories.Length;i++)
+        float unit = clip.Height / 10;
+        float labelHeight = unit * .60f;
+        float y = clip.Y;
+        foreach (var slot in Accessories)
         {
-            var (name,label,_,_)=Accessories[i];
-            int index=controls.FindIndex(c=>c.Name==name);
-            if(index<0) continue;
-            var tile=controls[index];
-            var bounds=tile.Bounds with { X=summary.Bounds.X+i*step,Y=y };
-            controls[index]=tile with { Bounds=bounds,Skin="Kenshi_InventorySlotSkin" };
-            controls.Add(new(name+"-label","TextBox",bounds with { Y=y-labelHeight,Height=labelHeight },
-                label,"","Kenshi_TextboxPaintedText",true,new Dictionary<string,string>{{"TextAlign","Left VCenter"}},
-                default,Pickable:false,Clip:tile.Clip));
+            int index = controls.FindIndex(c => c.Name == slot.Section);
+            if (index < 0) continue;
+            var tile = controls[index];
+            float cell = Math.Min(unit, clip.Width / slot.Columns);
+            var bounds = new UiRect(clip.X + (clip.Width - cell * slot.Columns) / 2,
+                y + labelHeight, cell * slot.Columns, cell * slot.Rows);
+            var properties = new Dictionary<string, string>(tile.Properties)
+            {
+                ["TileSize"] = FormattableString.Invariant($"{cell} {cell}")
+            };
+            controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties };
+            controls.Add(new(slot.Section + "-label", "TextBox",
+                new(clip.X, y, clip.Width, labelHeight), InventoryText(slot.Label),
+                "", "Kenshi_TextboxPaintedText", true,
+                new Dictionary<string, string> { ["TextAlign"] = "Center VCenter" },
+                default, Pickable: false, Clip: clip));
+            y += labelHeight + bounds.Height;
         }
     }
 
@@ -319,6 +336,16 @@ public sealed partial class AvatarMod : IMod
         var title = screens.Layout(id).Find("InventoryMainTitle")!;
         b.RelativePositions[title] = title.Position;
         b.Properties["NuePocketArea"] = new Dictionary<string, string> { ["NueBagScreen"] = id == "loot" ? "loot-bag" : "bag" };
+        b.Properties["NueAccessoriesArea"] = new Dictionary<string, string>
+            { ["NueShowAccessories"] = active.showAccessories ? "true" : "false" };
+        b.Actions["NueToggleAccessories"] = "nue-toggle-accessories";
+        b.Text["NueToggleAccessories"] = InventoryText(active.showAccessories ? "LIMBS" : "EXTRA SLOTS");
+        if (active.showAccessories)
+        {
+            foreach (string limb in LimbSections) b.Hidden.Add(limb);
+            b.Hidden.Add("NueArmTitle");
+            b.Hidden.Add("NueLegTitle");
+        }
     }
 
     private static readonly string[] LimbSections = ["left_arm_replace","right_arm_replace","left_leg_replace","right_leg_replace"];
@@ -558,6 +585,11 @@ public sealed partial class AvatarMod : IMod
     private static void Click(MyGuiEvent e)
     {
         active = e.Screen == "loot" ? other : own;
+        if (e.Screen is ("inventory" or "loot") && e.Action == "nue-toggle-accessories")
+        {
+            active.showAccessories = !active.showAccessories;
+            return;
+        }
         if (e.Screen is ("inventory" or "loot") && e.Action == ToggleVitals)
         {
             active.showHealthOverride = !AvatarShowsHealth(active);
