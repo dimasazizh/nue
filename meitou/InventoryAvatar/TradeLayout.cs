@@ -20,7 +20,7 @@ public sealed partial class AvatarMod
         AccessTools.Method(GameType("PlayerInterface"), "Selected");
     private const string StockScroll = "scrollview_backpack_content";
     private const string TradeArrangeSize = "NueTradeArrangeSize";
-    private sealed record VendorViewport(float HeaderHeight);
+    private sealed record VendorViewport(float HeaderHeight, float MadeWidth, float MadeHeight);
     private static readonly ConditionalWeakTable<UiBindings, VendorViewport> VendorViewports = new();
     private static readonly System.Reflection.MethodInfo BindFaithfulScreen =
         AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen");
@@ -69,8 +69,8 @@ public sealed partial class AvatarMod
         var body = layout.Roots[0].Children.FirstOrDefault(w => w.Skin == "Kenshi_GenericWindowSkin");
         if (body is not null && !(id == "trader" && body.Name == "Content"))
             __result.RelativePositions[body] = new(0, titleHeight, 1, Math.Max(0, 1 - titleHeight));
-        if (VendorViewports.TryGetValue(__result, out _))
-            VendorViewports.AddOrUpdate(__result, new(referenceHeader.Height));
+        if (VendorViewports.TryGetValue(__result, out var viewport))
+            VendorViewports.AddOrUpdate(__result, viewport with { HeaderHeight = referenceHeader.Height });
 
         float captionRight = 1;
         foreach (var button in header.Children.Where(w => w.Type == "Button"))
@@ -234,7 +234,7 @@ public sealed partial class AvatarMod
 
         var layout = screens.Layout("trader");
         if (!vendor.Positions.TryGetValue("Root", out var native) || native.Width <= 0 || native.Height <= 0 ||
-            layout.Find("Content") is null || layout.Find(StockScroll) is null) return false;
+            layout.Find("Content") is not {} content || layout.Find(StockScroll) is not {} view) return false;
 
         float vendorWidth = Math.Min(native.Width, width - playerWidth - 3 * gap);
         float start = TradeStart(width, playerWidth, gap, vendorWidth);
@@ -249,7 +249,10 @@ public sealed partial class AvatarMod
 
         bindings.Positions["Root"] = native with { Width = vendorWidth, Height = playerHeight };
         bindings.WindowPosition = new Vector2(start + playerWidth + gap, top) - screens.GetOffset(id);
-        VendorViewports.AddOrUpdate(bindings, new(38 * bindings.TemplateScale));
+        var nativeView = vendor.RelativePositions.GetValueOrDefault(view, view.Position);
+        VendorViewports.AddOrUpdate(bindings, new(38 * bindings.TemplateScale,
+            native.Width * content.Position.Width * nativeView.Width,
+            native.Height * content.Position.Height * nativeView.Height));
         return true;
     }
 
@@ -268,6 +271,9 @@ public sealed partial class AvatarMod
         b.Positions["Content"] = content;
         b.Positions[StockScroll] = new(content.X + inset, content.Y + viewTop, content.Width - 2 * inset,
             Math.Max(1, content.Height - viewTop - footer));
+        // A named position alone is treated as the authored size. Keep the old size so the
+        // scroll template stretches its Client (the grid clip) and reanchors both scrollbars.
+        b.MadeSizes[StockScroll] = (metrics.MadeWidth, metrics.MadeHeight);
     }
 
     private static void PlaceVendorMoneyBox(object __instance, List<UiControl> controls)
