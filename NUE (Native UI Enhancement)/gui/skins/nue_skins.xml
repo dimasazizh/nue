@@ -410,6 +410,11 @@
       <State name="normal" offset="0 0 64 64"/>
     </BasisSkin>
   </Resource>
+  <Resource type="ResourceSkin" name="NUE_Stats_brutality" size="64 64" texture="nue_stats_brutality.png">
+    <BasisSkin type="SubSkin" offset="0 0 64 64" align="Stretch">
+      <State name="normal" offset="0 0 64 64"/>
+    </BasisSkin>
+  </Resource>
   <Resource type="ResourceSkin" name="NUE_PanelBackground" size="128 96" texture="nue_panel_background.png">
     <BasisSkin type="SubSkin" offset="0 0 6 6" align="Left Top">
       <State name="normal" offset="0 0 6 6"/>

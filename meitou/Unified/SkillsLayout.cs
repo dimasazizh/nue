@@ -20,6 +20,7 @@ namespace Nue.Unified;
 internal static class SkillsLayout
 {
     private const string Athletics = "Skills3Panel-heading-4";
+    private const string BrutalityLabel = "brutality-stat-label", BrutalityValue = "brutality-stat-value";
     private const string ToggleAction = "nue-skills-modifiers";
     private const int PieSize = 24, PiesPerRow = 10;
     private static readonly Assembly Game = typeof(IMod).Assembly;
@@ -55,7 +56,7 @@ internal static class SkillsLayout
         context.Harmony.Patch(AccessTools.Method(Stats, "BindStatsGeometry"),
             postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(BindDescription)));
         context.Harmony.Patch(AccessTools.Method(Stats, "AddStatsContent"),
-            postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(Arrange)));
+            postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(Arrange)) { priority = Priority.Last });
         context.Harmony.Patch(AccessTools.Method(typeof(World), "HudOf"),
             postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(CaptureEffectiveValues)));
         context.Harmony.Patch(AccessTools.Method(Game.GetType("Meitou.Game.Ui.ScreenRouter", true), "FaithfulAction"),
@@ -163,13 +164,17 @@ internal static class SkillsLayout
         if (!indices.TryGetValue(Athletics, out int athletics) || columns[0].Count == 0 || columns[3].Count == 0) return;
         int split = columns[2].IndexOf(athletics);
         if (split < 0) return;
+        int brutalityLabel = controls.FindIndex(c => c.Name == BrutalityLabel && c.Action == "stat:brutality");
+        int brutalityValue = controls.FindIndex(c => c.Name == BrutalityValue && c.Action == "stat:brutality");
+        int[] brutality = brutalityLabel >= 0 && brutalityValue >= 0 ? [brutalityLabel] : [];
+        if (brutality.Length > 0) indices[BrutalityValue] = brutalityValue;
         int[] left = [..columns[0], ..columns[1], ..columns[2].Skip(split), ..leftMods];
-        int[] right = [..columns[2].Take(split), ..columns[3], ..rightMods];
+        int[] right = [..columns[2].Take(split), ..columns[3], ..brutality, ..rightMods];
         var area = frame.Bounds;
         float topMargin = 10 * scale, bottomMargin = 5 * scale, groupGap = 6 * scale;
         float FitRows(int[] rows)
         {
-            int groups = rows.Count(index => Array.IndexOf(HeadingNames, controls[index].Name) >= 0);
+            int groups = rows.Count(index => index == brutalityLabel || Array.IndexOf(HeadingNames, controls[index].Name) >= 0);
             return (area.Height - topMargin - bottomMargin - Math.Max(0, groups - 1) * groupGap) / rows.Length;
         }
         float row = Math.Min(20 * scale, Math.Min(FitRows(left), FitRows(right)));
@@ -204,6 +209,14 @@ internal static class SkillsLayout
                 }
                 else if (indices.TryGetValue(label.Name.Replace("-label-", "-value-", StringComparison.Ordinal), out int number))
                 {
+                    bool isBrutality = index == brutalityLabel;
+                    if (isBrutality)
+                    {
+                        y += groupGap;
+                        float side = Math.Min(row * 1.24f, area.Width * .045f);
+                        controls.Add(new("NueBrutalityIcon", "Widget", new(x - side - gap, y + (row - side) / 2, side, side),
+                            "", "", "NUE_Stats_brutality", true, new Dictionary<string, string>(), default, Pickable: false, Clip: clip));
+                    }
                     float labelWidth = Math.Max(0, valueRight - valueWidth - gap - x);
                     controls[index] = Move(label, new(x, y, labelWidth, row), clip, row * .77f);
                     var value = controls[number];
@@ -212,10 +225,38 @@ internal static class SkillsLayout
                     if (showModifiers)
                         AddModifiedValue(controls, value, label, effective,
                             new(valueRight + gap, y, modifierWidth, row), clip, row * .77f);
-                    AddPie(controls, lead, value, valueRight + gap + (showModifiers ? modifierWidth + gap : 0), y, row, clip);
+                    float pieX = valueRight + gap + (showModifiers ? modifierWidth + gap : 0);
+                    if (isBrutality)
+                        AddProgressPie(controls, value, BrutalityProgress.Read(player, lead), pieX, y, row, clip);
+                    else
+                        AddPie(controls, lead, value, pieX, y, row, clip);
                 }
                 y += row;
             }
+        }
+    }
+
+    private static class BrutalityProgress
+    {
+        private static readonly Type? StockRow = AccessTools.TypeByName("Meitou.Brutality.StockStatsRow");
+        private static readonly FieldInfo? Installed = StockRow is null ? null : AccessTools.Field(StockRow, "installed");
+        private static readonly MethodInfo? StockProgress = StockRow is null ? null : AccessTools.Method(StockRow, "Progress");
+        private static readonly MethodInfo? StockFraction = StockProgress is null
+            ? null : AccessTools.PropertyGetter(StockProgress.ReturnType, "Progress01");
+        private static readonly Type? Adapter = AccessTools.TypeByName("Meitou.Brutality.Ui.BrutalityUiAdapter");
+        private static readonly MethodInfo? Session = Adapter is null ? null : AccessTools.Method(Adapter, "Session");
+        private static readonly MethodInfo? Actor = Adapter is null ? null : AccessTools.Method(Adapter, "Actor");
+
+        internal static float Read(object player, CharacterSnapshot? lead)
+        {
+            if (Installed?.GetValue(null) is {} row && StockProgress?.Invoke(row, [player]) is {} progress &&
+                StockFraction?.Invoke(progress, null) is float fraction)
+                return fraction;
+            if (lead is not null && Session?.Invoke(null, [player]) is {} session &&
+                Actor?.Invoke(null, [session, lead.Id]) is {} actor &&
+                AccessTools.PropertyGetter(actor.GetType(), "Progress")?.Invoke(actor, null) is float legacyFraction)
+                return legacyFraction;
+            return 0;
         }
     }
 
@@ -285,13 +326,20 @@ internal static class SkillsLayout
     private static void AddPie(List<UiControl> controls, CharacterSnapshot? lead, UiControl value,
         float x, float y, float row, UiRect clip)
     {
-        if (lead is null || pieTexture.Length == 0 || !value.Action.StartsWith("stat:", StringComparison.Ordinal)) return;
+        if (lead is null || !value.Action.StartsWith("stat:", StringComparison.Ordinal)) return;
         var id = value.Action.AsSpan(5);
         bool mod = id.StartsWith("mod:", StringComparison.Ordinal);
         if (!int.TryParse(mod ? id[4..] : id, NumberStyles.None, CultureInfo.InvariantCulture, out int index)) return;
         float level = mod ? lead.ModSkills.ElementAtOrDefault(index) : lead.AllSkills.ElementAtOrDefault(index);
         if (!float.IsFinite(level)) return;
-        int progress = (int)MathF.Floor((level - MathF.Floor(level)) * 100);
+        AddProgressPie(controls, value, level - MathF.Floor(level), x, y, row, clip);
+    }
+
+    private static void AddProgressPie(List<UiControl> controls, UiControl value, float fraction,
+        float x, float y, float row, UiRect clip)
+    {
+        if (pieTexture.Length == 0 || !float.IsFinite(fraction)) return;
+        int progress = Math.Clamp((int)MathF.Floor(fraction * 100), 0, 99);
         float side = row * .76f;
         var style = new Dictionary<string, string>
         {
