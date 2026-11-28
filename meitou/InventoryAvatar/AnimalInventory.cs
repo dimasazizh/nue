@@ -59,10 +59,9 @@ public sealed partial class AvatarMod
         float gridWidth = Math.Max(hasMain ? grid!.Width : 0, hasBag ? grid!.BagWidth : 0) * cell.X;
         float animalWidth = Math.Min(half, Math.Max(nativeWidth, gridWidth + (hasBag ? 10 * cell.X : 0) + 3 * gap));
         float top = (height - panelHeight) / 2;
-        float centeredX = (width - animalWidth) / 2;
-        float animalX = trading && animal.IsPlayer ? TradeStart(width, half, gap, animalWidth) + half + gap : centeredX;
-        var origin = new Vector2(animalX, top) + (trading ? Vector2.Zero : screens.GetOffset(panelId));
-        float playerWidth = Math.Min(half, Math.Max(1, animalX - gap));
+        float start = trading ? TradeStart(width, half, gap, animalWidth) : (width - animalWidth) / 2;
+        var origin = trading ? new Vector2(start + half + gap, top)
+            : new Vector2(start, top) + screens.GetOffset(panelId);
         var animalPanel = new UiRect(origin.X, origin.Y, animalWidth, panelHeight);
         var character = inspection.Roots[0].Position.RelativeTo(new(0, 0, width, height), inspection.Roots[0].RealPosition);
         float interfaceScale = bindings.TemplateScale * 1080 / height;
@@ -70,8 +69,8 @@ public sealed partial class AvatarMod
 
         if (trading && id == "inventory")
         {
-            bindings.Positions["Root"] = root with { Width = playerWidth, Height = panelHeight };
-            bindings.WindowPosition = new Vector2(Math.Max(0, animalX - gap - playerWidth), top) - screens.GetOffset(id);
+            bindings.Positions["Root"] = root with { Width = half, Height = panelHeight };
+            bindings.WindowPosition = new Vector2(start, top) - screens.GetOffset(id);
         }
         else if (id == panelId)
         {
@@ -79,7 +78,7 @@ public sealed partial class AvatarMod
             bindings.WindowPosition = origin - screens.GetOffset(id);
             Mark(bindings, AnimalPanel, $"{(bagOpen ? 2 : hasBag ? 1 : 0)} {title.ToString(CultureInfo.InvariantCulture)}");
             MatchAnimalChrome(bindings, screens.Layout(id).Roots[0], root, animalPanel,
-                character.Width * interfaceScale, trading ? playerWidth : half, title);
+                character.Width * interfaceScale, half, title);
         }
         else if (id == bagId && bagOpen)
         {
