@@ -112,7 +112,10 @@ public sealed partial class AvatarMod : IMod
             postfix: new HarmonyMethod(typeof(AvatarMod), nameof(BindTradeChrome)));
         After(GameType("Ui.ScreenRouter"), "AddFaithfulContent", nameof(FitTradeArrangeButton));
         After(typeof(MyGuiScreenHost), "PlaceRoots", nameof(PlaceVendorViewport));
-        After(GameType("Ui.TradeWindows"), "ArrangeTraderWindow", nameof(PlaceVendorMoneyBox));
+        After(GameType("Ui.TradeWindows"), "ArrangeTraderWindow", nameof(FinishVendorLayout));
+        var presentation = typeof(MyGuiLayout).Assembly.GetType("Meitou.Data.Ui.MyGuiPresentation", true)!;
+        context.Harmony.Patch(AccessTools.Method(presentation, "VisitScrollView"),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(PrepareVendorScrollView)));
         After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));
