@@ -13,18 +13,6 @@ namespace Nue.SearchCompare;
 public sealed partial class SearchMod
 {
     private const string Overview = "overview", CraftTab = "craft", ResearchTab = "research";
-    private static readonly FieldInfo CraftStation = AccessTools.Field(Production, "_craftStation"),
-        CraftScroll = AccessTools.Field(Production, "_craftScroll"),
-        ResearchScroll = AccessTools.Field(Production, "_researchScroll"),
-        ProductionPlayer = AccessTools.Field(Production, "<player>P"),
-        PlayerScreens = AccessTools.Field(RouterPlayer.FieldType, "FaithfulScreens"),
-        PlayerSession = AccessTools.Field(RouterPlayer.FieldType, "Session"),
-        PlayerMouse = AccessTools.Field(RouterPlayer.FieldType, "Mouse"),
-        PlayerWidth = AccessTools.Field(RouterPlayer.FieldType, "Width"),
-        PlayerHeight = AccessTools.Field(RouterPlayer.FieldType, "Height");
-    private static readonly MethodInfo ItemCells = AccessTools.PropertyGetter(RouterPlayer.FieldType, "ItemCells"),
-        DrawItemCell = AccessTools.Method(ItemCells.ReturnType, "AddItemCell");
-
     private static MyGuiScreenHost ScreensOf(object player) => (MyGuiScreenHost)PlayerScreens.GetValue(player)!;
     private static WorldSnapshot SnapshotOf(object player) => ((WorldSession)PlayerSession.GetValue(player)!).CurrentSnapshot;
 

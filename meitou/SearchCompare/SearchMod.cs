@@ -24,7 +24,19 @@ public sealed partial class SearchMod : IMod
     static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
     static Type Ui(string name) => typeof(MyGuiScreenHost).Assembly.GetType("Meitou.Game.Ui." + name, true)!;
     static readonly Type Router = Ui("ScreenRouter"), Production = Ui("ProductionWindows"), Tips = Ui("TooltipRuntime");
-    static readonly FieldInfo RouterPlayer = AccessTools.Field(Router,"<player>P");
+    static readonly FieldInfo RouterPlayer = AccessTools.Field(Router,"<player>P") ??
+        throw new MissingFieldException(Router.FullName, "<player>P");
+    private static readonly FieldInfo CraftStation = AccessTools.Field(Production, "_craftStation"),
+        CraftScroll = AccessTools.Field(Production, "_craftScroll"),
+        ResearchScroll = AccessTools.Field(Production, "_researchScroll"),
+        ProductionPlayer = AccessTools.Field(Production, "<player>P"),
+        PlayerScreens = AccessTools.Field(RouterPlayer.FieldType, "FaithfulScreens"),
+        PlayerSession = AccessTools.Field(RouterPlayer.FieldType, "Session"),
+        PlayerMouse = AccessTools.Field(RouterPlayer.FieldType, "Mouse"),
+        PlayerWidth = AccessTools.Field(RouterPlayer.FieldType, "Width"),
+        PlayerHeight = AccessTools.Field(RouterPlayer.FieldType, "Height");
+    private static readonly MethodInfo ItemCells = AccessTools.PropertyGetter(RouterPlayer.FieldType, "ItemCells"),
+        DrawItemCell = AccessTools.Method(ItemCells.ReturnType, "AddItemCell");
     static readonly MethodInfo ToTip = AccessTools.Method(Tips.GetNestedType("ItemTip", BindingFlags.NonPublic)!, "Of",
         [typeof(InventoryItemView), typeof(TradeItemView), typeof(string)]);
     static readonly MethodInfo ItemLines = AccessTools.Method(Tips,"ItemLines");

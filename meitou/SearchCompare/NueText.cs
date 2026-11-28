@@ -15,7 +15,7 @@ internal static class NueText
         for (int i = 0; i < languages.Length; i++)
         {
             int column = i + 1;
-            var messages = rows.Select(row => (row[0], row[column])).ToArray();
+            var messages = rows.Select(row => new KeyValuePair<string, string>(row[0], row[column])).ToArray();
             context.AddTranslations(languages[i], messages, null);
             context.AddTranslations(locales[i], messages, null);
         }
