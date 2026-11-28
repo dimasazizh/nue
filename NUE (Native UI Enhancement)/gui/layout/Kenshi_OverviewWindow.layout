@@ -98,7 +98,7 @@
         <Property key="Caption" value="RESEARCH"/>
         <Property key="Visible" value="false"/>
         <Widget type="ListBox" skin="Kenshi_ListBoxEmpty" position_real="0.0022525 0.0407855 0.18018 0.351964" name="ResearchTypeList"/>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.1994325 0.0407855 0.3906575 0.57855">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.1994325 0.0407855 0.3906575 0.57855" name="NueResearchListFrame">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00571429 0.0261097 0.925714 0.932115" align="Stretch" name="BlueprintsAvailablePanel"/>
         </Widget>
         <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.6070900 0.0407855 0.3906575 0.57855">
@@ -127,7 +127,7 @@
           <Property key="Caption" value="DESCRIPTION"/>
           <Property key="TextAlign" value="Left VCenter"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816" name="NueResearchDescriptionFrame">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00678733 0.0365297 0.479638 0.913242" name="ResearchDescriptionPanel1"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.50905 0.0365297 0.468326 0.913242" name="ResearchDescriptionPanel2"/>
         </Widget>
@@ -139,13 +139,13 @@
           <Property key="Caption" value="STATIONS"/>
           <Property key="TextAlign" value="Center"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.3397508333 0.0317221 0.3204983333 0.593656">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.3397508333 0.0317221 0.3204983333 0.593656" name="NueCraftListFrame">
           <Widget type="Widget" skin="PanelEmpty" position_real="0 0.0254453 0.93617 0.931298" align="Stretch" name="QueueItemsPanel"/>
         </Widget>
         <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.6772491666 0.0317221 0.3204983334 0.564955">
           <Widget type="ItemBox" skin="Kenshi_ItemBoxEmpty" position_real="0.0545455 0.0375 0.909091 0.9375" name="CraftQueue"/>
         </Widget>
-        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816">
+        <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.0022525 0.664653 0.995495 0.330816" name="NueCraftDescriptionFrame">
           <Widget type="Widget" skin="PanelEmpty" position_real="0.00226244 0.0365297 0.443439 0.926941" align="Stretch" name="QueueDescriptionPanel1"/>
           <Widget type="Widget" skin="PanelEmpty" position_real="0.468326 0.0365297 0.50905 0.913242" align="Stretch" name="QueueDescriptionPanel2"/>
         </Widget>

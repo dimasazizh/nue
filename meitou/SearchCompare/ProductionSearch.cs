@@ -68,23 +68,24 @@ public sealed partial class SearchMod
         var screens = ScreensOf(player);
         if (!screens.IsOpen(Overview) || screens.GetTab(Overview, "TabsMain") != tab ||
             controls.Find(c => c.Type == "Window") is not {} window) return false;
-        int index = controls.FindIndex(c => c.Name == listName);
-        if (index < 0) return false;
+        string framePrefix = key == CraftTab ? "NueCraft" : "NueResearch";
+        if (controls.Find(c => c.Name == listName) is not {} list ||
+            controls.Find(c => c.Name == framePrefix + "ListFrame") is not {} listFrame ||
+            controls.Find(c => c.Name == framePrefix + "DescriptionFrame") is not {} descriptionFrame) return false;
 
-        var list = controls[index];
         var bounds = list.Bounds.Intersect(list.Clip ?? window.Bounds);
         float scale = (float)Property(player, "UiScale");
         float gap = Math.Max(2, 3 * scale);
-        float height = Math.Min(27 * scale, bounds.Height / 5);
-        float y = bounds.Y + bounds.Height - gap - height;
+        float top = listFrame.Bounds.Y + listFrame.Bounds.Height;
+        float space = descriptionFrame.Bounds.Y - top;
+        float height = Math.Min(27 * scale, space - 2 * gap);
+        float y = top + (space - height) / 2;
         float innerWidth = bounds.Width - 2 * gap;
         float clearWidth = Math.Min(height * 1.25f, innerWidth / 4);
-        if (height <= 0 || y <= bounds.Y + gap || innerWidth <= clearWidth + gap) return false;
-        var rows = bounds with { Height = y - gap - bounds.Y };
-        controls[index] = list with { Bounds = rows, Clip = rows };
+        if (height <= 0 || innerWidth <= clearWidth + gap) return false;
 
         var field = new UiRect(bounds.X + gap, y, innerWidth - clearWidth - gap, height);
-        AddStockSearch(controls, screens, Overview, bounds, field, bounds.X + bounds.Width - gap - clearWidth,
+        AddStockSearch(controls, screens, Overview, window.Bounds, field, bounds.X + bounds.Width - gap - clearWidth,
             clearWidth, key, hint);
         return true;
     }

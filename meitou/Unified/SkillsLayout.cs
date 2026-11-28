@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Meitou.Data.Gameplay.Bodies;
 using Meitou.Data.Ui;
 using Meitou.Game.Rendering.Ui;
 using Meitou.Game.Ui;
@@ -76,6 +77,20 @@ internal static class SkillsLayout
             args[3] = stat;
             if (SkillTotal.Invoke(SkillTerms.Invoke(null, args), null) is float value && float.IsFinite(value))
                 values[statId] = value;
+        }
+
+        // The HUD's melee totals include combat modifiers outside SkillTermsOf.
+        foreach (var line in __result.Stats)
+        {
+            switch (line.Label)
+            {
+                case "Attack:":
+                    values[(int)StatsEnumerated.MeleeAttack] = line.Value;
+                    break;
+                case "Defense:":
+                    values[(int)StatsEnumerated.MeleeDefence] = line.Value;
+                    break;
+            }
         }
         EffectiveByHud.AddOrUpdate(__result, values);
     }
@@ -167,9 +182,10 @@ internal static class SkillsLayout
                     var value = controls[number];
                     controls[number] = Move(value, new(valueRight - valueWidth, y, valueWidth, row), clip, row * .77f);
                     float modifierWidth = Math.Min(34 * scale, area.Width * .048f);
-                    bool hasModifier = showModifiers && AddModifiedValue(controls, value, label, effective,
-                        new(valueRight + gap, y, modifierWidth, row), clip, row * .77f);
-                    AddPie(controls, lead, value, valueRight + gap + (hasModifier ? modifierWidth + gap : 0), y, row, clip);
+                    if (showModifiers)
+                        AddModifiedValue(controls, value, label, effective,
+                            new(valueRight + gap, y, modifierWidth, row), clip, row * .77f);
+                    AddPie(controls, lead, value, valueRight + gap + (showModifiers ? modifierWidth + gap : 0), y, row, clip);
                 }
                 y += row;
             }
@@ -198,8 +214,8 @@ internal static class SkillsLayout
             if (!value.Name.StartsWith("AttributesPanel-value-", StringComparison.Ordinal)) continue;
             var label = controls.Find(c => c.Name == value.Name.Replace("-value-", "-label-", StringComparison.Ordinal));
             float right = Math.Min(value.Bounds.X + value.Bounds.Width, clip.X + clip.Width);
-            if (!AddModifiedValue(controls, value, label, effective,
-                new(right - width, value.Bounds.Y, width, value.Bounds.Height), clip, value.Bounds.Height * .77f)) continue;
+            AddModifiedValue(controls, value, label, effective,
+                new(right - width, value.Bounds.Y, width, value.Bounds.Height), clip, value.Bounds.Height * .77f);
             float baseRight = right - width - gap;
             float baseWidth = Math.Min(value.Bounds.Width, Math.Max(0, baseRight - clip.X) * .35f);
             float baseLeft = baseRight - baseWidth;
@@ -212,22 +228,21 @@ internal static class SkillsLayout
         }
     }
 
-    private static bool AddModifiedValue(List<UiControl> controls, UiControl value, UiControl? label,
+    private static void AddModifiedValue(List<UiControl> controls, UiControl value, UiControl? label,
         Dictionary<int, float>? effective, UiRect bounds, UiRect clip, float fontSize)
     {
         string action = value.Action.StartsWith("stat:", StringComparison.Ordinal) ? value.Action : label?.Action ?? "";
         if (effective is null || !action.StartsWith("stat:", StringComparison.Ordinal) ||
             !int.TryParse(action.AsSpan(5), NumberStyles.None, CultureInfo.InvariantCulture, out int stat) ||
             !effective.TryGetValue(stat, out float modified) ||
-            !float.TryParse(value.Caption, NumberStyles.Float, CultureInfo.InvariantCulture, out float baseline)) return false;
+            !float.TryParse(value.Caption, NumberStyles.Float, CultureInfo.InvariantCulture, out float baseline)) return;
         modified = MathF.Floor(modified);
-        if (modified == baseline) return false;
+        if (modified == baseline) return;
         string tint = modified < baseline ? "0.90 0.30 0.24" : "0.42 0.76 0.32";
         var text = new UiControl(value.Name + "-modified", "TextBox", bounds, $"({modified:0})", "", "", true,
             new Dictionary<string, string> { ["TextAlign"] = "Right VCenter", ["TextColour"] = tint,
                 ["FontName"] = "Kenshi_StandardFont_Small" }, default, Pickable: false, Clip: clip);
         controls.Add(Move(text, bounds, clip, fontSize));
-        return true;
     }
 
     private static UiControl Move(UiControl control, UiRect bounds, UiRect clip, float fontSize)
