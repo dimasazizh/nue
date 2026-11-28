@@ -26,6 +26,8 @@ internal static class NueText
 
     private const string Messages = """
 Search|Suchen|Rechercher|搜索|Поиск|検索|검색
+SHOW MODIFIERS|MODIFIKATOREN ANZEIGEN|AFFICHER LES MODIFICATEURS|显示修正值|ПОКАЗАТЬ МОДИФИКАТОРЫ|補正値を表示|보정치 표시
+HIDE MODIFIERS|MODIFIKATOREN AUSBLENDEN|MASQUER LES MODIFICATEURS|隐藏修正值|СКРЫТЬ МОДИФИКАТОРЫ|補正値を非表示|보정치 숨기기
 Search items|Gegenstände suchen|Rechercher des objets|搜索物品|Поиск предметов|アイテムを検索|아이템 검색
 Search all items|Alle Gegenstände suchen|Rechercher tous les objets|搜索所有物品|Поиск по всем предметам|すべてのアイテムを検索|모든 아이템 검색
 Search all blueprints|Alle Baupläne suchen|Rechercher tous les plans|搜索所有蓝图|Поиск по всем чертежам|すべての設計図を検索|모든 설계도 검색

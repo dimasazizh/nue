@@ -113,12 +113,13 @@
       <Property key="NeedMouse" value="false"/>
       <Property key="NeedKey" value="false"/>
       <Property key="InheritsPick" value="true"/>
-      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008000 0.559000 0.987000 0.426000">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.765 0.557 0.230 0.037" name="NueSkillModifiersArea"/>
+      <Widget type="Widget" skin="Kenshi_GenericTextBoxSkin" position_real="0.008000 0.600000 0.987000 0.385000">
         <Property key="NeedMouse" value="false"/>
         <Property key="NeedKey" value="false"/>
         <Property key="InheritsPick" value="true"/>
       </Widget>
-      <Widget type="Widget" skin="PanelEmpty" position_real="0.004000 0.559000 0.991000 0.426000" name="NueSkillsDescription">
+      <Widget type="Widget" skin="PanelEmpty" position_real="0.004000 0.600000 0.991000 0.385000" name="NueSkillsDescription">
         <Widget type="Widget" skin="PanelEmpty" position_real="0.015000 0.045000 0.352000 0.940000" align="HStretch Top" name="Description1Panel"/>
         <Widget type="Widget" skin="PanelEmpty" position_real="0.383000 0.045000 0.601000 0.940000" name="Description2Panel" align="HStretch Top"/>
         <Property key="NeedMouse" value="false"/>

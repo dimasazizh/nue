@@ -42,7 +42,7 @@ public sealed partial class SearchMod
     {
         __state = false;
         var player = ProductionPlayer.GetValue(__instance)!;
-        if (!ProductionBar(player, controls, CraftTab, 3, "QueueItemsPanel", "QueueDescriptionPanel1", "Search all items") ||
+        if (!ProductionBar(player, controls, CraftTab, 3, "QueueItemsPanel", "Search all items") ||
             CraftStation.GetValue(__instance) is not null || Query(CraftTab).Length == 0) return;
 
         // The native item list needs a live station even when the query searches all stations.
@@ -60,10 +60,10 @@ public sealed partial class SearchMod
 
     private static void ResearchBar(object __instance, List<UiControl> controls) =>
         ProductionBar(ProductionPlayer.GetValue(__instance)!, controls, ResearchTab, 2,
-            "BlueprintsAvailablePanel", "ResearchDescriptionPanel1", "Search all blueprints");
+            "BlueprintsAvailablePanel", "Search all blueprints");
 
     private static bool ProductionBar(object player, List<UiControl> controls, string key, int tab,
-        string listName, string descriptionName, string hint)
+        string listName, string hint)
     {
         var screens = ScreensOf(player);
         if (!screens.IsOpen(Overview) || screens.GetTab(Overview, "TabsMain") != tab ||
@@ -72,20 +72,19 @@ public sealed partial class SearchMod
         if (index < 0) return false;
 
         var list = controls[index];
-        var bounds = list.Bounds;
+        var bounds = list.Bounds.Intersect(list.Clip ?? window.Bounds);
         float scale = (float)Property(player, "UiScale");
         float gap = Math.Max(2, 3 * scale);
         float height = Math.Min(27 * scale, bounds.Height / 5);
-        float bottom = controls.Find(c => c.Name == descriptionName) is {} description
-            ? description.Bounds.Y - 10 * scale : bounds.Y + bounds.Height;
-        float y = Math.Min(bounds.Y + bounds.Height + gap, bottom - height);
-        float clearWidth = Math.Min(height * 1.25f, bounds.Width / 4);
-        if (height <= 0 || y <= bounds.Y + gap || bounds.Width <= clearWidth + gap) return false;
-        if (y - gap < bounds.Y + bounds.Height)
-            controls[index] = list with { Bounds = bounds with { Height = y - gap - bounds.Y } };
+        float y = bounds.Y + bounds.Height - gap - height;
+        float innerWidth = bounds.Width - 2 * gap;
+        float clearWidth = Math.Min(height * 1.25f, innerWidth / 4);
+        if (height <= 0 || y <= bounds.Y + gap || innerWidth <= clearWidth + gap) return false;
+        var rows = bounds with { Height = y - gap - bounds.Y };
+        controls[index] = list with { Bounds = rows, Clip = rows };
 
-        var field = new UiRect(bounds.X, y, bounds.Width - clearWidth - gap, height);
-        AddStockSearch(controls, screens, Overview, window.Bounds, field, bounds.X + bounds.Width - clearWidth,
+        var field = new UiRect(bounds.X + gap, y, innerWidth - clearWidth - gap, height);
+        AddStockSearch(controls, screens, Overview, bounds, field, bounds.X + bounds.Width - gap - clearWidth,
             clearWidth, key, hint);
         return true;
     }

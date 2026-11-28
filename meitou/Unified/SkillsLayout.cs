@@ -1,16 +1,20 @@
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Meitou.Data.Ui;
 using Meitou.Game.Rendering.Ui;
+using Meitou.Game.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
+using Nue.SearchCompare;
 
 namespace Nue.Unified;
 
 internal static class SkillsLayout
 {
     private const string Athletics = "Skills3Panel-heading-4";
+    private const string ToggleAction = "nue-skills-modifiers";
     private const int PieSize = 24, PiesPerRow = 10;
     private static readonly Assembly Game = typeof(IMod).Assembly;
     private static readonly Type Stats = Game.GetType("Meitou.Game.Ui.StatsWindow", true)!;
@@ -18,6 +22,14 @@ internal static class SkillsLayout
     private static readonly FieldInfo StatsPlayer = AccessTools.GetDeclaredFields(Stats).Single(field => field.FieldType == Player);
     private static readonly MethodInfo Selected = AccessTools.Method(Player, "Selected");
     private static readonly MethodInfo UiScale = AccessTools.PropertyGetter(Player, "UiScale");
+    private static readonly MethodInfo SkillTerms = AccessTools.Method(typeof(World), "SkillTermsOf");
+    private static readonly MethodInfo SkillTotal = AccessTools.PropertyGetter(SkillTerms.ReturnType, "Total");
+    private static readonly (int Id, object Stat)[] DisplayedStats = ((Array[])AccessTools.Field(Stats, "StatPanels").GetValue(null)!)
+        .SelectMany(panel => panel.Cast<object>()).Distinct().Select(stat => (Convert.ToInt32(stat), stat)).ToArray();
+    private sealed record ModifierTarget(CharacterId Id);
+    private static volatile ModifierTarget? modifierTarget;
+    private static bool showModifiers;
+    private static readonly ConditionalWeakTable<HudView, Dictionary<int, float>> EffectiveByHud = new();
     private static readonly string[] HeadingNames =
     [
         "Skills1Panel-heading-0", "Skills2Panel-heading-0", "Skills2Panel-heading-4",
@@ -34,6 +46,38 @@ internal static class SkillsLayout
             postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(BindDescription)));
         context.Harmony.Patch(AccessTools.Method(Stats, "AddStatsContent"),
             postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(Arrange)));
+        context.Harmony.Patch(AccessTools.Method(typeof(World), "HudOf"),
+            postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(CaptureEffectiveValues)));
+        context.Harmony.Patch(AccessTools.Method(Game.GetType("Meitou.Game.Ui.ScreenRouter", true), "FaithfulAction"),
+            prefix: new HarmonyMethod(typeof(SkillsLayout), nameof(ToggleModifiers)));
+        context.Harmony.Patch(AccessTools.Method(typeof(MyGuiScreenHost), "Close"),
+            postfix: new HarmonyMethod(typeof(SkillsLayout), nameof(ClearTarget)));
+    }
+
+    private static bool ToggleModifiers(MyGuiEvent e)
+    {
+        if (e.Screen != "stats" || e.Action != ToggleAction) return true;
+        showModifiers = !showModifiers;
+        return false;
+    }
+
+    private static void ClearTarget(string id)
+    {
+        if (id == "stats") modifierTarget = null;
+    }
+
+    private static void CaptureEffectiveValues(CharacterId id, object cold, object? med, object? stats, HudView __result)
+    {
+        if (modifierTarget?.Id != id || med is null || stats is null) return;
+        var values = new Dictionary<int, float>();
+        object[] args = [cold, med, stats, 0];
+        foreach (var (statId, stat) in DisplayedStats)
+        {
+            args[3] = stat;
+            if (SkillTotal.Invoke(SkillTerms.Invoke(null, args), null) is float value && float.IsFinite(value))
+                values[statId] = value;
+        }
+        EffectiveByHud.AddOrUpdate(__result, values);
     }
 
     private static void BindDescription(MyGuiLayout layout, UiBindings bindings)
@@ -49,6 +93,13 @@ internal static class SkillsLayout
         var player = StatsPlayer.GetValue(__instance)!;
         float scale = (float)UiScale.Invoke(player, null)!;
         var lead = ((IReadOnlyList<CharacterSnapshot>)Selected.Invoke(player, null)!).FirstOrDefault();
+        if (modifierTarget?.Id != lead?.Id)
+            modifierTarget = lead is null ? null : new(lead.Id);
+        Dictionary<int, float>? effective = null;
+        if (showModifiers && lead?.Hud is {} hud)
+            EffectiveByHud.TryGetValue(hud, out effective);
+        AddModifierToggle(controls);
+        if (showModifiers) ShiftAttributeValues(controls, effective, scale);
         var indices = new Dictionary<string, int>(StringComparer.Ordinal);
         var columns = new List<int>[] { [], [], [], [] };
         var leftMods = new List<int>();
@@ -115,11 +166,68 @@ internal static class SkillsLayout
                     controls[index] = Move(label, new(x, y, labelWidth, row), clip, row * .77f);
                     var value = controls[number];
                     controls[number] = Move(value, new(valueRight - valueWidth, y, valueWidth, row), clip, row * .77f);
-                    AddPie(controls, lead, value, valueRight + gap, y, row, clip);
+                    float modifierWidth = Math.Min(34 * scale, area.Width * .048f);
+                    bool hasModifier = showModifiers && AddModifiedValue(controls, value, label, effective,
+                        new(valueRight + gap, y, modifierWidth, row), clip, row * .77f);
+                    AddPie(controls, lead, value, valueRight + gap + (hasModifier ? modifierWidth + gap : 0), y, row, clip);
                 }
                 y += row;
             }
         }
+    }
+
+    private static void AddModifierToggle(List<UiControl> controls)
+    {
+        if (controls.Find(c => c.Name == "NueSkillModifiersArea") is not {} anchor) return;
+        var bounds = anchor.Bounds;
+        controls.Add(new("NueSkillModifiersToggle", "Button", bounds,
+            NueText.Get(showModifiers ? "HIDE MODIFIERS" : "SHOW MODIFIERS"), ToggleAction, "Kenshi_Button1Skin",
+            true, new Dictionary<string, string> { ["TextAlign"] = "Center VCenter",
+                ["FontName"] = "Kenshi_StandardFont_Small" }, default, Pickable: true, Clip: bounds));
+    }
+
+    private static void ShiftAttributeValues(List<UiControl> controls, Dictionary<int, float>? effective, float scale)
+    {
+        if (controls.Find(c => c.Name == "AttributesPanel") is not {} panel) return;
+        var clip = panel.Bounds.Intersect(panel.Clip ?? panel.Bounds);
+        float gap = 3 * scale, width = Math.Min(34 * scale, clip.Width * .25f);
+        int count = controls.Count;
+        for (int i = 0; i < count; i++)
+        {
+            var value = controls[i];
+            if (!value.Name.StartsWith("AttributesPanel-value-", StringComparison.Ordinal)) continue;
+            var label = controls.Find(c => c.Name == value.Name.Replace("-value-", "-label-", StringComparison.Ordinal));
+            float right = Math.Min(value.Bounds.X + value.Bounds.Width, clip.X + clip.Width);
+            if (!AddModifiedValue(controls, value, label, effective,
+                new(right - width, value.Bounds.Y, width, value.Bounds.Height), clip, value.Bounds.Height * .77f)) continue;
+            float baseRight = right - width - gap;
+            float baseWidth = Math.Min(value.Bounds.Width, Math.Max(0, baseRight - clip.X) * .35f);
+            float baseLeft = baseRight - baseWidth;
+            controls[i] = value with { Bounds = value.Bounds with { X = baseLeft, Width = baseWidth } };
+            if (label is not null && label.Bounds.X + label.Bounds.Width > baseLeft)
+            {
+                int index = controls.IndexOf(label);
+                controls[index] = label with { Bounds = label.Bounds with { Width = Math.Max(0, baseLeft - label.Bounds.X - gap) } };
+            }
+        }
+    }
+
+    private static bool AddModifiedValue(List<UiControl> controls, UiControl value, UiControl? label,
+        Dictionary<int, float>? effective, UiRect bounds, UiRect clip, float fontSize)
+    {
+        string action = value.Action.StartsWith("stat:", StringComparison.Ordinal) ? value.Action : label?.Action ?? "";
+        if (effective is null || !action.StartsWith("stat:", StringComparison.Ordinal) ||
+            !int.TryParse(action.AsSpan(5), NumberStyles.None, CultureInfo.InvariantCulture, out int stat) ||
+            !effective.TryGetValue(stat, out float modified) ||
+            !float.TryParse(value.Caption, NumberStyles.Float, CultureInfo.InvariantCulture, out float baseline)) return false;
+        modified = MathF.Floor(modified);
+        if (modified == baseline) return false;
+        string tint = modified < baseline ? "0.90 0.30 0.24" : "0.42 0.76 0.32";
+        var text = new UiControl(value.Name + "-modified", "TextBox", bounds, $"({modified:0})", "", "", true,
+            new Dictionary<string, string> { ["TextAlign"] = "Right VCenter", ["TextColour"] = tint,
+                ["FontName"] = "Kenshi_StandardFont_Small" }, default, Pickable: false, Clip: clip);
+        controls.Add(Move(text, bounds, clip, fontSize));
+        return true;
     }
 
     private static UiControl Move(UiControl control, UiRect bounds, UiRect clip, float fontSize)

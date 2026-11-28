@@ -21,7 +21,8 @@ public sealed partial class SearchMod : IMod
     const string StockView = "scrollview_backpack_content";
     const string ClearAction = "nue-search-clear";
     static readonly Dictionary<string,string> Queries = new();
-    static readonly ConditionalWeakTable<object,InventoryItemView> Comparisons = new();
+    sealed record GearComparisonTarget(InventoryItemView Item, string? HoveredName, string? EquippedName);
+    static readonly ConditionalWeakTable<object,GearComparisonTarget> Comparisons = new();
     static Type Ui(string name) => typeof(MyGuiScreenHost).Assembly.GetType("Meitou.Game.Ui." + name, true)!;
     static readonly Type Router = Ui("ScreenRouter"), Production = Ui("ProductionWindows"), Tips = Ui("TooltipRuntime");
     static readonly FieldInfo RouterPlayer = AccessTools.Field(Router,"<player>P") ??
@@ -189,12 +190,25 @@ public sealed partial class SearchMod : IMod
         var lookup = (Func<string,GameRecord?>?)Property(runtime,"ItemRecordOf");
         string q = Installed ? AddInventorySearch(player, id, kind, controls, r) : "";
         CharacterSnapshot? owner = null;
+        CharacterSnapshot? squadMate = null;
         if (GearComparison)
         {
             var windows = Property(player,"InventoryWindows");
-            owner = AccessTools.Method(windows.GetType(),"WindowCharacter").Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
+            var windowCharacter = AccessTools.Method(windows.GetType(),"WindowCharacter");
+            owner = windowCharacter.Invoke(windows,[kind=="trader" ? "inventory" : id]) as CharacterSnapshot;
+            var screens = ScreensOf(player);
+            if (id is ("inventory" or "bag" or "loot" or "loot-bag") &&
+                owner is { IsPlayer: true, Animal: false } && screens.IsOpen("inventory") &&
+                screens.IsOpen("loot") && !screens.IsOpen("trader"))
+            {
+                string otherScreen = id is "loot" or "loot-bag" ? "inventory" : "loot";
+                if (windowCharacter.Invoke(windows, [otherScreen]) is CharacterSnapshot { IsPlayer: true, Animal: false } other &&
+                    other.Id != owner.Id)
+                    squadMate = other;
+            }
         }
-        if (q.Length == 0 && owner?.ItemGrid is null) return;
+        var comparisonGrid = (squadMate ?? owner)?.ItemGrid;
+        if (q.Length == 0 && comparisonGrid is null) return;
         foreach (var cell in controls.ToArray())
         {
             if (!(cell.Name.StartsWith("inventory-item-") || cell.Name.StartsWith("trade-item-")) || tips[cell.Name] is not {} tip) continue;
@@ -203,18 +217,19 @@ public sealed partial class SearchMod : IMod
                 && !(record?.Type==FcsRecordType.Armour && Match((string)SectionOf.Invoke(null,[record])!,q)))
                 controls.Add(new(cell.Name+"-dim","Widget",cell.Bounds,"","","",true,new Dictionary<string,string>(),
                     new Vector4(.045f,.035f,.025f,.82f),Pickable:false,Clip:cell.Clip));
-            if (owner?.ItemGrid is not {} grid || record == null) continue;
+            if (comparisonGrid is not {} grid || record == null) continue;
             string slot = record.Type switch {
                 FcsRecordType.Weapon or FcsRecordType.Crossbow => "back",
                 FcsRecordType.Container => "backpack_attach",
                 FcsRecordType.Armour or FcsRecordType.Item => (string)SectionOf.Invoke(null,[record])!,
                 _ => "" };
             if (!InventoryCommands.IsEquipmentSection(slot)) continue;
-            string? index = kind!="trader" ? cell.Properties.GetValueOrDefault("InventoryItem") : null;
+            string? index = kind != "trader" && squadMate is null ? cell.Properties.GetValueOrDefault("InventoryItem") : null;
             var equipped = grid.Items.Where(i => i.Index.ToString()!=index &&
                 (i.Section==slot || slot=="back" && i.Section=="hip"))
                 .OrderBy(i => i.Section!=slot).FirstOrDefault();
-            if (equipped != null) Comparisons.AddOrUpdate(tip,equipped);
+            if (equipped != null)
+                Comparisons.AddOrUpdate(tip, new(equipped, squadMate is null ? null : owner?.Name, squadMate?.Name));
         }
     }
 

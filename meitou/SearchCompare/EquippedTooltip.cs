@@ -18,7 +18,7 @@ public sealed partial class SearchMod
     const string Red = "0.90 0.30 0.24";
     // A measurable prefix reserves space in the native tooltip layout. The decoration replaces it with geometry.
     const string ArrowSpace = "00 ";
-    static readonly ConditionalWeakTable<IReadOnlyList<TooltipLine>,InventoryItemView> EquippedByLines = new();
+    static readonly ConditionalWeakTable<IReadOnlyList<TooltipLine>,GearComparisonTarget> EquippedByLines = new();
 
     const string Number = @"[+−-]?\d+(?:\.\d+)?";
     static readonly Regex Stat = new(
@@ -26,7 +26,8 @@ public sealed partial class SearchMod
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     sealed record TooltipPair(int Start, IReadOnlyList<TooltipLine> Equipped, string?[] EquippedColours,
-        int[] HoveredDirections, int[] EquippedDirections);
+        int[] HoveredDirections, int[] EquippedDirections, string? HoveredName, string? EquippedName,
+        TooltipTone HoveredGrade, TooltipTone EquippedGrade);
     enum RowKind { None, Stat, Skill, Weather }
 
     static void RememberComparison(object t, IReadOnlyList<TooltipLine> __result)
@@ -40,7 +41,7 @@ public sealed partial class SearchMod
     {
         __state = null;
         if (prefix != "tooltip" || !EquippedByLines.TryGetValue(lines, out var equipped)) return;
-        var tip = ToTip.Invoke(null, [equipped, null, null]);
+        var tip = ToTip.Invoke(null, [equipped.Item, null, null]);
         var last = LastModTooltip.GetValue(__instance);
         IReadOnlyList<TooltipLine> equippedLines;
         try
@@ -87,8 +88,25 @@ public sealed partial class SearchMod
         }
         valueColours = hoveredColours;
         lines = hoveredRows;
-        __state = new(controls.Count, equippedRows, equippedColours, hoveredDirections, equippedDirections);
+        __state = new(controls.Count, equippedRows, equippedColours, hoveredDirections, equippedDirections,
+            equipped.HoveredName, equipped.EquippedName, GradeOf(hoveredRows), GradeOf(equippedRows));
     }
+
+    static TooltipTone GradeOf(IEnumerable<TooltipLine> rows) =>
+        rows.Select(row => row.KeyTone).FirstOrDefault(tone => GradeBorder(tone).HasValue);
+
+    // Match ItemGrade0–ItemGrade4 in the NUE palette.
+    static Vector4? GradeBorder(TooltipTone grade) => grade switch
+    {
+        TooltipTone.Grade0 => Rgb(0x787878),
+        TooltipTone.Grade1 => Rgb(0xD9CCBF),
+        TooltipTone.Grade2 => Rgb(0x4099B3),
+        TooltipTone.Grade3 => Rgb(0x66FC80),
+        TooltipTone.Grade4 => Rgb(0xFCEB0D),
+        _ => null
+    };
+
+    static Vector4 Rgb(int hex) => new(((hex >> 16) & 255) / 255f, ((hex >> 8) & 255) / 255f, (hex & 255) / 255f, 1);
 
     static RowKind ComparisonKind(TooltipLine line)
     {
@@ -168,10 +186,12 @@ public sealed partial class SearchMod
         // The plate image contains a transparent margin. Space the visible frame edges.
         float leftInset = leftPlate.Type == "ImageBox" ? 16 * scale : 0;
         float rightInset = rightPlate.Type == "ImageBox" ? 16 * scale : 0;
-        float rightOffset = left.Width - leftInset + gap - rightInset + border;
-        float rightTop = leftInset - rightInset + border;
+        var hoveredBorder = GradeBorder(pair.HoveredGrade);
+        float leftBorder = hoveredBorder.HasValue ? border : 0;
+        float rightOffset = left.Width - leftInset + leftBorder + gap - rightInset + border;
+        float rightTop = leftInset - leftBorder - rightInset + border;
         float pairWidth = rightOffset + right.Width - rightInset + border;
-        float pairHeight = Math.Max(left.Height - leftInset, rightTop + right.Height - rightInset + border);
+        float pairHeight = Math.Max(left.Height - leftInset + leftBorder, rightTop + right.Height - rightInset + border);
         float x = Math.Clamp(left.X, 0, Math.Max(0, width - pairWidth));
         float y = Math.Clamp(left.Y, labelHeight + border,
             Math.Max(labelHeight + border, height - pairHeight));
@@ -186,16 +206,28 @@ public sealed partial class SearchMod
 
         var frame = new UiRect(rightX + rightInset, rightY + rightInset,
             right.Width - 2 * rightInset, right.Height - 2 * rightInset);
-        var gold = new Vector4(.909804f, .741176f, .447059f, 1);
+        var hoveredFrame = new UiRect(x + leftInset, y + leftInset, left.Width - 2 * leftInset, left.Height - 2 * leftInset);
         var style = new Dictionary<string,string>();
-        void Edge(string name, UiRect bounds) => controls.Add(new(EquippedPrefix + "-" + name, "Widget", bounds,
-            "", "", "", true, style, gold, Pickable:false));
-        Edge("top", new(frame.X - border, frame.Y - border, frame.Width + 2 * border, border));
-        Edge("bottom", new(frame.X - border, frame.Y + frame.Height, frame.Width + 2 * border, border));
-        Edge("left", new(frame.X - border, frame.Y, border, frame.Height));
-        Edge("right", new(frame.X + frame.Width, frame.Y, border, frame.Height));
-        controls.Add(new(EquippedPrefix + "-heading", "TextBox",
-            new(frame.X, frame.Y - border - labelHeight, frame.Width, labelHeight), NueText.Get("EQUIPPED"), "", "", true,
+        if (hoveredBorder is {} colour)
+            Frame("tooltip", hoveredFrame, colour);
+        Frame(EquippedPrefix, frame, GradeBorder(pair.EquippedGrade) ?? Rgb(0xE8BD72));
+        if (pair.HoveredName is {} hoveredName)
+            Heading("tooltip-heading", hoveredFrame.X, hoveredFrame.Y - leftBorder, hoveredFrame.Width, hoveredName);
+        Heading(EquippedPrefix + "-heading", frame.X, frame.Y - border, frame.Width,
+            pair.EquippedName ?? NueText.Get("EQUIPPED"));
+
+        void Frame(string prefix, UiRect rect, Vector4 tint)
+        {
+            void Edge(string name, UiRect bounds) => controls.Add(new(prefix + "-grade-" + name, "Widget", bounds,
+                "", "", "", true, style, tint, Pickable: false));
+            Edge("top", new(rect.X - border, rect.Y - border, rect.Width + 2 * border, border));
+            Edge("bottom", new(rect.X - border, rect.Y + rect.Height, rect.Width + 2 * border, border));
+            Edge("left", new(rect.X - border, rect.Y, border, rect.Height));
+            Edge("right", new(rect.X + rect.Width, rect.Y, border, rect.Height));
+        }
+
+        void Heading(string name, float leftEdge, float top, float frameWidth, string caption) =>
+            controls.Add(new(name, "TextBox", new(leftEdge, top - labelHeight, frameWidth, labelHeight), caption, "", "", true,
             new Dictionary<string,string> {
                 ["FontName"] = "Kenshi_StandardFont_Small", ["TextAlign"] = "Center VCenter", ["TextColour"] = Yellow
             }, default, Pickable:false));
