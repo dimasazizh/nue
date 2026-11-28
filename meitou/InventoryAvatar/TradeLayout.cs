@@ -20,7 +20,7 @@ public sealed partial class AvatarMod
         AccessTools.Method(GameType("PlayerInterface"), "Selected");
     private const string StockScroll = "scrollview_backpack_content";
     private const string TradeArrangeSize = "NueTradeArrangeSize";
-    private sealed record VendorViewport(float HeaderHeight, float MadeWidth, float MadeHeight);
+    private sealed record VendorViewport(float HeaderHeight, MyGuiWidget ScrollView);
     private static readonly ConditionalWeakTable<UiBindings, VendorViewport> VendorViewports = new();
     private static readonly System.Reflection.MethodInfo BindFaithfulScreen =
         AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen");
@@ -234,7 +234,7 @@ public sealed partial class AvatarMod
 
         var layout = screens.Layout("trader");
         if (!vendor.Positions.TryGetValue("Root", out var native) || native.Width <= 0 || native.Height <= 0 ||
-            layout.Find("Content") is not {} content || layout.Find(StockScroll) is not {} view) return false;
+            layout.Find("Content") is null || layout.Find(StockScroll) is not {} view) return false;
 
         float vendorWidth = Math.Min(native.Width, width - playerWidth - 3 * gap);
         float start = TradeStart(width, playerWidth, gap, vendorWidth);
@@ -249,10 +249,7 @@ public sealed partial class AvatarMod
 
         bindings.Positions["Root"] = native with { Width = vendorWidth, Height = playerHeight };
         bindings.WindowPosition = new Vector2(start + playerWidth + gap, top) - screens.GetOffset(id);
-        var nativeView = vendor.RelativePositions.GetValueOrDefault(view, view.Position);
-        VendorViewports.AddOrUpdate(bindings, new(38 * bindings.TemplateScale,
-            native.Width * content.Position.Width * nativeView.Width,
-            native.Height * content.Position.Height * nativeView.Height));
+        VendorViewports.AddOrUpdate(bindings, new(38 * bindings.TemplateScale, view));
         return true;
     }
 
@@ -269,11 +266,46 @@ public sealed partial class AvatarMod
         // Named, absolute positions take precedence over the template's own client geometry.
         var content = new UiRect(root.X, root.Y + metrics.HeaderHeight, root.Width, bodyHeight);
         b.Positions["Content"] = content;
-        b.Positions[StockScroll] = new(content.X + inset, content.Y + viewTop, content.Width - 2 * inset,
+        var viewport = new UiRect(content.X + inset, content.Y + viewTop, content.Width - 2 * inset,
             Math.Max(1, content.Height - viewTop - footer));
-        // A named position alone is treated as the authored size. Keep the old size so the
-        // scroll template stretches its Client (the grid clip) and reanchors both scrollbars.
-        b.MadeSizes[StockScroll] = (metrics.MadeWidth, metrics.MadeHeight);
+        b.Positions[StockScroll] = viewport;
+        FitVendorScrollParts(b, metrics.ScrollView, viewport, scale);
+    }
+
+    private static void FitVendorScrollParts(UiBindings bindings, MyGuiWidget view, UiRect bounds, float scale)
+    {
+        var client = ScrollPart(view, "Client");
+        if (client is null) return;
+        var vertical = ScrollPart(view, "VScroll");
+        var horizontal = ScrollPart(view, "HScroll");
+        float barWidth = (vertical?.Position.Width ?? 0) * scale;
+        float barHeight = (horizontal?.Position.Height ?? 0) * scale;
+        float x = Math.Min(client.Position.X * scale, bounds.Width / 4);
+        float y = Math.Min(client.Position.Y * scale, bounds.Height / 4);
+        float width = Math.Max(1, bounds.Width - 2 * x - barWidth);
+        float height = Math.Max(1, bounds.Height - 2 * y - barHeight);
+
+        // The renderer computes the canvas clip and scroll range from the Client control.
+        SetPart(client, x, y, width, height);
+        if (vertical is not null) SetPart(vertical, x + width, y, barWidth, height);
+        if (horizontal is not null) SetPart(horizontal, x, y + height, width, barHeight);
+
+        void SetPart(MyGuiWidget widget, float left, float top, float partWidth, float partHeight) =>
+            bindings.RelativePositions[widget] = new(left / bounds.Width, top / bounds.Height,
+                partWidth / bounds.Width, partHeight / bounds.Height);
+    }
+
+    private static MyGuiWidget? ScrollPart(MyGuiWidget view, string part)
+    {
+        MyGuiWidget? Find(MyGuiWidget widget)
+        {
+            if (widget.Properties.GetValueOrDefault("TemplateOwner") == view.Name &&
+                widget.Properties.GetValueOrDefault("TemplatePart") == part) return widget;
+            foreach (var child in widget.Children)
+                if (Find(child) is {} found) return found;
+            return null;
+        }
+        return Find(view);
     }
 
     private static void PlaceVendorMoneyBox(object __instance, List<UiControl> controls)
