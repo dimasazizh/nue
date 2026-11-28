@@ -68,9 +68,9 @@ Added a search bar for item crafting and research. Item crafting also show icons
 ![Descriptive alt text](images/b.jpg)
 
 ## Compatibility
-
+NUE must be put below these in the mod order:
 1. [Item Markers](https://steamcommunity.com/sharedfiles/filedetails/?id=3834849740). The equipment icon border will follow modified equipment slot sizes.  
-2. [Brutality](https://steamcommunity.com/sharedfiles/filedetails/?id=3838915159). Added Brutality skill is given unique icon and repositioned better.
+2. [Brutality](https://steamcommunity.com/sharedfiles/filedetails/?id=3838915159). Brutality skill is given unique icon and repositioned better.
 
 ## Planned UI improvements
 

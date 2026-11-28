@@ -167,7 +167,6 @@ internal static class SkillsLayout
         int brutalityLabel = controls.FindIndex(c => c.Name == BrutalityLabel && c.Action == "stat:brutality");
         int brutalityValue = controls.FindIndex(c => c.Name == BrutalityValue && c.Action == "stat:brutality");
         int[] brutality = brutalityLabel >= 0 && brutalityValue >= 0 ? [brutalityLabel] : [];
-        if (brutality.Length > 0) indices[BrutalityValue] = brutalityValue;
         int[] left = [..columns[0], ..columns[1], ..columns[2].Skip(split), ..leftMods];
         int[] right = [..columns[2].Take(split), ..columns[3], ..brutality, ..rightMods];
         var area = frame.Bounds;
@@ -207,9 +206,15 @@ internal static class SkillsLayout
                         controls[iconIndex] = icon with { Bounds = new(x - side - gap, y + (row - side) / 2, side, side), Clip = clip };
                     }
                 }
-                else if (indices.TryGetValue(label.Name.Replace("-label-", "-value-", StringComparison.Ordinal), out int number))
+                else
                 {
                     bool isBrutality = index == brutalityLabel;
+                    int number = brutalityValue;
+                    if (!isBrutality && !indices.TryGetValue(label.Name.Replace("-label-", "-value-", StringComparison.Ordinal), out number))
+                    {
+                        y += row;
+                        continue;
+                    }
                     if (isBrutality)
                     {
                         y += groupGap;
