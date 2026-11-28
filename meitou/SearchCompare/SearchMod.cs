@@ -3,7 +3,6 @@ using System.Collections;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Meitou.Data;
@@ -13,7 +12,6 @@ using Meitou.Game.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
 using Meitou.Simulation.Items;
-using Meitou.Simulation.Production;
 
 namespace Nue.SearchCompare;
 
@@ -47,10 +45,14 @@ public sealed partial class SearchMod : IMod
         HarmonyMethod Hook(string name) => new(typeof(SearchMod),name);
         if (search)
         {
-            foreach (var method in new[]{"AddCraftContent","AddResearchContent"})
-                context.Harmony.Patch(AccessTools.Method(Production,method), prefix:Hook(nameof(ListBar)), transpiler:Hook(nameof(FilterRows)));
+            context.Harmony.Patch(AccessTools.Method(Production, "AddCraftContent"), prefix: Hook(nameof(CraftBar)),
+                transpiler: Hook(nameof(SearchAllCrafts)), finalizer: Hook(nameof(RestoreCraftStation)));
+            context.Harmony.Patch(AccessTools.Method(Production, "AddResearchContent"), prefix: Hook(nameof(ResearchBar)),
+                transpiler: Hook(nameof(SearchAllResearch)));
+            context.Harmony.Patch(AccessTools.Method(Production, "CraftAction"), prefix: Hook(nameof(RouteCraftResult)));
             context.Harmony.Patch(AccessTools.Method(Router,"FaithfulAction"), prefix:Hook(nameof(Input)));
         }
+        context.Harmony.Patch(AccessTools.Method(Tips, "AddHoverLabel"), postfix: Hook(nameof(CraftIconTooltip)));
         context.Harmony.Patch(AccessTools.Method(Router,"AddFaithfulContent"), postfix:Hook(nameof(Inventory)));
         if (gearComparison)
         {
@@ -62,10 +64,11 @@ public sealed partial class SearchMod : IMod
 
     static bool Input(MyGuiEvent e,object __instance)
     {
+        var player = RouterPlayer.GetValue(__instance)!;
+        if (ProductionSearchInput(e, player)) return false;
         if(e.Screen is ("inventory" or "loot" or "trader") &&
             e.Widget=="NueClear" && e.Action==ClearAction)
         {
-            var player=RouterPlayer.GetValue(__instance)!;
             var screens=(MyGuiScreenHost)AccessTools.Field(player.GetType(),"FaithfulScreens").GetValue(player)!;
             screens.SetText(e.Screen,Prefix+e.Screen,"");
             Queries.Remove(Prefix+e.Screen);
@@ -78,49 +81,6 @@ public sealed partial class SearchMod : IMod
 
     static string Query(string key) => Queries.GetValueOrDefault(Prefix + key,"").Trim();
     static bool Match(string name,string query) => name.Contains(query,StringComparison.OrdinalIgnoreCase);
-
-    // Filter the sorted options before Meitou measures the scrollbar and binds queue actions.
-    static IEnumerable<CodeInstruction> FilterRows(IEnumerable<CodeInstruction> instructions)
-    {
-        bool found = false;
-        foreach (var op in instructions)
-        {
-            yield return op;
-            if (op.operand is not MethodInfo { Name:"ToList", IsGenericMethod:true } m || m.DeclaringType != typeof(Enumerable)) continue;
-            var row = m.GetGenericArguments()[0];
-            string? filter = row == typeof(CraftOptionView) ? nameof(Crafts) : row == typeof(ResearchOption) ? nameof(Research) : null;
-            if (filter == null) continue;
-            found = true;
-            yield return new CodeInstruction(OpCodes.Call,AccessTools.Method(typeof(SearchMod),filter));
-        }
-        if (!found) throw new InvalidOperationException("Missing nightly production option list");
-    }
-
-    static List<CraftOptionView> Crafts(List<CraftOptionView> rows)
-    {
-        var q = Query("craft");
-        if (q.Length > 0) rows.RemoveAll(r => !Match(r.Name,q));
-        return rows;
-    }
-
-    static List<ResearchOption> Research(List<ResearchOption> rows)
-    {
-        var q = Query("research");
-        if (q.Length > 0) rows.RemoveAll(r => !Match(r.Name,q));
-        return rows;
-    }
-
-    static void ListBar(List<UiControl> controls, MethodBase __originalMethod)
-    {
-        bool craft = __originalMethod.Name == "AddCraftContent";
-        int index = controls.FindIndex(c => c.Name == (craft ? "QueueItemsPanel" : "BlueprintsAvailablePanel"));
-        if (index < 0) return;
-        var panel = controls[index];
-        var r = panel.Bounds;
-        float height = Math.Min(28,r.Height / 4);
-        controls[index] = panel with { Bounds = r with { Y=r.Y+height, Height=r.Height-height } };
-        Bar(controls,craft ? "craft" : "research",r with { Height=height });
-    }
 
     static void Bar(List<UiControl> controls,string key,UiRect r)
     {
@@ -175,9 +135,9 @@ public sealed partial class SearchMod : IMod
     }
 
     static void AddStockSearch(List<UiControl> controls, MyGuiScreenHost screens, string id, UiRect window,
-        UiRect field, float clearX, float clearWidth)
+        UiRect field, float clearX, float clearWidth, string? key = null, string hint = "Search items")
     {
-        string name = Prefix + id;
+        string name = Prefix + (key ?? id);
         string query = screens.GetText(id, name);
         var style = new Dictionary<string,string> { ["TextPadding"] = "8 2", ["TextAlign"] = "Left VCenter" };
         var focus = screens.Focus;
@@ -193,9 +153,9 @@ public sealed partial class SearchMod : IMod
         // Runtime controls use the actual skin from the character inventory's EditBox template.
         controls.Add(new(name,"EditBox",field,query,"","Kenshi_GenericInputBoxSkin",true,style,default,Pickable:true,Clip:window));
         if (!focused && query.Length == 0)
-            controls.Add(new("NueSearchHint","TextBox",field,"Search items","","",true,style,default,Pickable:false,Clip:field.Intersect(window)));
+            controls.Add(new("NueSearchHint","TextBox",field,hint,"","",true,style,default,Pickable:false,Clip:field.Intersect(window)));
         var clear = new UiRect(clearX, field.Y, clearWidth, field.Height);
-        controls.Add(new("NueClear","Button",clear,"×",ClearAction,"Kenshi_Button1Skin",true,
+        controls.Add(new(key is null ? "NueClear" : "NueClear." + key,"Button",clear,"×",ClearAction,"Kenshi_Button1Skin",true,
             new Dictionary<string,string> { ["TextAlign"] = "Center", ["FontName"] = "Kenshi_PaintedTextFont_Medium" },
             default,Pickable:true,Clip:window));
     }
