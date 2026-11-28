@@ -195,7 +195,7 @@ public sealed partial class SearchMod
         Edge("left", new(frame.X - border, frame.Y, border, frame.Height));
         Edge("right", new(frame.X + frame.Width, frame.Y, border, frame.Height));
         controls.Add(new(EquippedPrefix + "-heading", "TextBox",
-            new(frame.X, frame.Y - border - labelHeight, frame.Width, labelHeight), "EQUIPPED", "", "", true,
+            new(frame.X, frame.Y - border - labelHeight, frame.Width, labelHeight), NueText.Get("EQUIPPED"), "", "", true,
             new Dictionary<string,string> {
                 ["FontName"] = "Kenshi_StandardFont_Small", ["TextAlign"] = "Center VCenter", ["TextColour"] = Yellow
             }, default, Pickable:false));

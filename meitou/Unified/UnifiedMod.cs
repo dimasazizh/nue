@@ -48,6 +48,7 @@ public sealed class UnifiedMod : IMod
     public void Initialize(ModContext context)
     {
         var options = new Options();
+        SearchCompare.NueText.Register(context);
         context.AddSettings(options);
         ContainerHighlights.Install(context, options);
         if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),

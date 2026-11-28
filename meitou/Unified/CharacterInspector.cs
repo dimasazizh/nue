@@ -12,6 +12,7 @@ using Meitou.Modding;
 using Meitou.Simulation;
 using Meitou.Simulation.Combat;
 using Meitou.Simulation.Items;
+using Nue.SearchCompare;
 
 namespace Nue.Unified;
 
@@ -148,7 +149,7 @@ internal static partial class CharacterInspector
         }
 
         var estimate = selected is null ? Average(estimates.Values) : estimates[selected.Id];
-        Text(0, selected?.Name.ToUpperInvariant() ?? "EST. ARMOUR PROTECTION", heading: true);
+        Text(0, selected is null ? "EST. ARMOUR PROTECTION" : NueText.Get(selected.Name).ToUpperInvariant(), heading: true);
         if (parts.Length == 0)
         {
             Text(1, "No body-part data available.");
@@ -254,8 +255,9 @@ internal static partial class CharacterInspector
     }
 
     private static Dictionary<string, string> Tooltip(Part part, Protection p) =>
-        UiTooltips.RowProperties([(part.Name, ""), ("Coverage", p.Coverage.ToString("P0")),
-            ("Cut", p.Cut.ToString("P0")), ("Blunt", p.Blunt.ToString("P0")), ("Harpoon", $"{p.Harpoon:0.#} pts")]);
+        UiTooltips.RowProperties([(NueText.Get(part.Name), ""), (NueText.Get("Coverage"), p.Coverage.ToString("P0")),
+            (NueText.Get("Cut"), p.Cut.ToString("P0")), (NueText.Get("Blunt"), p.Blunt.ToString("P0")),
+            (NueText.Get("Harpoon"), $"{p.Harpoon:0.#} pts")]);
 
     private static void DrawGear(List<UiControl> controls, object player, UiRect row, string font, UiRect clip,
         Part part, Gear gear, int index)
@@ -272,9 +274,9 @@ internal static partial class CharacterInspector
         AddText(controls, $"gear-name-{index}", text, $"{item.Name} · {coverage}%", font, "Left VCenter", Gold);
         string resistances = $"C {armour.CutDefence:P0} · B {armour.BluntDefence:P0} · H {armour.PierceDefence:0.#} pts";
         AddText(controls, $"gear-resist-{index}", text with { Y = text.Y + text.Height }, resistances, font, "Left VCenter");
-        var details = UiTooltips.RowProperties([(item.Name, ""), ("Coverage", $"{coverage}%"),
-            ("Cut", armour.CutDefence.ToString("P0")), ("Blunt", armour.BluntDefence.ToString("P0")),
-            ("Harpoon", $"{armour.PierceDefence:0.#} pts")]);
+        var details = UiTooltips.RowProperties([(item.Name, ""), (NueText.Get("Coverage"), $"{coverage}%"),
+            (NueText.Get("Cut"), armour.CutDefence.ToString("P0")), (NueText.Get("Blunt"), armour.BluntDefence.ToString("P0")),
+            (NueText.Get("Harpoon"), $"{armour.PierceDefence:0.#} pts")]);
         controls.Add(new(ActionPrefix + "gear-tip-" + index, "Widget", row with { Height = row.Height * 2 },
             "", "", "", true, details, default, Pickable: true, Clip: clip));
     }
@@ -304,7 +306,7 @@ internal static partial class CharacterInspector
         style["TextAlign"] = "Center VCenter";
         style["FontName"] = "Kenshi_StandardFont_Small";
         style["FontPixels"] = font;
-        controls.Add(new(ActionPrefix + action, "Button", bounds, caption, ActionPrefix + action,
+        controls.Add(new(ActionPrefix + action, "Button", bounds, NueText.Get(caption), ActionPrefix + action,
             "Kenshi_Button1Skin", true, style, default, Pickable: true, Clip: bounds));
     }
 
@@ -318,7 +320,7 @@ internal static partial class CharacterInspector
             ["FontPixels"] = font
         };
         if (colour is not null) style["TextColour"] = colour;
-        controls.Add(new(ActionPrefix + name, "TextBox", bounds, caption, "", "", true,
+        controls.Add(new(ActionPrefix + name, "TextBox", bounds, NueText.Get(caption), "", "", true,
             style, default, Pickable: false, Clip: bounds));
     }
 }

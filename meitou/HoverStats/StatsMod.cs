@@ -71,7 +71,11 @@ public sealed class StatsMod : IMod
         if (target.IsPlayer) return;
         var id = target.Id;
         var player = MenuPlayer.GetValue(__instance)!;
-        __result.Add(("Examine", () =>
+        string caption = "Examine";
+#if NUE_UNIFIED
+        caption = Nue.SearchCompare.NueText.Get(caption);
+#endif
+        __result.Add((caption, () =>
         {
             var session = (WorldSession)Session.GetValue(player)!;
             if (!session.CurrentSnapshot.Characters.Any(c=>c.Id==id)) return;

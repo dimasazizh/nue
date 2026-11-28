@@ -175,23 +175,31 @@ public sealed class HudTabsMod : IMod, IUiExtension
                 Pickable: false, Clip: lower));
         }
 
+        string statsLabel = "STATS", healthLabel = "HEALTH";
+#if NUE_UNIFIED
+        statsLabel = Nue.SearchCompare.NueText.Get(statsLabel);
+        healthLabel = Nue.SearchCompare.NueText.Get(healthLabel);
+#endif
         float gap = 2 * unit, width = 30 * unit;
-        float cell = (dock.Height - gap) / 15; // Seven cells for STATS and eight for HEALTH, including padding.
-        var stats = new UiRect(dock.X + dock.Width + gap, dock.Y, width, cell * 7);
-        var health = stats with { Y = stats.Y + stats.Height + gap, Height = cell * 8 };
-        AddTab(__result, stats, StatsTab, "STATS", "stats", cell, showStats);
-        AddTab(__result, health, HealthTab, "HEALTH", "medic", cell, !showStats);
+        int statsCells = statsLabel.Length + 2, healthCells = healthLabel.Length + 2;
+        float cell = (dock.Height - gap) / (statsCells + healthCells);
+        var stats = new UiRect(dock.X + dock.Width + gap, dock.Y, width, cell * statsCells);
+        var health = stats with { Y = stats.Y + stats.Height + gap, Height = cell * healthCells };
+        AddTab(__result, stats, StatsTab, statsLabel, "stats", "stats", cell, showStats);
+        AddTab(__result, health, HealthTab, healthLabel, "health", "medic", cell, !showStats);
     }
 
-    static void AddTab(List<UiControl> controls, UiRect rect, string name, string label, string icon, float cell, bool selected)
+    static void AddTab(List<UiControl> controls, UiRect rect, string name, string label, string action, string icon,
+        float cell, bool selected)
     {
         var face = new Dictionary<string, string> { ["TextAlign"] = "Center", ["FontName"] = "Kenshi_PaintedTextFont_Medium",
-            ["FontPixels"] = Math.Max(8, (int)(cell * .85f)).ToString(CultureInfo.InvariantCulture) };
+            ["FontPixels"] = Math.Max(1, (int)(Math.Min(cell, rect.Width) * .85f)).ToString(CultureInfo.InvariantCulture) };
         var skin = selected ? new Dictionary<string, string> { ["State"] = "normal_checked" } : Empty;
-        controls.Add(new(name, "Button", rect, "", "nue.hud-tabs:" + label.ToLowerInvariant(), "NUE_ButtonSurface",
+        controls.Add(new(name, "Button", rect, "", "nue.hud-tabs:" + action, "NUE_ButtonSurface",
             true, skin, default, Pickable: true));
         float y = rect.Y + cell * .4f;
-        var symbol = new UiRect(rect.X + (rect.Width - cell) / 2, y, cell, cell);
+        float iconSize = Math.Min(cell, rect.Width);
+        var symbol = new UiRect(rect.X + (rect.Width - iconSize) / 2, y, iconSize, iconSize);
         controls.Add(new(name + "Icon", "Widget", symbol, "", "", "NUE_Icon_" + icon, true, Empty, default, Pickable: false));
         for (int i = 0; i < label.Length; i++)
         {

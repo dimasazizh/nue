@@ -36,7 +36,11 @@ public sealed partial class SearchMod : IMod
     internal static bool Installed { get; private set; }
     static bool GearComparison;
 
-    public void Initialize(ModContext context) => Install(context, search: true, gearComparison: true);
+    public void Initialize(ModContext context)
+    {
+        NueText.Register(context);
+        Install(context, search: true, gearComparison: true);
+    }
 
     internal void Install(ModContext context, bool search, bool gearComparison)
     {
@@ -86,7 +90,7 @@ public sealed partial class SearchMod : IMod
     {
         float label = Math.Min(48,r.Width*.4f);
         var style = new Dictionary<string,string>{{"TextAlign","Left VCenter"}};
-        controls.Add(new(Prefix+key+".label","TextBox",r with {Width=label},"Search","","",true,style,default,Pickable:false));
+        controls.Add(new(Prefix+key+".label","TextBox",r with {Width=label},NueText.Get("Search"),"","",true,style,default,Pickable:false));
         controls.Add(new(Prefix+key,"EditBox",r with {X=r.X+label,Width=r.Width-label},
             Queries.GetValueOrDefault(Prefix+key,""),"","",true,style,new Vector4(.1f,.08f,.06f,.95f),Pickable:true));
     }
@@ -153,7 +157,7 @@ public sealed partial class SearchMod : IMod
         // Runtime controls use the actual skin from the character inventory's EditBox template.
         controls.Add(new(name,"EditBox",field,query,"","Kenshi_GenericInputBoxSkin",true,style,default,Pickable:true,Clip:window));
         if (!focused && query.Length == 0)
-            controls.Add(new("NueSearchHint","TextBox",field,hint,"","",true,style,default,Pickable:false,Clip:field.Intersect(window)));
+            controls.Add(new("NueSearchHint","TextBox",field,NueText.Get(hint),"","",true,style,default,Pickable:false,Clip:field.Intersect(window)));
         var clear = new UiRect(clearX, field.Y, clearWidth, field.Height);
         controls.Add(new(key is null ? "NueClear" : "NueClear." + key,"Button",clear,"×",ClearAction,"Kenshi_Button1Skin",true,
             new Dictionary<string,string> { ["TextAlign"] = "Center", ["FontName"] = "Kenshi_PaintedTextFont_Medium" },
@@ -222,7 +226,7 @@ public sealed partial class SearchMod : IMod
         else if(!shared) Bar(controls,id,new(r.X+6,r.Y+4,Math.Min(160,r.Width*.35f),24));
         if(shared && id==source && screens.Focus?.Widget!=Prefix+source && Query(source).Length==0 &&
             controls.Find(c=>c.Name==Prefix+source) is {} field)
-            controls.Add(new("NueSearchHint","TextBox",field.Bounds,"Search items","","",true,field.Properties,default,Pickable:false));
+            controls.Add(new("NueSearchHint","TextBox",field.Bounds,NueText.Get("Search items"),"","",true,field.Properties,default,Pickable:false));
         return Query(shared ? source : id);
     }
 }

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using Meitou.Data.Ui;
 using Meitou.Game.Ui;
+using Nue.SearchCompare;
 
 namespace Nue.Unified;
 
@@ -55,11 +56,11 @@ internal static partial class CharacterInspector
             AddText(controls, "radar-axis-" + axis, label, part.Name, font, align, Gold);
             var protection = estimates[part.Id];
             var tooltip = UiTooltips.RowProperties([
-                ("#E8BD72" + part.Name.ToUpperInvariant() + " · ARMOUR PROTECTION", ""),
-                ("Armour coverage", protection.Coverage.ToString("P0")),
-                ("Cut damage resistance", protection.Cut.ToString("P0")),
-                ("Blunt damage resistance", protection.Blunt.ToString("P0")),
-                ("Harpoon resistance", $"{protection.Harpoon:0.#} pts")
+                ("#E8BD72" + NueText.Get(part.Name).ToUpperInvariant() + " · " + NueText.Get("ARMOUR PROTECTION"), ""),
+                (NueText.Get("Armour coverage"), protection.Coverage.ToString("P0")),
+                (NueText.Get("Cut damage resistance"), protection.Cut.ToString("P0")),
+                (NueText.Get("Blunt damage resistance"), protection.Blunt.ToString("P0")),
+                (NueText.Get("Harpoon resistance"), $"{protection.Harpoon:0.#} pts")
             ]);
             controls.Add(new(ActionPrefix + "radar-tip-" + axis, "Button", label, "", ActionPrefix + "part:" + part.Id,
                 "", true, tooltip, default, Pickable: true, Clip: area));
@@ -68,10 +69,11 @@ internal static partial class CharacterInspector
         float legendWidth = area.Width / ArmourRadarImage.Metrics.Length;
         for (int i = 0; i < ArmourRadarImage.Metrics.Length; i++)
         {
-            string label = ArmourRadarImage.Metrics[i];
+            string label = NueText.Get(ArmourRadarImage.Metrics[i]);
             var colour = ArmourRadarImage.Palette[colours[i]];
             var bounds = new UiRect(area.X + i * legendWidth, area.Y + area.Height, legendWidth, row);
-            var style = UiTooltips.RowProperties([("Click to change " + label.ToLowerInvariant() + " colour", "")]);
+            var hint = string.Format(CultureInfo.CurrentCulture, NueText.Get("Click to change {0} colour"), label);
+            var style = UiTooltips.RowProperties([(hint, "")]);
             style["TextAlign"] = "Center VCenter";
             style["FontName"] = "Kenshi_StandardFont_Small";
             style["FontPixels"] = font;

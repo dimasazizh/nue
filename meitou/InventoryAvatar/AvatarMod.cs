@@ -49,6 +49,15 @@ public sealed partial class AvatarMod : IMod
     private static float lastDragX;
     private static MyGuiScreenHost? dragHost;
     private static readonly string[] Backgrounds = ["Desert", "Swamp", "Black"];
+#if NUE_UNIFIED
+    private static readonly (string Widget, string Caption)[] InventoryCaptions =
+    [
+        ("InventoryMainTitle", "INVENTORY"), ("ArrangeButton", "ARRANGE"), ("lbBackpack", "BACKPACK"),
+        ("lbWeapon1", "PRIMARY"), ("lbWeapon2", "SECONDARY"), ("lbShirt", "SHIRT"),
+        ("lbHead", "HELMET"), ("lbPants", "PANTS"), ("lbArmor", "BODY ARMOR"),
+        ("lbBoots", "BOOTS"), ("lbBelt", "BELT"), ("NueArmTitle", "ARMS"), ("NueLegTitle", "LEGS")
+    ];
+#endif
     private static string folder = "";
     private static MyGuiLayout inspection = null!;
     private static object? ui, renderer;
@@ -67,6 +76,14 @@ public sealed partial class AvatarMod : IMod
     private static readonly FieldInfo Painter = AccessTools.Field(Player, "UiPainter");
     private static readonly PropertyInfo StageView = AccessTools.Property(Render, "StageView");
     private static string TextureName => active == other ? Texture+"-partner" : Texture;
+    private static string InventoryText(string english)
+    {
+#if NUE_UNIFIED
+        return Nue.SearchCompare.NueText.Get(english);
+#else
+        return english;
+#endif
+    }
     private static readonly FieldInfo Library = AccessTools.Field(Host, "AnimationLibrary");
 
     private static readonly FieldInfo Editor = AccessTools.Field(Host, "CharacterEditor");
@@ -258,6 +275,8 @@ public sealed partial class AvatarMod : IMod
         }
 
 #if NUE_UNIFIED
+        foreach (var (widget, caption) in InventoryCaptions)
+            b.Text[widget] = InventoryText(caption);
         if (Nue.Unified.CharacterInspector.Enabled)
         {
             active.Inspector.Use(subject.Id);
@@ -265,7 +284,7 @@ public sealed partial class AvatarMod : IMod
             bool hasBag = subject.ItemGrid is { BagWidth: > 0, BagHeight: > 0 } grid &&
                 grid.Items.Any(item => item.Section == "backpack_attach");
             bool bagOpen = hasBag && screens.IsOpen(id == "loot" ? "loot-bag" : "bag");
-            b.Text[button] = bagOpen ? "CHARACTER INSPECTOR" : "OPEN BAG";
+            b.Text[button] = InventoryText(bagOpen ? "CHARACTER INSPECTOR" : "OPEN BAG");
             if (hasBag)
             {
                 b.Disabled.Remove(button);
@@ -480,8 +499,8 @@ public sealed partial class AvatarMod : IMod
             var style = new Dictionary<string,string> { ["TextAlign"] = anchor == "NueBackdropMenu" ? "Right VCenter" : "Left VCenter" };
             void Button(int index, string label, float y) => controls.Add(new(anchor+index,"Button",bounds with { Y=y },
                 label,action+index,"Kenshi_Button1",true,style,default,Pickable:true,Clip:root));
-            Button(-1,options[selected]+"  ▾",bounds.Y);
-            if (open) for(int i=0;i<options.Length;i++) Button(i,options[i],bounds.Y+(i+1)*bounds.Height);
+            Button(-1,InventoryText(options[selected])+"  ▾",bounds.Y);
+            if (open) for(int i=0;i<options.Length;i++) Button(i,InventoryText(options[i]),bounds.Y+(i+1)*bounds.Height);
         }
         Menu("NuePoseMenu","nue-avatar:",Labels,active.choice,active.expanded);
         Menu("NueBackdropMenu","nue-background:",Backgrounds,active.background,active.backgroundsOpen);
