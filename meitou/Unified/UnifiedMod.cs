@@ -18,6 +18,9 @@ public sealed class UnifiedMod : IMod
         public bool ShowOutline { get; set; } = true;
         [Setting("Container highlights", SubGroup = Core)]
         public bool ContainerHighlights { get; set; } = true;
+        [Setting("Hold Alt to reveal character names", Hint = "Applies when MeitouClient's Show Character Names option is off.",
+            SubGroup = Core)]
+        public bool AltCharacterNames { get; set; } = true;
         [Setting("↳ Additional container highlight key", Hint = "Leave blank to use the game's highlight key (Alt by default). Enter a key or chord, such as H or Ctrl+H.",
             SubGroup = Core, VisibleWhen = nameof(ContainerHighlights))]
         public string ContainerHighlightKey { get; set; } = "";
@@ -51,6 +54,7 @@ public sealed class UnifiedMod : IMod
         SearchCompare.NueText.Register(context);
         context.AddSettings(options);
         ContainerHighlights.Install(context, options);
+        CharacterNameReveal.Install(context, options);
         if (options.CursorTooltips) context.Harmony.Patch(HarmonyLib.AccessTools.Method(typeof(IMod).Assembly.GetType("Meitou.Game.Ui.TooltipRuntime"),"PlaceTooltip"),
             prefix:new HarmonyLib.HarmonyMethod(typeof(UnifiedMod),nameof(FollowPointer)));
         new StatsMod().Install(context, () => options.Hover && options.ShowOutline,

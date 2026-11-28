@@ -26,6 +26,9 @@ internal static class NueText
 
     private const string Messages = """
 Search|Suchen|Rechercher|搜索|Поиск|検索|검색
+Base level|Grundstufe|Niveau de base|基础等级|Базовый уровень|基礎レベル|기본 레벨
+Effective level|Effektive Stufe|Niveau effectif|实际等级|Эффективный уровень|実効レベル|실제 레벨
+XP progress|EP-Fortschritt|Progression d’XP|经验进度|Прогресс опыта|経験値の進捗|경험치 진행도
 SHOW MODIFIERS|MODIFIKATOREN ANZEIGEN|AFFICHER LES MODIFICATEURS|显示修正值|ПОКАЗАТЬ МОДИФИКАТОРЫ|補正値を表示|보정치 표시
 HIDE MODIFIERS|MODIFIKATOREN AUSBLENDEN|MASQUER LES MODIFICATEURS|隐藏修正值|СКРЫТЬ МОДИФИКАТОРЫ|補正値を非表示|보정치 숨기기
 Search items|Gegenstände suchen|Rechercher des objets|搜索物品|Поиск предметов|アイテムを検索|아이템 검색

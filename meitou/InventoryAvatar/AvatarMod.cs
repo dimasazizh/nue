@@ -1,4 +1,6 @@
 using HarmonyLib;
+using Meitou.Data;
+using Meitou.Data.Fcs;
 using Meitou.Simulation.Items;
 using Meitou.Data.Gameplay;
 using Meitou.Data.Gameplay.Combat;
@@ -38,7 +40,7 @@ public sealed partial class AvatarMod : IMod
         public long framedKey;
         public string? openRack;
         public UiRect bagArea;
-        public float inventoryCell;
+        public float inventoryCell, inventoryTitleHeight;
         public bool? showHealthOverride;
         public bool mainHudShowsStats;
 #if NUE_UNIFIED
@@ -110,6 +112,8 @@ public sealed partial class AvatarMod : IMod
                 Secondary = slot.Secondary,
                 RollFromClothing = !slot.Secondary
             });
+        context.Harmony.Patch(AccessTools.Method(typeof(CharacterAppearance), "WornArmour", [typeof(List<GameRecord>)]),
+            prefix: new HarmonyMethod(typeof(AvatarMod), nameof(KeepAllWornArmour)));
         After(GameType("Ui.InventoryLayout"), "AddModSlots", nameof(PlaceAccessories));
         if (!preview) return;
         After(Render, "StageCamera", nameof(FrameAvatar));
@@ -165,6 +169,14 @@ public sealed partial class AvatarMod : IMod
         ("neck", "NECK", 11, 2, 2, 1, false, 424, 240)
     ];
 
+    private static bool KeepAllWornArmour(List<GameRecord> items, ref List<GameRecord> __result)
+    {
+        // The native collector replaces earlier armour with the same FCS attach slot.
+        // Equipment in secondary sections still shares the attachment point with the primary section.
+        __result = items.FindAll(item => item.Type == FcsRecordType.Armour);
+        return false;
+    }
+
     // The native item icons and hit targets are arranged after these slot controls.
     private static void PlaceAccessories(List<UiControl> controls)
     {
@@ -193,7 +205,7 @@ public sealed partial class AvatarMod : IMod
         if (cellWidth <= 0 || cellHeight <= 0) return;
         float labelHeight = cellHeight * .65f;
         float gap = Math.Max(0, Math.Min(cellWidth * .25f, clip.Width - 4 * cellWidth));
-        float y = clip.Y;
+        float y = inventory.Bounds.Y - labelHeight;
         foreach (var slot in Accessories)
         {
             int index = controls.FindIndex(c => c.Name == slot.Section);
@@ -209,11 +221,18 @@ public sealed partial class AvatarMod : IMod
             {
                 ["TileSize"] = FormattableString.Invariant($"{cellWidth} {cellHeight}")
             };
-            controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties, Skin = "Kenshi_InventorySlotSkin" };
+            string skin = slot.Section switch
+            {
+                "eyes_hats" or "eyes_eyes" => "NUE_Equipment_head",
+                "eyes_belts" => "NUE_Equipment_belt",
+                "gloves" => "NUE_Equipment_shirt",
+                _ => "NUE_Equipment_armour"
+            };
+            controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties, Skin = skin };
             controls.Add(new(slot.Section + "-label", "TextBox",
                 new(paired ? left : clip.X, y, paired ? width : clip.Width, labelHeight), InventoryText(slot.Label),
                 "", "Kenshi_TextboxPaintedText", true,
-                new Dictionary<string, string> { ["TextAlign"] = "Center VCenter" },
+                new Dictionary<string, string> { ["TextAlign"] = "Center VCenter", ["TextColour"] = "0.91 0.74 0.45" },
                 default, Pickable: false, Clip: clip));
             if (!paired) y += labelHeight + bounds.Height;
         }
@@ -264,6 +283,7 @@ public sealed partial class AvatarMod : IMod
                 current.Roots[0].Position != animal.Roots[0].Position)
                 screens.Replace(id, animal);
             active.bagArea = default;
+            active.inventoryTitleHeight = 0;
             return;
         }
 
@@ -277,6 +297,7 @@ public sealed partial class AvatarMod : IMod
         if (current.Find("NuePreviewArea") != null || current.Find("MainSectionName") != null)
             screens.Replace(id, NativeInventoryLayout(player, animal: false));
         active.bagArea = default;
+        active.inventoryTitleHeight = 0;
     }
 
     private static MyGuiLayout NativeInventoryLayout(object player, bool animal)
@@ -394,7 +415,9 @@ public sealed partial class AvatarMod : IMod
             side = Math.Min(side, Math.Min(area.Bounds.Width * .9f / grid.BagWidth,
                 area.Bounds.Height * .8f / grid.BagHeight));
         }
-        (bag == "loot-bag" ? other : own).inventoryCell = side;
+        var view = bag == "loot-bag" ? other : own;
+        view.inventoryCell = side;
+        view.inventoryTitleHeight = controls.Find(c => c.Skin == "Kenshi_GenericWindowHeaderSkin")?.Bounds.Height ?? 0;
         controls[index] = WithCells(slot with { Bounds = anchor.Bounds with {
             Width = side * grid.Width, Height = side * grid.Height }, Clip = anchor.Bounds }, grid.Width, grid.Height);
         int arrangeIndex = controls.FindIndex(c => c.Name == "ArrangeButton");
@@ -448,6 +471,32 @@ public sealed partial class AvatarMod : IMod
             }
         }
         controls[i] = WithCells(slot, grid.BagWidth, grid.BagHeight);
+        float titleHeight = screens.IsOpen(parent) && view.inventoryTitleHeight > 0
+            ? view.inventoryTitleHeight : 38 * (float)AccessTools.PropertyGetter(Player, "UiScale").Invoke(player, null)!;
+        ResizeBackpackTitle(controls, titleHeight);
+    }
+
+    private static void ResizeBackpackTitle(List<UiControl> controls, float height)
+    {
+        int index = controls.FindIndex(c => c.Skin == "Kenshi_GenericWindowHeaderSkin");
+        if (index < 0 || controls[index].Bounds.Height <= 0 || height <= 0) return;
+        var header = controls[index];
+        var oldBounds = header.Bounds;
+        if (oldBounds.Height == height) return;
+        var bounds = oldBounds with { Height = height };
+        controls[index] = header with { Bounds = bounds, Clip = bounds };
+        float ratio = height / oldBounds.Height;
+        for (int i = 0; i < controls.Count; i++)
+        {
+            var child = controls[i];
+            if (child.Name != "Caption") continue;
+            var rect = child.Bounds with
+            {
+                Y = bounds.Y + (child.Bounds.Y - oldBounds.Y) * ratio,
+                Height = child.Bounds.Height * ratio
+            };
+            controls[i] = child with { Bounds = rect, Clip = rect.Intersect(bounds) };
+        }
     }
 
     private static readonly FieldInfo RouterPlayer = GameType("Ui.ScreenRouter").GetFields(AccessTools.allDeclared).Single(f=>f.FieldType==Player);
@@ -498,9 +547,27 @@ public sealed partial class AvatarMod : IMod
         }
     }
 
+    private static void DrawInventoryFootprints(string id, List<UiControl> controls)
+    {
+        string section = id is "bag" or "loot-bag" ? "backpack_content" : "main";
+        if (controls.Find(c => c.Name == section) is not {} slot) return;
+        foreach (var hit in controls.ToArray())
+        {
+            if (!hit.Name.StartsWith("inventory-item-", StringComparison.Ordinal) ||
+                !hit.Properties.TryGetValue("InventoryItem", out var item)) continue;
+            var clip = hit.Bounds.Intersect(hit.Clip ?? slot.Bounds).Intersect(slot.Bounds);
+            if (clip.Width <= 0 || clip.Height <= 0) continue;
+            int index = controls.FindIndex(c => c.Name == hit.Name || c.Name.StartsWith(hit.Name + "-", StringComparison.Ordinal));
+            controls.Insert(index, new("NueInventoryFootprint-" + item, "Widget", hit.Bounds,
+                "", "", "", true, new Dictionary<string, string>(),
+                new Vector4(.25f, .21f, .16f, 1), Pickable: false, Clip: clip));
+        }
+    }
+
     private static void Controls(string id, List<UiControl> controls,object __instance)
     {
         active = id == "loot" ? other : own;
+        if (id is "inventory" or "loot" or "bag" or "loot-bag") DrawInventoryFootprints(id, controls);
         if (id is not ("inventory" or "loot") || controls.Find(c => c.Name == "NuePreviewArea") is not {} preview ||
             controls.Find(c=>c.Type=="Window") is not {} window) return;
         var player = RouterPlayer.GetValue(__instance)!;

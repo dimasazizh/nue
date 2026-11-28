@@ -139,8 +139,9 @@ internal static class SkillsLayout
         if (modifierTarget?.Id != lead?.Id)
             modifierTarget = lead is null ? null : new(lead.Id);
         Dictionary<int, float>? effective = null;
-        if (showModifiers && lead?.Hud is {} hud)
+        if (lead?.Hud is {} hud)
             EffectiveByHud.TryGetValue(hud, out effective);
+        AddStatTooltips(controls, lead, effective);
         AddModifierToggle(controls);
         if (showModifiers) ShiftAttributeValues(controls, effective, scale);
         var indices = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -265,6 +266,61 @@ internal static class SkillsLayout
         }
     }
 
+    private static void AddStatTooltips(List<UiControl> controls, CharacterSnapshot? lead, Dictionary<int, float>? effective)
+    {
+        if (lead is null) return;
+        var values = controls.Where(c => (c.Name == BrutalityValue || c.Name.Contains("-value-", StringComparison.Ordinal)) &&
+                c.Action.StartsWith("stat:", StringComparison.Ordinal))
+            .GroupBy(c => c.Action).ToDictionary(group => group.Key, group => group.First());
+        for (int i = 0; i < controls.Count; i++)
+        {
+            var label = controls[i];
+            if ((label.Name != BrutalityLabel && !label.Name.Contains("-label-", StringComparison.Ordinal)) ||
+                !values.TryGetValue(label.Action, out var value)) continue;
+            var rows = new List<(string, string)> { (label.Caption, ""), (NueText.Get("Base level"), value.Caption) };
+            if (int.TryParse(label.Action.AsSpan(5), NumberStyles.None, CultureInfo.InvariantCulture, out int id))
+            {
+                if (effective?.TryGetValue(id, out float level) == true)
+                    rows.Add((NueText.Get("Effective level"), MathF.Floor(level).ToString("0", CultureInfo.CurrentCulture)));
+                AddNativeStatDetails(rows, lead.Hud, (StatsEnumerated)id);
+            }
+            controls[i] = AttachTooltip(label, rows);
+            int valueIndex = controls.IndexOf(value);
+            if (valueIndex >= 0) controls[valueIndex] = AttachTooltip(value, rows);
+        }
+    }
+
+    private static void AddNativeStatDetails(List<(string, string)> rows, HudView? hud, StatsEnumerated stat)
+    {
+        if (hud is null) return;
+        string? name = stat switch
+        {
+            StatsEnumerated.Strength => "Strength:",
+            StatsEnumerated.Dexterity => "Dexterity:",
+            StatsEnumerated.Toughness => "Toughness:",
+            StatsEnumerated.Perception => "Perception:",
+            StatsEnumerated.MeleeAttack => "Attack:",
+            StatsEnumerated.MeleeDefence => "Defense:",
+            StatsEnumerated.Dodge => "Dodge:",
+            StatsEnumerated.MartialArts => "Martial Arts:",
+            StatsEnumerated.Crossbows => "Crossbows:",
+            StatsEnumerated.FriendlyFire => "Precision:",
+            _ => null
+        };
+        var native = name is null ? null : hud.Stats.FirstOrDefault(line => line.Label == name).Tip;
+        if (native is { Count: > 0 })
+            rows.AddRange(native);
+        else if (hud.StatReadouts?.TryGetValue(stat, out var readouts) == true)
+            rows.AddRange(readouts.Select(readout => (readout.Label, readout.Value)));
+    }
+
+    private static UiControl AttachTooltip(UiControl control, List<(string, string)> rows)
+    {
+        var properties = new Dictionary<string, string>(control.Properties);
+        foreach (var (key, value) in UiTooltips.RowProperties(rows)) properties[key] = value;
+        return control with { Properties = properties, Pickable = true };
+    }
+
     private static void AddModifierToggle(List<UiControl> controls)
     {
         if (controls.Find(c => c.Name == "NueSkillModifiersArea") is not {} anchor) return;
@@ -346,12 +402,11 @@ internal static class SkillsLayout
         if (pieTexture.Length == 0 || !float.IsFinite(fraction)) return;
         int progress = Math.Clamp((int)MathF.Floor(fraction * 100), 0, 99);
         float side = row * .76f;
-        var style = new Dictionary<string, string>
-        {
-            ["ImageTexture"] = pieTexture,
-            ["ImageRect"] = FormattableString.Invariant($"{(progress % PiesPerRow) * PieSize} {(progress / PiesPerRow) * PieSize} {PieSize} {PieSize}")
-        };
+        float displayed = MathF.Floor(Math.Clamp(fraction, 0, 1) * 100) / 100;
+        var style = UiTooltips.RowProperties([(NueText.Get("XP progress"), displayed.ToString("P0"))]);
+        style["ImageTexture"] = pieTexture;
+        style["ImageRect"] = FormattableString.Invariant($"{(progress % PiesPerRow) * PieSize} {(progress / PiesPerRow) * PieSize} {PieSize} {PieSize}");
         controls.Add(new(value.Name + "-xp", "ImageBox", new(x, y + (row - side) / 2, side, side),
-            "", "", "", true, style, default, Pickable: false, Clip: clip));
+            "", value.Action, "", true, style, default, Pickable: true, Clip: clip));
     }
 }
