@@ -69,7 +69,8 @@ Added a search bar for item crafting and research. Item crafting also show icons
 
 ## Compatibility
 
-Compatible with [Item Markers](https://steamcommunity.com/sharedfiles/filedetails/?id=3834849740). The equipment icon border will follow modified equipment slot sizes.
+1. [Item Markers](https://steamcommunity.com/sharedfiles/filedetails/?id=3834849740). The equipment icon border will follow modified equipment slot sizes.  
+2. [Brutality](https://steamcommunity.com/sharedfiles/filedetails/?id=3838915159). Added Brutality skill is given unique icon and repositioned better.
 
 ## Planned UI improvements
 
