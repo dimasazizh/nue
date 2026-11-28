@@ -5,6 +5,9 @@ Unified package: **0.1.15** for **MeitouClient 0.24.0**
 
 [Download Latest Version](https://github.com/dimasazizh/nue/releases/latest/download/asset-name.zip)
 
+![Descriptive alt text](images/c.jpg)
+![Descriptive alt text](images/a(5).jpeg)
+
 ## Build with GitHub Actions
 
 Once the workflow is on the default branch, open **Actions → Build NUE mod → Run workflow**. Select the source branch and optionally enter a mod version, such as `0.1.8`. A blank version uses `meitou/Unified/meitou.json`.
@@ -29,6 +32,8 @@ With the NUE layout enabled, the lower-left character panel opens on Health. Cli
 
 Selecting a building shows a compact bottom-left panel. It grows with the visible actions and condition meters. Buildings with extended stats have an expand button.
 
+![Descriptive alt text](images/a(1).jpeg)
+
 ## Inventory inspection for MeitouClient
 
 Opening a human character’s standalone inventory shows a separately rendered, equipped 3D avatar on the left. The gameplay camera stays in place. Nine equal equipment tiles form a 3×3 block in the middle, above a 10×8 personal inventory in the legacy standalone build. Arrange sits beside the inventory heading. Weight, disguise, and ownership appear above the open backpack in the right column.
@@ -47,11 +52,24 @@ The top-center compass follows the camera and shows eight directions. Nearby dis
 
 Type in the crafting or research list to filter recipes or topics in the current category. Inventory and trade searches dim items whose names do not match, keeping their grid positions visible. Hover over gear to see its differing shared stats alongside the equipped item's values, with the hovered value first.
 
+![Descriptive alt text](images/a(3).jpeg)
+![Descriptive alt text](images/a(7).jpeg)
+
 ## Hover Stats for MeitouClient
 
 Point at a character in the world to preview their information in the HUD. Move the pointer away to return to the selected building or the selected or inspected character. In the Skills window, hover a built-in skill or attribute to see its racial XP multiplier beside the description heading.
 
 Hold right-click on an NPC and release over **Examine** to open their Skills window. Use **Settings → Mods → Show character hover outline** to hide or allow the normal hover outline. Showing it also requires the game’s **Hover outline** setting.
+
+## Search Bars for Research and Item Crafting
+
+Added a search bar for item crafting and research. Item crafting also show icons for hovered items.
+
+![Descriptive alt text](images/b.jpg)
+
+## Compatibility
+
+Compatible with Item Markers. The equipment icon border will follow modified equipment slot sizes.
 
 ## Planned UI improvements
 
@@ -61,8 +79,8 @@ See the [UI improvements checklist](TODO.md) for progress on changes to search, 
 In Japanese folklore, the Nue is traditionally depicted as a creature with the head of a monkey, the body of a tanuki, the limbs of a tiger, and a snake for a tail. The chimeric nature of the creature is also a fitting metaphor for this GUI mod, as it combines native Kenshi MyGUI and MeitouClient's own GUI codes.
 
 ## Contributors
-Dimsky - Author, main contributor\
+Dimsky - Author, main contributor
 
-With special thanks to:
-Shutori - Character Inspector (https://github.com/shutori/Shutori_Re_Kenshi_Source)
+With special thanks to:  
+Shutori - Character Inspector (https://github.com/shutori/Shutori_Re_Kenshi_Source)  
 PZA -  Service Record for Meitou (https://github.com/Meitou-Modding-Ecosystem/PZAMeitouServiceRecord/) for letting me borrow his spider chart code.
