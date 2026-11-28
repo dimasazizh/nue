@@ -8,6 +8,11 @@ using Meitou.Game.Rendering.Ui;
 using Meitou.Game.Ui;
 using Meitou.Modding;
 using Meitou.Simulation;
+using Meitou.Simulation.Combat;
+using Meitou.Simulation.Crime;
+using Meitou.Simulation.Locks;
+using Meitou.Simulation.Player;
+using Meitou.Simulation.Production;
 using Nue.SearchCompare;
 
 namespace Nue.Unified;
@@ -25,6 +30,10 @@ internal static class SkillsLayout
     private static readonly MethodInfo UiScale = AccessTools.PropertyGetter(Player, "UiScale");
     private static readonly MethodInfo SkillTerms = AccessTools.Method(typeof(World), "SkillTermsOf");
     private static readonly MethodInfo SkillTotal = AccessTools.PropertyGetter(SkillTerms.ReturnType, "Total");
+    private static readonly Func<CharacterCold, StatsEnumerated, float> WorkSkill =
+        AccessTools.Method(typeof(ProductionSystem), "Effective").CreateDelegate<Func<CharacterCold, StatsEnumerated, float>>();
+    private static readonly Func<CharacterCold, StatsEnumerated, float> GearFactor =
+        AccessTools.Method(typeof(CombatSystem), "GearFactor").CreateDelegate<Func<CharacterCold, StatsEnumerated, float>>();
     private static readonly (int Id, object Stat)[] DisplayedStats = ((Array[])AccessTools.Field(Stats, "StatPanels").GetValue(null)!)
         .SelectMany(panel => panel.Cast<object>()).Distinct().Select(stat => (Convert.ToInt32(stat), stat)).ToArray();
     private sealed record ModifierTarget(CharacterId Id);
@@ -67,7 +76,7 @@ internal static class SkillsLayout
         if (id == "stats") modifierTarget = null;
     }
 
-    private static void CaptureEffectiveValues(CharacterId id, object cold, object? med, object? stats, HudView __result)
+    private static void CaptureEffectiveValues(CharacterId id, CharacterCold cold, object? med, object? stats, HudView __result)
     {
         if (modifierTarget?.Id != id || med is null || stats is null) return;
         var values = new Dictionary<int, float>();
@@ -75,22 +84,40 @@ internal static class SkillsLayout
         foreach (var (statId, stat) in DisplayedStats)
         {
             args[3] = stat;
-            if (SkillTotal.Invoke(SkillTerms.Invoke(null, args), null) is float value && float.IsFinite(value))
+            // Prefer activity-specific calculations where the game supplies an effective level.
+            float? effective = (StatsEnumerated)statId switch
+            {
+                StatsEnumerated.Stealth => MathF.Round(Orders.Stealth(cold) * 100f, 4),
+                StatsEnumerated.Lockpicking => Lockpicking.Skill(cold),
+                StatsEnumerated.Thieving => CrimeSystem.Thievery(cold),
+                StatsEnumerated.Assassination =>
+                    WorkSkill(cold, StatsEnumerated.Assassination) * GearFactor(cold, StatsEnumerated.Assassination),
+                StatsEnumerated.Crossbows or StatsEnumerated.FriendlyFire =>
+                    WorkSkill(cold, (StatsEnumerated)statId) * GearFactor(cold, StatsEnumerated.Crossbows),
+                StatsEnumerated.Labouring or StatsEnumerated.Farming or StatsEnumerated.Cooking or
+                    StatsEnumerated.Engineering or StatsEnumerated.Science or StatsEnumerated.Robotics =>
+                    WorkSkill(cold, (StatsEnumerated)statId),
+                _ => SkillTotal.Invoke(SkillTerms.Invoke(null, args), null) as float?
+            };
+            if (effective is float value && float.IsFinite(value))
                 values[statId] = value;
         }
 
-        // The HUD's melee totals include combat modifiers outside SkillTermsOf.
+        // Where the HUD reports a combat skill level, use its contextual total.
         foreach (var line in __result.Stats)
         {
-            switch (line.Label)
+            var stat = line.Label switch
             {
-                case "Attack:":
-                    values[(int)StatsEnumerated.MeleeAttack] = line.Value;
-                    break;
-                case "Defense:":
-                    values[(int)StatsEnumerated.MeleeDefence] = line.Value;
-                    break;
-            }
+                "Attack:" => StatsEnumerated.MeleeAttack,
+                "Defense:" => StatsEnumerated.MeleeDefence,
+                "Dodge:" => StatsEnumerated.Dodge,
+                "Martial Arts:" => StatsEnumerated.MartialArts,
+                "Crossbows:" => StatsEnumerated.Crossbows,
+                "Precision:" => StatsEnumerated.FriendlyFire,
+                _ => StatsEnumerated.None
+            };
+            if (stat != StatsEnumerated.None && float.IsFinite(line.Value))
+                values[(int)stat] = line.Value;
         }
         EffectiveByHud.AddOrUpdate(__result, values);
     }
