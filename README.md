@@ -69,7 +69,7 @@ Added a search bar for item crafting and research. Item crafting also show icons
 
 ## Compatibility
 
-Compatible with Item Markers. The equipment icon border will follow modified equipment slot sizes.
+Compatible with [Item Markers](https://steamcommunity.com/sharedfiles/filedetails/?id=3834849740). The equipment icon border will follow modified equipment slot sizes.
 
 ## Planned UI improvements
 
