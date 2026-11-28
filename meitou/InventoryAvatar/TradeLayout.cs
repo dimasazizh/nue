@@ -21,15 +21,23 @@ public sealed partial class AvatarMod
     private const string TradeArrangeSize = "NueTradeArrangeSize";
     private static readonly System.Reflection.MethodInfo BindFaithfulScreen =
         AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen");
+    [ThreadStatic] private static bool measuringLinkedStorage;
 
     private static bool IsStockWindow(string id) => id is "trader" or "storage" or "storage-own";
 
     private static void BindTradeChrome(string id, object __instance, UiBindings __result)
     {
+        if (id == "inventory")
+        {
+            if (!measuringLinkedStorage) DockLinkedStorageInventory(__instance, __result);
+            return;
+        }
         if (!IsStockWindow(id) || !__result.Positions.TryGetValue("Root", out var stock) ||
             stock.Width <= 0 || stock.Height <= 0) return;
         var player = RouterPlayer.GetValue(__instance)!;
         var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (id is "storage" or "storage-own")
+            __result.FitWindowToViewport = true;
         if (!screens.IsRegistered("inventory")) return;
         var layout = screens.Layout(id);
         var header = layout.Roots[0].Children.FirstOrDefault(w => w.Skin == "Kenshi_GenericWindowHeaderSkin");
@@ -40,6 +48,15 @@ public sealed partial class AvatarMod
         var inventoryHeader = inventory.Roots[0].Children.FirstOrDefault(w => w.Skin == header.Skin);
         if (inventoryHeader is null || !reference.Positions.TryGetValue("Root", out var inventoryRoot) ||
             inventoryRoot.Width <= 0 || inventoryRoot.Height <= 0) return;
+
+        if (id == "storage" && screens.IsOpen("inventory") && StorageLinked(player))
+        {
+            var (width, height, gap, _, _) = TradeDimensions(player);
+            stock = stock with { Width = Math.Min(stock.Width, LinkedStorageWidth(width, gap, inventoryRoot.Width)) };
+            __result.Positions["Root"] = stock;
+            float top = StorageTradeTop(height, stock, inventoryRoot);
+            __result.WindowPosition = new Vector2(Math.Max(0, width - stock.Width), top) - screens.GetOffset(id);
+        }
 
         var referenceHeader = BoundWithin(reference, inventoryHeader, inventoryRoot);
         if (referenceHeader.Height <= 0 || referenceHeader.Width <= 0) return;
@@ -79,6 +96,38 @@ public sealed partial class AvatarMod
                 { [TradeArrangeSize] = FormattableString.Invariant($"{rect.Width} {rect.Height}") };
         }
     }
+
+    private static void DockLinkedStorageInventory(object router, UiBindings inventory)
+    {
+        if (!inventory.Positions.TryGetValue("Root", out var root)) return;
+        var player = RouterPlayer.GetValue(router)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (!screens.IsOpen("storage") || !StorageLinked(player)) return;
+
+        UiBindings storage;
+        measuringLinkedStorage = true;
+        try
+        {
+            storage = (UiBindings)BindFaithfulScreen.Invoke(router, ["storage"])!;
+        }
+        finally
+        {
+            measuringLinkedStorage = false;
+        }
+        if (!storage.Positions.TryGetValue("Root", out var stock) || stock.Width <= 0 || stock.Height <= 0) return;
+
+        var (width, height, gap, _, _) = TradeDimensions(player);
+        root = root with { Width = Math.Min(root.Width, Math.Max(1, width - stock.Width - gap)) };
+        inventory.Positions["Root"] = root;
+        float x = Math.Max(0, width - stock.Width - gap - root.Width);
+        inventory.WindowPosition = new Vector2(x, StorageTradeTop(height, stock, root)) - screens.GetOffset("inventory");
+    }
+
+    private static float LinkedStorageWidth(float width, float gap, float inventoryWidth) =>
+        Math.Max(1, Math.Min(width - 24, width - gap - Math.Min(inventoryWidth, width / 2)));
+
+    private static float StorageTradeTop(float height, UiRect storage, UiRect inventory) =>
+        Math.Max(0, (height - Math.Max(Math.Min(storage.Height, height - 24), inventory.Height)) / 2);
 
     private static UiRect BoundWithin(UiBindings bindings, MyGuiWidget widget, UiRect parent)
     {
