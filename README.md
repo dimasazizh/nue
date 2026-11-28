@@ -3,7 +3,7 @@ NUE (Native UI Enhancement) is Kenshi UI modification that seeks to improve qual
 
 Unified package: **0.1.15** for **MeitouClient 0.24.0 and later**
 
-[Download Latest Version](https://github.com/dimasazizh/nue/releases/latest/download/asset-name.zip)
+[Download Latest Version](https://github.com/dimasazizh/nue/releases/latest/download/NUE-Unified-0.1.16.zip)
 
 ![Descriptive alt text](images/c.jpg)
 ![Descriptive alt text](images/a(5).jpeg)
