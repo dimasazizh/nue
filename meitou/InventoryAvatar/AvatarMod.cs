@@ -27,7 +27,8 @@ public sealed partial class AvatarMod : IMod
         public readonly Stopwatch Clock = Stopwatch.StartNew();
         public int choice, background, width = 280, height = 540, framedPose = -1;
         public float yaw = .12f, zoom = 1f, framePadding, eyeHeight;
-        public bool expanded, backgroundsOpen, showAccessories;
+        public bool expanded, backgroundsOpen;
+        public bool showAccessories = true;
         public CharacterId subject = CharacterId.None;
         public UiPainter? publishedPainter;
         public CharacterId publishedSubject = CharacterId.None;
@@ -170,7 +171,16 @@ public sealed partial class AvatarMod : IMod
         if (controls.Find(c => c.Name == "NueAccessoriesArea") is not {} strip) return;
         var clip = strip.Bounds.Intersect(strip.Clip ?? strip.Bounds);
         if (clip.Width <= 0 || clip.Height <= 0) return;
-        if (strip.Properties.GetValueOrDefault("NueShowAccessories") != "true")
+        bool showing = strip.Properties.GetValueOrDefault("NueShowAccessories") == "true";
+        if (controls.Find(c => c.Name == "NueToggleAccessoriesArea") is {} toggle)
+        {
+            controls.Add(new("NueToggleAccessories", "Button", toggle.Bounds,
+                InventoryText(showing ? "LIMBS" : "EXTRA SLOTS"), "nue-toggle-accessories", "Kenshi_Button1Skin",
+                true, new Dictionary<string, string> { ["TextAlign"] = "Center VCenter",
+                    ["FontName"] = "Kenshi_StandardFont_Small" }, default,
+                Pickable: true, Clip: toggle.Clip ?? toggle.Bounds));
+        }
+        if (!showing)
         {
             controls.RemoveAll(c => Accessories.Any(slot => slot.Section == c.Name));
             return;
@@ -190,7 +200,7 @@ public sealed partial class AvatarMod : IMod
             {
                 ["TileSize"] = FormattableString.Invariant($"{cell} {cell}")
             };
-            controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties };
+            controls[index] = tile with { Bounds = bounds, Clip = clip, Properties = properties, Skin = "Kenshi_InventorySlotSkin" };
             controls.Add(new(slot.Section + "-label", "TextBox",
                 new(clip.X, y, clip.Width, labelHeight), InventoryText(slot.Label),
                 "", "Kenshi_TextboxPaintedText", true,
@@ -338,8 +348,6 @@ public sealed partial class AvatarMod : IMod
         b.Properties["NuePocketArea"] = new Dictionary<string, string> { ["NueBagScreen"] = id == "loot" ? "loot-bag" : "bag" };
         b.Properties["NueAccessoriesArea"] = new Dictionary<string, string>
             { ["NueShowAccessories"] = active.showAccessories ? "true" : "false" };
-        b.Actions["NueToggleAccessories"] = "nue-toggle-accessories";
-        b.Text["NueToggleAccessories"] = InventoryText(active.showAccessories ? "LIMBS" : "EXTRA SLOTS");
         if (active.showAccessories)
         {
             foreach (string limb in LimbSections) b.Hidden.Add(limb);
