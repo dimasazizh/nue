@@ -2,8 +2,8 @@
   "id": "nue.unified",
   "version": "0.1.8",
   "apiVersion": 2,
-  "gameVersion": "0.24.0",
-  "loadAfter": ["ItemMarkers", "timelight-map"],
+  "gameVersion": ">=0.24.0",
+  "loadAfter": ["ItemMarkers", "timelight-map", "Brutality"],
   "assemblies": ["Nue.Unified.dll"],
   "entry": "Nue.Unified.UnifiedMod"
 }

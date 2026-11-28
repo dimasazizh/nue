@@ -111,6 +111,8 @@ public sealed partial class AvatarMod : IMod
             prefix: new HarmonyMethod(typeof(AvatarMod), nameof(SelectLayout)),
             postfix: new HarmonyMethod(typeof(AvatarMod), nameof(BindTradeChrome)));
         After(GameType("Ui.ScreenRouter"), "AddFaithfulContent", nameof(FitTradeArrangeButton));
+        After(typeof(MyGuiScreenHost), "PlaceRoots", nameof(PlaceVendorViewport));
+        After(GameType("Ui.TradeWindows"), "ArrangeTraderWindow", nameof(PlaceVendorMoneyBox));
         After(GameType("Ui.InventoryWindows"), "SectionsOf", nameof(IncludeLimbTargets));
         After(GameType("Ui.InventoryWindows"), "BagWanted", nameof(DefaultBag));
         After(Layout, "ArrangeEquipmentGrid", nameof(FitPocketGrid));

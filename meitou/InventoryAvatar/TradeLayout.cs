@@ -1,6 +1,7 @@
 using Meitou.Game.Ui;
 using HarmonyLib;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Meitou.Data.Ui;
 using Meitou.Simulation;
 using Meitou.Simulation.Items;
@@ -19,6 +20,8 @@ public sealed partial class AvatarMod
         AccessTools.Method(GameType("PlayerInterface"), "Selected");
     private const string StockScroll = "scrollview_backpack_content";
     private const string TradeArrangeSize = "NueTradeArrangeSize";
+    private sealed record VendorViewport(float HeaderHeight);
+    private static readonly ConditionalWeakTable<UiBindings, VendorViewport> VendorViewports = new();
     private static readonly System.Reflection.MethodInfo BindFaithfulScreen =
         AccessTools.Method(GameType("Ui.ScreenRouter"), "BindFaithfulScreen");
     [ThreadStatic] private static bool measuringLinkedStorage;
@@ -66,9 +69,8 @@ public sealed partial class AvatarMod
         var body = layout.Roots[0].Children.FirstOrDefault(w => w.Skin == "Kenshi_GenericWindowSkin");
         if (body is not null && !(id == "trader" && body.Name == "Content"))
             __result.RelativePositions[body] = new(0, titleHeight, 1, Math.Max(0, 1 - titleHeight));
-        if (id == "trader" && screens.IsOpen("inventory") &&
-            layout.Find("Content") is {} content && layout.Find(StockScroll) is {} view)
-            FitVendorContent(__result, content, view, stock.Width, stock.Height, referenceHeader.Height);
+        if (VendorViewports.TryGetValue(__result, out _))
+            VendorViewports.AddOrUpdate(__result, new(referenceHeader.Height));
 
         float captionRight = 1;
         foreach (var button in header.Children.Where(w => w.Type == "Button"))
@@ -159,6 +161,16 @@ public sealed partial class AvatarMod
             Y = button.Bounds.Y + button.Bounds.Height - dimensions[1],
             Width = width, Height = dimensions[1]
         };
+        if (id == "trader" && controls.Find(c => c.Name == StockScroll) is {} stock)
+        {
+            float footerTop = stock.Bounds.Y + stock.Bounds.Height;
+            float footerHeight = window.Bounds.Y + window.Bounds.Height - footerTop;
+            bounds = bounds with
+            {
+                X = stock.Bounds.X + (stock.Bounds.Width - width) / 2,
+                Y = footerTop + Math.Max(0, (footerHeight - bounds.Height) / 2)
+            };
+        }
         controls[index] = button with { Bounds = bounds, Clip = bounds.Intersect(window.Bounds) };
     }
     private static bool StorageLinked(object player) =>
@@ -237,31 +249,48 @@ public sealed partial class AvatarMod
 
         bindings.Positions["Root"] = native with { Width = vendorWidth, Height = playerHeight };
         bindings.WindowPosition = new Vector2(start + playerWidth + gap, top) - screens.GetOffset(id);
+        VendorViewports.AddOrUpdate(bindings, new(38 * bindings.TemplateScale));
         return true;
     }
 
-    private static void FitVendorContent(UiBindings bindings, MyGuiWidget content, MyGuiWidget view,
-        float vendorWidth, float playerHeight, float header)
+    private static void PlaceVendorViewport(UiBindings b)
     {
-        float scale = bindings.TemplateScale;
-        float bodyHeight = playerHeight - header;
-        if (bodyHeight <= 0) return;
-        float inset = Math.Min(10 * scale, vendorWidth * .05f);
+        if (!VendorViewports.TryGetValue(b, out var metrics) || !b.Positions.TryGetValue("Root", out var root)) return;
+        float scale = b.TemplateScale;
+        float bodyHeight = root.Height - metrics.HeaderHeight;
+        if (bodyHeight <= 0 || root.Width <= 0) return;
+        float inset = Math.Min(10 * scale, root.Width * .05f);
         float moneyHeight = Math.Min(28 * scale, bodyHeight * .12f);
         float footer = Math.Min(56 * scale, bodyHeight * .20f);
         float viewTop = moneyHeight + 2 * inset;
-        bindings.RelativePositions[content] = new(0, header / playerHeight, 1, bodyHeight / playerHeight);
-        bindings.RelativePositions[view] = new(inset / vendorWidth, viewTop / bodyHeight,
-            1 - 2 * inset / vendorWidth, Math.Max(1, bodyHeight - viewTop - footer) / bodyHeight);
-        if (content.Children.FirstOrDefault(widget => widget.Children.Any(child => child.Name == "datapanel")) is {} moneyBox &&
-            moneyBox.Children.FirstOrDefault(child => child.Name == "datapanel") is {} money)
+        // Named, absolute positions take precedence over the template's own client geometry.
+        var content = new UiRect(root.X, root.Y + metrics.HeaderHeight, root.Width, bodyHeight);
+        b.Positions["Content"] = content;
+        b.Positions[StockScroll] = new(content.X + inset, content.Y + viewTop, content.Width - 2 * inset,
+            Math.Max(1, content.Height - viewTop - footer));
+    }
+
+    private static void PlaceVendorMoneyBox(object __instance, List<UiControl> controls)
+    {
+        var player = TradePlayer.GetValue(__instance)!;
+        var screens = (MyGuiScreenHost)Screens.GetValue(player)!;
+        if (!screens.IsOpen("inventory") ||
+            controls.Find(c => c.Name == "Content") is not {} content ||
+            controls.Find(c => c.Name == StockScroll) is not {} view ||
+            screens.Layout("trader").Find("Content") is not {} template ||
+            template.Children.FirstOrDefault(w => w.Children.Any(child => child.Name == "datapanel")) is not {} box) return;
+
+        float inset = view.Bounds.X - content.Bounds.X;
+        float top = content.Bounds.Y + inset;
+        float height = view.Bounds.Y - top - inset;
+        if (height <= 0 || inset < 0) return;
+        var area = new UiRect(view.Bounds.X, top, view.Bounds.Width * .40f, height);
+        for (int i = 0; i < controls.Count; i++)
         {
-            bindings.RelativePositions[moneyBox] = new(inset / vendorWidth, inset / bodyHeight,
-                .40f, moneyHeight / bodyHeight);
-            bindings.RelativePositions[money] = new(0, 0, 1, 1);
+            var control = controls[i];
+            if (control.Name == box.Name && control.Skin == box.Skin || control.Name == "datapanel")
+                controls[i] = control with { Bounds = area, Clip = area };
         }
-        if (content.Children.FirstOrDefault(widget => widget.Name == "ArrangeButton") is {} arrange)
-            bindings.RelativePositions[arrange] = new(.38f, 1 - .75f * footer / bodyHeight, .24f, .5f * footer / bodyHeight);
     }
 
     private static float TradeStart(float width, float playerWidth, float gap, float stockWidth) =>
